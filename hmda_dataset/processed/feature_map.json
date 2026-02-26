@@ -1,0 +1,17 @@
+[
+  "loan_amount",
+  "income",
+  "interest_rate",
+  "loan_term",
+  "dti_numeric",
+  "loan_type_2",
+  "loan_type_3",
+  "loan_type_4",
+  "loan_purpose_2",
+  "loan_purpose_31",
+  "loan_purpose_32",
+  "loan_purpose_4",
+  "loan_purpose_5",
+  "occupancy_type_2",
+  "occupancy_type_3"
+]

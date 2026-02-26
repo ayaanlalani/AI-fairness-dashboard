@@ -1,0 +1,17 @@
+{
+  "race": {
+    "DisparateImpact": 0.8956,
+    "TheilIndex": 0.4838,
+    "BiasFlag": false
+  },
+  "sex": {
+    "DisparateImpact": 0.9291,
+    "TheilIndex": 0.4838,
+    "BiasFlag": false
+  },
+  "age_group": {
+    "DisparateImpact": 1.0138,
+    "TheilIndex": 0.4838,
+    "BiasFlag": false
+  }
+}

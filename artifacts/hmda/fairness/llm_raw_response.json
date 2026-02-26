@@ -1,0 +1,72 @@
+{
+  "result": {
+    "metrics": [
+      {
+        "attribute": "race",
+        "privileged_value": "White",
+        "disparate_impact": 0.3258,
+        "demographic_parity_diff": -0.5173,
+        "equal_opportunity_diff": -0.0375,
+        "average_odds_diff": -0.0128,
+        "theil_index": 0.3193,
+        "bias_flag": true
+      },
+      {
+        "attribute": "sex",
+        "privileged_value": "Male",
+        "disparate_impact": 0.9532,
+        "demographic_parity_diff": -0.0357,
+        "equal_opportunity_diff": -0.0195,
+        "average_odds_diff": -0.0121,
+        "theil_index": 0.3193,
+        "bias_flag": false
+      },
+      {
+        "attribute": "age_group",
+        "privileged_value": "mid",
+        "disparate_impact": 0.9254,
+        "demographic_parity_diff": -0.0559,
+        "equal_opportunity_diff": -0.0463,
+        "average_odds_diff": -0.0218,
+        "theil_index": 0.3193,
+        "bias_flag": false
+      }
+    ],
+    "qualitative": [
+      {
+        "attribute": "race",
+        "severity": "CRITICAL",
+        "what_is_wrong": "For the 'race' attribute, significant disparities are observed. The unprivileged group ('American Indian') has a selection rate that is 0.33 times that of the privileged group ('White'), indicating a negative disparate impact. The demographic parity difference of -0.5173 further confirms that the unprivileged group is less likely to receive the favorable outcome. Moreover, the equal opportunity difference of -0.0375 implies that the model performs worse for the unprivileged group when they are truly positive (lower True Positive Rate). The average odds difference of -0.0128 suggests overall performance disparities across both false positive and true positive rates. ",
+        "why_is_wrong": "Potential root causes for these disparities include: 1) Data Imbalance: The training data might have fewer samples for unprivileged groups, leading to poorer model learning. 2) Historical Bias: The labels or features in the training data could reflect historical biases against certain groups in mortgage lending decisions. 3) Proxy Features: Features highly correlated with protected attributes (e.g., zip code correlating with race) might act as proxies, inadvertently introducing bias. 4) Algorithmic Bias: The model itself might learn to associate protected attributes with outcomes, even if not explicitly trained to do so.",
+        "how_to_fix": "To mitigate these biases using Fairlearn, several strategies can be applied: 1) Pre-processing: Techniques like re-sampling (e.g., fairlearn.reductions.exponentiated_gradient on re-weighted data) or data augmentation could balance representation or feature distributions. 2) In-processing: Integrate fairness constraints during model training. `fairlearn.reductions.ExponentiatedGradient` or `fairlearn.reductions.GridSearch` can be used with fairness constraints such as `DemographicParity` or `EqualizedOdds` to train a new model that explicitly aims for fairness. 3) Post-processing: Adjust the model's predictions after training. `fairlearn.postprocessing.ThresholdOptimizer` can be particularly effective for binary classification to optimize thresholds for different groups to satisfy fairness metrics like Equal Opportunity."
+      },
+      {
+        "attribute": "sex",
+        "severity": "LOW",
+        "what_is_wrong": "For the 'sex' attribute, significant disparities are observed. The unprivileged group ('Female') has a selection rate that is 0.95 times that of the privileged group ('Male'), indicating a negative disparate impact. The demographic parity difference of -0.0357 further confirms that the unprivileged group is less likely to receive the favorable outcome. Moreover, the equal opportunity difference of -0.0195 implies that the model performs worse for the unprivileged group when they are truly positive (lower True Positive Rate). The average odds difference of -0.0121 suggests overall performance disparities across both false positive and true positive rates. ",
+        "why_is_wrong": "Potential root causes for these disparities include: 1) Data Imbalance: The training data might have fewer samples for unprivileged groups, leading to poorer model learning. 2) Historical Bias: The labels or features in the training data could reflect historical biases against certain groups in mortgage lending decisions. 3) Proxy Features: Features highly correlated with protected attributes (e.g., zip code correlating with race) might act as proxies, inadvertently introducing bias. 4) Algorithmic Bias: The model itself might learn to associate protected attributes with outcomes, even if not explicitly trained to do so.",
+        "how_to_fix": "To mitigate these biases using Fairlearn, several strategies can be applied: 1) Pre-processing: Techniques like re-sampling (e.g., fairlearn.reductions.exponentiated_gradient on re-weighted data) or data augmentation could balance representation or feature distributions. 2) In-processing: Integrate fairness constraints during model training. `fairlearn.reductions.ExponentiatedGradient` or `fairlearn.reductions.GridSearch` can be used with fairness constraints such as `DemographicParity` or `EqualizedOdds` to train a new model that explicitly aims for fairness. 3) Post-processing: Adjust the model's predictions after training. `fairlearn.postprocessing.ThresholdOptimizer` can be particularly effective for binary classification to optimize thresholds for different groups to satisfy fairness metrics like Equal Opportunity."
+      },
+      {
+        "attribute": "age_group",
+        "severity": "LOW",
+        "what_is_wrong": "For the 'age_group' attribute, significant disparities are observed. The unprivileged group ('young') has a selection rate that is 0.93 times that of the privileged group ('mid'), indicating a negative disparate impact. The demographic parity difference of -0.0559 further confirms that the unprivileged group is less likely to receive the favorable outcome. Moreover, the equal opportunity difference of -0.0463 implies that the model performs worse for the unprivileged group when they are truly positive (lower True Positive Rate). The average odds difference of -0.0218 suggests overall performance disparities across both false positive and true positive rates. ",
+        "why_is_wrong": "Potential root causes for these disparities include: 1) Data Imbalance: The training data might have fewer samples for unprivileged groups, leading to poorer model learning. 2) Historical Bias: The labels or features in the training data could reflect historical biases against certain groups in mortgage lending decisions. 3) Proxy Features: Features highly correlated with protected attributes (e.g., zip code correlating with race) might act as proxies, inadvertently introducing bias. 4) Algorithmic Bias: The model itself might learn to associate protected attributes with outcomes, even if not explicitly trained to do so.",
+        "how_to_fix": "To mitigate these biases using Fairlearn, several strategies can be applied: 1) Pre-processing: Techniques like re-sampling (e.g., fairlearn.reductions.exponentiated_gradient on re-weighted data) or data augmentation could balance representation or feature distributions. 2) In-processing: Integrate fairness constraints during model training. `fairlearn.reductions.ExponentiatedGradient` or `fairlearn.reductions.GridSearch` can be used with fairness constraints such as `DemographicParity` or `EqualizedOdds` to train a new model that explicitly aims for fairness. 3) Post-processing: Adjust the model's predictions after training. `fairlearn.postprocessing.ThresholdOptimizer` can be particularly effective for binary classification to optimize thresholds for different groups to satisfy fairness metrics like Equal Opportunity."
+      }
+    ]
+  },
+  "usage": {
+    "model": "gemini-2.5-flash",
+    "attempts": 1,
+    "wall_clock_s": 121.63,
+    "input_tokens": 22910,
+    "output_tokens": 1826,
+    "total_tokens": 24736,
+    "input_cost_usd": 0.002291,
+    "output_cost_usd": 0.00073,
+    "total_cost_usd": 0.003021,
+    "price_input_per_m": 0.1,
+    "price_output_per_m": 0.4
+  }
+}

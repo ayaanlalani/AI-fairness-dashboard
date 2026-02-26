@@ -1,0 +1,278 @@
+    You are an AI fairness auditor. You are given a CSV of model predictions with
+    ground-truth labels and protected attributes. Your job is to independently
+    analyse this data for bias using **only fairlearn** as your reference
+    framework for metric definitions and mitigation strategies.
+
+    ## Dataset
+    Name: German Credit
+    Target column: `actual` (ground truth)
+    Prediction column: `predicted` (model output)
+    Favorable label: 1
+
+    Protected attributes and their privileged values:
+      - `Sex_original` (privileged value: `male`)
+  - `AgeGroup_original` (privileged value: `40_plus`)
+  - `foreign_worker_original` (privileged value: `0`)
+
+    ## Raw prediction data (CSV)
+    ```
+    actual,predicted,Sex_original,AgeGroup_original,foreign_worker_original
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,2,male,40_plus,1
+1,2,male,under_40,1
+2,1,male,under_40,1
+1,1,male,under_40,1
+1,1,female,under_40,1
+1,1,female,under_40,1
+1,1,male,under_40,1
+1,1,female,40_plus,1
+1,1,male,under_40,1
+2,1,male,40_plus,1
+1,1,male,40_plus,1
+2,1,female,under_40,1
+2,2,female,under_40,1
+1,1,male,40_plus,1
+1,1,male,40_plus,1
+1,1,female,40_plus,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+2,1,male,40_plus,1
+2,2,female,under_40,1
+1,1,female,40_plus,1
+1,1,female,40_plus,1
+1,1,male,under_40,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,2,male,under_40,1
+1,1,male,under_40,1
+1,2,male,40_plus,1
+1,1,male,under_40,1
+2,2,female,under_40,1
+1,1,male,40_plus,1
+1,2,male,40_plus,1
+2,1,female,under_40,1
+2,2,male,under_40,1
+1,1,female,40_plus,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+2,2,female,under_40,1
+2,2,female,under_40,1
+1,1,male,40_plus,1
+2,1,male,under_40,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+2,2,female,under_40,1
+2,2,female,under_40,1
+2,1,male,40_plus,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,1,male,40_plus,1
+2,1,male,under_40,1
+2,1,female,under_40,1
+2,2,male,under_40,1
+1,2,male,under_40,1
+2,2,male,under_40,1
+2,1,female,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,female,under_40,1
+2,2,female,under_40,0
+1,2,female,under_40,1
+2,1,male,under_40,1
+1,1,female,40_plus,1
+1,1,male,under_40,1
+1,2,male,under_40,1
+2,1,female,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,1,male,under_40,1
+2,1,male,under_40,1
+1,1,male,under_40,1
+2,2,male,under_40,1
+1,1,male,under_40,1
+2,1,male,40_plus,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,male,under_40,1
+1,1,female,under_40,1
+1,1,female,40_plus,1
+2,2,female,under_40,1
+1,1,male,40_plus,1
+2,1,male,40_plus,1
+2,2,female,under_40,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+2,1,female,under_40,1
+1,1,male,40_plus,1
+2,2,male,under_40,1
+2,1,male,under_40,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,female,40_plus,1
+1,1,male,40_plus,1
+1,1,male,40_plus,1
+1,1,female,40_plus,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,1,male,under_40,1
+2,1,male,40_plus,1
+2,1,male,40_plus,1
+1,2,female,under_40,1
+1,1,female,40_plus,1
+1,1,male,under_40,1
+2,2,male,under_40,1
+2,2,male,under_40,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,female,40_plus,1
+1,1,male,40_plus,1
+2,1,female,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,0
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,2,female,under_40,1
+2,1,male,under_40,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+1,2,male,under_40,1
+1,2,female,under_40,1
+2,1,male,40_plus,1
+2,2,female,under_40,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+2,2,female,under_40,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+1,2,female,under_40,1
+2,2,male,under_40,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+2,1,male,40_plus,1
+1,1,male,under_40,0
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,0
+1,1,female,under_40,1
+1,1,male,under_40,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+1,1,female,40_plus,1
+2,2,male,40_plus,1
+2,2,female,under_40,1
+1,1,female,under_40,1
+2,2,male,under_40,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+1,1,male,under_40,1
+1,1,female,under_40,1
+2,2,male,under_40,1
+2,1,male,40_plus,1
+1,1,male,40_plus,0
+2,1,male,under_40,1
+1,1,male,under_40,1
+1,1,female,under_40,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,2,male,40_plus,1
+1,2,male,40_plus,1
+1,1,female,under_40,1
+1,1,female,40_plus,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+1,1,male,under_40,1
+2,2,male,40_plus,1
+2,2,male,under_40,1
+1,1,female,40_plus,1
+1,1,male,40_plus,1
+1,1,male,40_plus,1
+1,1,female,under_40,1
+2,2,male,under_40,1
+1,1,male,40_plus,0
+1,1,male,under_40,1
+1,1,female,40_plus,1
+2,2,male,40_plus,1
+1,1,male,40_plus,1
+1,1,male,under_40,1
+2,1,male,under_40,1
+1,1,male,under_40,1
+
+    ```
+
+    ## Your task
+
+    For EACH protected attribute listed above, compute the following fairlearn
+    metrics (compare unprivileged group(s) vs the privileged group):
+
+    1. **Disparate Impact (DI)** = selection_rate(unprivileged) / selection_rate(privileged)
+       Equivalent to fairlearn.metrics.selection_rate ratio.
+       For multi-group attributes, use the group with the LOWEST selection rate as the unprivileged group.
+    2. **Demographic Parity Difference (DPD)** = selection_rate(unprivileged) - selection_rate(privileged)
+       Equivalent to fairlearn.metrics.demographic_parity_difference.
+    3. **Equal Opportunity Difference (EOD)** = TPR(unprivileged) - TPR(privileged)
+       Equivalent to fairlearn.metrics.equalized_odds_difference restricted to the positive class.
+    4. **Average Odds Difference (AOD)** = 0.5 * ((FPR_unpriv - FPR_priv) + (TPR_unpriv - TPR_priv))
+       Equivalent to the average of TPR and FPR gaps from fairlearn.metrics.equalized_odds_difference.
+    5. **Theil Index** = (1/N) * sum( (y_pred_i / mean(y_pred)) * ln(y_pred_i / mean(y_pred)) )
+       where y_pred are the binary predictions. If mean is 0 or all predictions
+       are the same, report 0.
+
+    Then produce a qualitative fairness analysis covering:
+    - **What is wrong**: describe the disparities you found in the data
+    - **Why it is wrong**: root causes (data imbalance, historical bias, proxy features, etc.)
+    - **How to fix it**: specific mitigation strategies referencing **fairlearn** algorithms
+      (e.g. fairlearn.reductions.ExponentiatedGradient, fairlearn.postprocessing.ThresholdOptimizer,
+       fairlearn.reductions.GridSearch, etc.)
+    - **Severity**: classify each attribute as CRITICAL (DI < 0.72), HIGH (0.72 <= DI < 0.80),
+      MODERATE (0.80 <= DI < 0.95), or LOW (DI >= 0.95)
+
+    ## Required output format
+
+    Return ONLY valid JSON (no markdown fences, no commentary outside the JSON) with this structure:
+    {
+      "metrics": [
+        {
+          "attribute": "<attr name>",
+          "privileged_value": "<value>",
+          "disparate_impact": <float>,
+          "demographic_parity_diff": <float>,
+          "equal_opportunity_diff": <float>,
+          "average_odds_diff": <float>,
+          "theil_index": <float>,
+          "bias_flag": <bool>
+        }
+      ],
+      "qualitative": [
+        {
+          "attribute": "<attr name>",
+          "severity": "<CRITICAL|HIGH|MODERATE|LOW>",
+          "what_is_wrong": "<paragraph>",
+          "why_is_wrong": "<paragraph>",
+          "how_to_fix": "<paragraph>"
+        }
+      ]
+    }
+
+    bias_flag should be true if DI < 0.8, false otherwise.
+    Round all floats to 4 decimal places.

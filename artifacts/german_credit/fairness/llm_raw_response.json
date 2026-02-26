@@ -1,0 +1,72 @@
+{
+  "result": {
+    "metrics": [
+      {
+        "attribute": "Sex_original",
+        "privileged_value": "male",
+        "disparate_impact": 0.8752,
+        "demographic_parity_diff": -0.0988,
+        "equal_opportunity_diff": -0.0658,
+        "average_odds_diff": -0.0381,
+        "theil_index": 0.0543,
+        "bias_flag": false
+      },
+      {
+        "attribute": "AgeGroup_original",
+        "privileged_value": "40_plus",
+        "disparate_impact": 0.8848,
+        "demographic_parity_diff": -0.095,
+        "equal_opportunity_diff": -0.0811,
+        "average_odds_diff": -0.0245,
+        "theil_index": 0.0543,
+        "bias_flag": false
+      },
+      {
+        "attribute": "foreign_worker_original",
+        "privileged_value": "0",
+        "disparate_impact": 0.9755,
+        "demographic_parity_diff": -0.0195,
+        "equal_opportunity_diff": -0.0336,
+        "average_odds_diff": -0.0175,
+        "theil_index": 0.0543,
+        "bias_flag": false
+      }
+    ],
+    "qualitative": [
+      {
+        "attribute": "Sex_original",
+        "severity": "MODERATE",
+        "what_is_wrong": "For the 'Sex_original' attribute, the unprivileged group ('female') experiences a lower selection rate compared to the privileged group ('male'). This disparity is reflected by a Disparate Impact of 0.8752 and a Demographic Parity Difference of -0.0988. Furthermore, the model exhibits a lower True Positive Rate (TPR) for the unprivileged group (Equal Opportunity Difference: -0.0658), meaning individuals in the unprivileged group who are actually favorable are less likely to be correctly identified as such. The Average Odds Difference of -0.0381 suggests broader disparities in overall error rates (false positives and false negatives) across the groups, indicating that the model's performance is not consistently fair across all sensitive groups.",
+        "why_is_wrong": "Potential root causes for such bias often include historical biases embedded in the training data, where past decisions might have disproportionately favored the privileged group, leading the model to learn and perpetuate these patterns. Proxy features highly correlated with the protected attribute could also inadvertently lead to discriminatory outcomes. Additionally, data imbalance, where certain groups are underrepresented or exhibit different underlying distributions, can exacerbate these issues, making it harder for the model to learn fair representations.",
+        "how_to_fix": "To mitigate the observed bias for the 'Sex_original' attribute, various fairlearn strategies can be employed. For post-processing, `fairlearn.postprocessing.ThresholdOptimizer` can be used to adjust the decision threshold for each group, aiming to satisfy fairness constraints like Demographic Parity or Equalized Odds without retraining the original model. For in-processing mitigation, `fairlearn.reductions.ExponentiatedGradient` or `fairlearn.reductions.GridSearch` can be integrated into the model training pipeline. These methods allow a standard estimator to be optimized for both accuracy and fairness (e.g., 'demographic_parity' or 'equalized_odds') by learning a reweighing of the training samples or by generating a sequence of reweighted models. Data preprocessing techniques like `fairlearn.reductions.Reweighing` could also be applied to adjust sample weights based on group membership and label before training, to achieve specific fairness criteria."
+      },
+      {
+        "attribute": "AgeGroup_original",
+        "severity": "MODERATE",
+        "what_is_wrong": "For the 'AgeGroup_original' attribute, the unprivileged group ('under_40') experiences a lower selection rate compared to the privileged group ('40_plus'). This disparity is reflected by a Disparate Impact of 0.8848 and a Demographic Parity Difference of -0.0950. Furthermore, the model exhibits a lower True Positive Rate (TPR) for the unprivileged group (Equal Opportunity Difference: -0.0811), meaning individuals in the unprivileged group who are actually favorable are less likely to be correctly identified as such. The Average Odds Difference of -0.0245 suggests broader disparities in overall error rates (false positives and false negatives) across the groups, indicating that the model's performance is not consistently fair across all sensitive groups.",
+        "why_is_wrong": "Potential root causes for such bias often include historical biases embedded in the training data, where past decisions might have disproportionately favored the privileged group, leading the model to learn and perpetuate these patterns. Proxy features highly correlated with the protected attribute could also inadvertently lead to discriminatory outcomes. Additionally, data imbalance, where certain groups are underrepresented or exhibit different underlying distributions, can exacerbate these issues, making it harder for the model to learn fair representations.",
+        "how_to_fix": "To mitigate the observed bias for the 'AgeGroup_original' attribute, various fairlearn strategies can be employed. For post-processing, `fairlearn.postprocessing.ThresholdOptimizer` can be used to adjust the decision threshold for each group, aiming to satisfy fairness constraints like Demographic Parity or Equalized Odds without retraining the original model. For in-processing mitigation, `fairlearn.reductions.ExponentiatedGradient` or `fairlearn.reductions.GridSearch` can be integrated into the model training pipeline. These methods allow a standard estimator to be optimized for both accuracy and fairness (e.g., 'demographic_parity' or 'equalized_odds') by learning a reweighing of the training samples or by generating a sequence of reweighted models. Data preprocessing techniques like `fairlearn.reductions.Reweighing` could also be applied to adjust sample weights based on group membership and label before training, to achieve specific fairness criteria."
+      },
+      {
+        "attribute": "foreign_worker_original",
+        "severity": "LOW",
+        "what_is_wrong": "For the 'foreign_worker_original' attribute, the unprivileged group ('1') experiences a lower selection rate compared to the privileged group ('0'). This disparity is reflected by a Disparate Impact of 0.9755 and a Demographic Parity Difference of -0.0195. Furthermore, the model exhibits a lower True Positive Rate (TPR) for the unprivileged group (Equal Opportunity Difference: -0.0336), meaning individuals in the unprivileged group who are actually favorable are less likely to be correctly identified as such. The Average Odds Difference of -0.0175 suggests broader disparities in overall error rates (false positives and false negatives) across the groups, indicating that the model's performance is not consistently fair across all sensitive groups.",
+        "why_is_wrong": "Potential root causes for such bias often include historical biases embedded in the training data, where past decisions might have disproportionately favored the privileged group, leading the model to learn and perpetuate these patterns. Proxy features highly correlated with the protected attribute could also inadvertently lead to discriminatory outcomes. Additionally, data imbalance, where certain groups are underrepresented or exhibit different underlying distributions, can exacerbate these issues, making it harder for the model to learn fair representations.",
+        "how_to_fix": "To mitigate the observed bias for the 'foreign_worker_original' attribute, various fairlearn strategies can be employed. For post-processing, `fairlearn.postprocessing.ThresholdOptimizer` can be used to adjust the decision threshold for each group, aiming to satisfy fairness constraints like Demographic Parity or Equalized Odds without retraining the original model. For in-processing mitigation, `fairlearn.reductions.ExponentiatedGradient` or `fairlearn.reductions.GridSearch` can be integrated into the model training pipeline. These methods allow a standard estimator to be optimized for both accuracy and fairness (e.g., 'demographic_parity' or 'equalized_odds') by learning a reweighing of the training samples or by generating a sequence of reweighted models. Data preprocessing techniques like `fairlearn.reductions.Reweighing` could also be applied to adjust sample weights based on group membership and label before training, to achieve specific fairness criteria."
+      }
+    ]
+  },
+  "usage": {
+    "model": "gemini-2.5-flash",
+    "attempts": 1,
+    "wall_clock_s": 75.57,
+    "input_tokens": 3539,
+    "output_tokens": 1904,
+    "total_tokens": 5443,
+    "input_cost_usd": 0.000354,
+    "output_cost_usd": 0.000762,
+    "total_cost_usd": 0.001116,
+    "price_input_per_m": 0.1,
+    "price_output_per_m": 0.4
+  }
+}
