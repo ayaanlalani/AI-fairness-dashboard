@@ -46,15 +46,17 @@
 \begin{abstract}
 Algorithmic decision-making in lending carries significant fairness risks:
 models trained on historical data can perpetuate and amplify biases along
-demographic lines. This report presents an end-to-end AI fairness auditing
-pipeline applied to two lending datasets: the UCI German Credit dataset and
-the U.S.\ Home Mortgage Disclosure Act (HMDA) dataset for Georgia. We
-compute five standard fairness metrics using AIF360, perform deterministic
-qualitative root-cause analysis, and benchmark our findings against an
-independent Gemini LLM auditor constrained to fairlearn definitions.
-Results show moderate bias across most protected attributes, with the
-deterministic pipeline and LLM largely agreeing on severity while
-diverging on metric computation for small subgroups.
+demographic lines. A major goal of this project is to define a
+\textbf{reference audit specification}: the set of analysis metrics and
+response elements (root causes, severity, concrete recommendations) that
+an audit must provide to support remediation. We implement an end-to-end
+fairness pipeline applied to two lending datasets (UCI German Credit,
+HMDA Georgia), compute five AIF360-based metrics, perform deterministic
+qualitative root-cause analysis, and benchmark against an independent
+Gemini LLM auditor. Results show moderate bias across most protected
+attributes, with pipeline and LLM largely agreeing on severity while
+diverging on small subgroups. We plan to benchmark against additional LLMs
+to position our approach in the broader landscape.
 \end{abstract}
 
 % ===================================================================
@@ -75,25 +77,34 @@ analysis, and independent validation.
 \paragraph{Interim problem statement.}
 We focus on evaluating biases in datasets and, over time, in the data used
 by AI models, in order to provide recommendations on how to fix those
-biases so that future systems do not exhibit them. We address: (1) how to
-assess bias in a reproducible way across multiple fairness dimensions and
-protected attributes; (2) how to move from raw metrics to interpretable
-root causes and concrete mitigation recommendations; and (3) how
-rule-based evaluation compares to LLM-based evaluation on the same data.
-Lending is our current application domain; the framing aims to be applicable to any
-domain where biased data or models lead to unfair outcomes (e.g., lending, hiring, etc.) eventually.
+biases so that future systems do not exhibit them. Lending is our current
+application domain; the framing aims to be applicable to any domain where
+biased data or models lead to unfair outcomes (e.g., lending, hiring)
+eventually.
+
+\paragraph{Major goals.}
+Two goals drive this work. First, we aim to define a \textbf{reference
+audit specification}: the set of analysis metrics and response elements
+(root causes, severity, concrete mitigation recommendations) that a
+fairness audit must provide so that remediations can be carried out. This
+specification answers: what to measure, how to interpret it, and what to
+recommend. Second, we aim to \textbf{benchmark against multiple LLMs} (we
+start with Gemini and plan to add others) so that we can see where our
+deterministic pipeline stands in the general scheme of things and when to
+prefer or combine rule-based vs.\ LLM-based analysis.
 
 This project makes three contributions:
 \begin{enumerate}[nosep]
   \item A \textbf{reproducible fairness pipeline} that preprocesses data,
         trains classifiers, computes five AIF360-based metrics, and generates
-        structured reports for each protected attribute.
+        structured reports aligned with the reference audit specification.
   \item A \textbf{deterministic qualitative analysis engine} that diagnoses
         data imbalance, detects proxy features, maps root causes, and
         recommends specific mitigations.
-  \item A \textbf{Gemini LLM benchmark} that independently audits the same
-        prediction data using fairlearn definitions, enabling side-by-side
-        comparison of a rule-based vs.\ LLM-based fairness auditor.
+  \item An \textbf{LLM benchmark} (Gemini initially; more LLMs planned) that
+        independently audits the same prediction data using fairlearn
+        definitions, enabling side-by-side comparison and positioning of our
+        approach relative to LLM-based auditors.
 \end{enumerate}
 
 % ===================================================================
@@ -204,6 +215,22 @@ that executes six sequential steps per dataset:
 A consolidation step then merges per-dataset results into cross-dataset
 reports and comparison visualizations. The pipeline supports selective
 execution (e.g., rerunning only the LLM benchmark step).
+
+\subsection{Reference Audit Specification}
+
+To support remediation, we define a \textbf{reference audit specification}:
+the minimum set of metrics and response elements that an analysis must
+provide. \textbf{Metrics:} (1) Disparate Impact, (2) Demographic Parity
+Difference, (3) Equal Opportunity Difference, (4) Average Odds Difference,
+(5) Theil Index; each per protected attribute with privileged/unprivileged
+groups stated. \textbf{Response elements:} (1) per-group breakdown
+(selection rate, TPR, FPR, base rate); (2) severity classification
+(Critical / High / Moderate / Low) with a stated threshold (e.g., DI$<$0.8);
+(3) diagnosed root causes (e.g., data imbalance, proxy features, historical
+label bias); (4) concrete mitigation recommendations (algorithm or
+post-processing step). Our pipeline and our comparison with LLMs are
+evaluated against this specification; future work will benchmark
+additional LLMs on the same specification.
 
 \subsection{Model Training}
 
@@ -559,21 +586,16 @@ LLM-based independent benchmarking. Key findings:
 \end{itemize}
 
 \paragraph{Future work.}
-We plan to deepen our analysis within the finance and lending domain:
-\begin{itemize}[nosep]
-  \item \textbf{Additional lending datasets}: incorporate peer-to-peer
-        lending and consumer credit bureau data to test generalizability.
-  \item \textbf{Intersectional fairness}: analyze compound protected groups
-        (e.g., race $\times$ sex) to detect bias invisible at single-attribute
-        granularity.
-  \item \textbf{End-to-end mitigation}: implement the recommended AIF360
-        and fairlearn mitigations (Reweighing, ExponentiatedGradient,
-        ThresholdOptimizer) and measure their impact on both accuracy and
-        fairness.
-  \item \textbf{Longitudinal bias monitoring}: track fairness metric drift
-        over time as data distributions shift, enabling early detection of
-        emergent bias.
-\end{itemize}
+We plan to: (1) formulate andformalize the reference audit specification so
+that other tools and LLMs can be evaluated against it; (2) benchmark
+against additional LLMs (e.g., Claude, GPT, open-weight models) on the
+same prediction data and prompt structure to see where our pipeline stands
+in the general scheme of things; (3) deepen analysis within the finance and
+lending domain first via in-depth analysis of the two datasets we have used so far, and then via additional datasets if required (peer-to-peer lending, credit
+bureau data), intersectional fairness (e.g., race $\times$ sex), and
+end-to-end mitigation (implementing Reweighing, ExponentiatedGradient,
+ThresholdOptimizer and measuring accuracy-fairness trade-offs); (4) add
+longitudinal bias monitoring to detect fairness drift over time.
 
 % ===================================================================
 \begin{thebibliography}{9}

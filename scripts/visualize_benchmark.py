@@ -2,7 +2,7 @@
 visualize_benchmark.py
 
 Generates comparison charts between our deterministic pipeline (AIF360) and
-the Gemini LLM benchmark (fairlearn).
+the Gemini LLM benchmark.
 
 Reads from artifacts/ and writes PNGs to artifacts/visualizations/.
 
@@ -47,7 +47,7 @@ def load_data() -> dict:
         ds_dir = ARTIFACTS / ds_key
 
         our_csv = ds_dir / "fairness" / "fairness_metrics.csv"
-        llm_json = ds_dir / "fairness" / "llm_raw_response.json"
+        llm_json = ds_dir / "fairness" / "gemini" / "llm_raw_response.json"
 
         if not our_csv.exists() or not llm_json.exists():
             log.warning(f"Missing data for {ds_key}, skipping")
@@ -57,13 +57,15 @@ def load_data() -> dict:
         with open(llm_json) as f:
             llm_data = json.load(f)
 
+        result_payload = llm_data["result"]
+        usage_payload = llm_data["usage"]
         data[ds_key] = {
             "label": ds_info["label"],
             "color": ds_info["color"],
             "our": our_df,
-            "llm_metrics": llm_data["result"]["metrics"],
-            "llm_qual": llm_data["result"]["qualitative"],
-            "usage": llm_data["usage"],
+            "llm_metrics": result_payload["metrics"],
+            "llm_qual": result_payload["qualitative"],
+            "usage": usage_payload,
         }
     return data
 

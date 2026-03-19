@@ -57,14 +57,25 @@ DATASETS: dict[str, dict] = {
                 " --dataset_name 'German Credit'"
             ),
             "llm_benchmark": (
+                "mkdir -p metrics/fairness/gemini metrics/fairness/openai && "
                 f"{PYTHON} ../scripts/llm_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
                 " --qualitative_report metrics/fairness/qualitative_report.md"
                 " --target actual --pred_col predicted --favorable_label 1"
                 " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
-                " --out_dir metrics/fairness"
+                " --out_dir metrics/fairness/gemini"
                 " --dataset_name 'German Credit'"
+                " && "
+                f"{PYTHON} ../scripts/openai_fairness_analysis.py"
+                " --predictions metrics/classification_predictions.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 1"
+                " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
+                " --out_dir metrics/fairness/openai"
+                " --dataset_name 'German Credit'"
+                " --max_cost_usd 50"
             ),
         },
     },
@@ -85,14 +96,25 @@ DATASETS: dict[str, dict] = {
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
             ),
             "llm_benchmark": (
+                "mkdir -p metrics/fairness/gemini metrics/fairness/openai && "
                 f"{PYTHON} ../scripts/llm_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
                 " --qualitative_report metrics/fairness/qualitative_report.md"
                 " --target actual --pred_col predicted --favorable_label 1"
                 " --protected_attrs 'race:White,sex:Male,age_group:mid'"
-                " --out_dir metrics/fairness"
+                " --out_dir metrics/fairness/gemini"
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
+                " && "
+                f"{PYTHON} ../scripts/openai_fairness_analysis.py"
+                " --predictions metrics/classification_predictions.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 1"
+                " --protected_attrs 'race:White,sex:Male,age_group:mid'"
+                " --out_dir metrics/fairness/openai"
+                " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
+                " --max_cost_usd 50"
             ),
         },
     },
@@ -192,9 +214,12 @@ def _copy_artifacts(datasets_run: list[str]) -> None:
         models_dst = art_dir / "models"
         models_dst.mkdir(parents=True, exist_ok=True)
 
-        for f in fairness_src.glob("*"):
+        for f in fairness_src.rglob("*"):
             if f.is_file():
-                shutil.copy2(f, fairness_dst / f.name)
+                rel = f.relative_to(fairness_src)
+                dest = fairness_dst / rel
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(f, dest)
 
         metrics_dir = ds_dir / "metrics"
         for pattern in ["classification_predictions.csv", "classification_metrics.json",
@@ -257,22 +282,23 @@ def consolidate(datasets_run: list[str]) -> None:
         log.info("  Saved cross-dataset qualitative analysis")
 
     # ── merge LLM benchmark comparisons ───────────────────────────
-    benchmark_lines = ["# Cross-Dataset LLM Benchmark Comparison", ""]
-    for ds_name in datasets_run:
-        ds_dir = ROOT / DATASETS[ds_name]["dir"]
-        bench_path = ds_dir / "metrics" / "fairness" / "benchmark_comparison.md"
-        if bench_path.exists():
-            content = bench_path.read_text(encoding="utf-8")
-            benchmark_lines.append(content)
-            benchmark_lines.append("")
-            benchmark_lines.append("---")
-            benchmark_lines.append("")
+    for provider in ["gemini", "openai"]:
+        benchmark_lines = [f"# Cross-Dataset {provider.title()} LLM Benchmark Comparison", ""]
+        for ds_name in datasets_run:
+            ds_dir = ROOT / DATASETS[ds_name]["dir"]
+            bench_path = ds_dir / "metrics" / "fairness" / provider / "benchmark_comparison.md"
+            if bench_path.exists():
+                content = bench_path.read_text(encoding="utf-8")
+                benchmark_lines.append(content)
+                benchmark_lines.append("")
+                benchmark_lines.append("---")
+                benchmark_lines.append("")
 
-    if len(benchmark_lines) > 2:
-        text = "\n".join(benchmark_lines)
-        for dest in [cons_dir, legacy_dir]:
-            (dest / "llm_benchmark_comparison.md").write_text(text, encoding="utf-8")
-        log.info("  Saved cross-dataset LLM benchmark comparison")
+        if len(benchmark_lines) > 2:
+            text = "\n".join(benchmark_lines)
+            for dest in [cons_dir, legacy_dir]:
+                (dest / f"llm_benchmark_comparison_{provider}.md").write_text(text, encoding="utf-8")
+            log.info(f"  Saved cross-dataset {provider} LLM benchmark comparison")
 
 
 # ═══════════════════════════════════════════════════════════════════════

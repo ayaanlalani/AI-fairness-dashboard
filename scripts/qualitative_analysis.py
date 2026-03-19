@@ -35,6 +35,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from scholarly_evidence import (
+    build_attribute_queries,
+    format_evidence_markdown,
+    gather_research_context,
+)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -385,6 +391,7 @@ def generate_qualitative_report(
     feature_cols: list[str],
     dataset_name: str = "Dataset",
     threshold: float = 0.8,
+    research_evidence_by_attr: dict[str, list[dict[str, Any]]] | None = None,
 ) -> str:
     """Build the full qualitative markdown report. Returns markdown string."""
 
@@ -522,6 +529,9 @@ def generate_qualitative_report(
             lines.append("No specific mitigations required at this time.")
         lines.append("")
 
+        if research_evidence_by_attr and research_evidence_by_attr.get(attr):
+            lines.extend(format_evidence_markdown(research_evidence_by_attr[attr]))
+
     # ── cross-attribute summary ────────────────────────────────────
     lines.append("---")
     lines.append("## Summary")
@@ -613,6 +623,32 @@ def run_qualitative_analysis(
     non_feature = {target_col, pred_col, "actual", "predicted"} | set(protected_attrs)
     feature_cols = [c for c in predictions_df.columns if c not in non_feature]
 
+    research_evidence_by_attr: dict[str, list[dict[str, Any]]] = {}
+    for attr in protected_attrs:
+        if attr not in predictions_df.columns:
+            continue
+        metrics = _get_attr_metrics(fairness_df, attr)
+        breakdown = per_group_breakdown(predictions_df, attr, target_col, pred_col, favorable_label)
+        imbalance = diagnose_imbalance(breakdown, attr)
+        proxies = detect_proxy_features(predictions_df, attr, feature_cols)
+        root = map_root_causes(
+            metrics.get("DisparateImpact"),
+            metrics.get("DemographicParityDiff"),
+            metrics.get("EqualOpportunityDiff"),
+            metrics.get("AverageOddsDiff"),
+            imbalance,
+            proxies,
+            breakdown,
+            threshold,
+        )
+        queries = build_attribute_queries(dataset_name, attr, root["causes"], root["fixes"])
+        research_evidence_by_attr[attr] = gather_research_context(
+            dataset_name=dataset_name,
+            protected_attrs=[attr],
+            extra_queries=queries,
+            max_papers=3,
+        )
+
     report = generate_qualitative_report(
         predictions_df=predictions_df,
         fairness_df=fairness_df,
@@ -623,11 +659,17 @@ def run_qualitative_analysis(
         feature_cols=feature_cols,
         dataset_name=dataset_name,
         threshold=threshold,
+        research_evidence_by_attr=research_evidence_by_attr,
     )
 
     report_path = out_dir / "qualitative_report.md"
     report_path.write_text(report, encoding="utf-8")
     log.info(f"Qualitative report saved to {report_path}")
+    (out_dir / "qualitative_research_evidence.json").write_text(
+        json.dumps(research_evidence_by_attr, indent=2),
+        encoding="utf-8",
+    )
+    log.info(f"Research evidence saved to {out_dir / 'qualitative_research_evidence.json'}")
     return report_path
 
 

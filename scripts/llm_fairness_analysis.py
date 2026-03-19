@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import math
 import os
 import re
 import textwrap
@@ -36,6 +37,8 @@ import time
 from pathlib import Path
 
 import pandas as pd
+
+from scholarly_evidence import gather_research_context, format_evidence_for_prompt
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,6 +54,15 @@ except ImportError:
     pass
 
 GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_MAX_OUTPUT_TOKENS = 5000
+
+AIF360_CONTEXT = """\
+Reference fairness toolkit context:
+- AIF360 common mitigations: Reweighing, DisparateImpactRemover, PrejudiceRemover,
+  EqOddsPostprocessing, CalibratedEqOddsPostprocessing.
+- Fairlearn common mitigations: ExponentiatedGradient, GridSearch, ThresholdOptimizer.
+- Use these only as reference concepts. You still need to reason from the dataset provided.
+"""
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -73,6 +85,7 @@ def build_prompt(
     target_col: str,
     pred_col: str,
     favorable_label: int,
+    research_context: str = "",
 ) -> str:
     """Build the Gemini prompt.
 
@@ -86,8 +99,9 @@ def build_prompt(
     return textwrap.dedent(f"""\
     You are an AI fairness auditor. You are given a CSV of model predictions with
     ground-truth labels and protected attributes. Your job is to independently
-    analyse this data for bias using **only fairlearn** as your reference
-    framework for metric definitions and mitigation strategies.
+    analyse this data for bias using the dataset itself, the fairness toolkit
+    context below, and the research evidence provided. You do NOT have access to
+    our pre-computed fairness metrics or qualitative analysis.
 
     ## Dataset
     Name: {dataset_name}
@@ -98,6 +112,14 @@ def build_prompt(
     Protected attributes and their privileged values:
     {attr_desc}
 
+    ## Fairness toolkit context
+    {AIF360_CONTEXT}
+
+    ## Research evidence (Semantic Scholar)
+    Use this as supporting evidence when you define the audit standard and justify
+    mitigations. Do not just repeat paper titles; use them to support your reasoning.
+    {research_context}
+
     ## Raw prediction data (CSV)
     ```
     {csv_text}
@@ -105,7 +127,11 @@ def build_prompt(
 
     ## Your task
 
-    For EACH protected attribute listed above, compute the following fairlearn
+    First, define a remediation-ready **reference audit specification**: the set
+    of metrics and response elements an audit should include to support future
+    remediation. Ground this in the research evidence above and your reasoning.
+
+    Then, for EACH protected attribute listed above, compute the following fairness
     metrics (compare unprivileged group(s) vs the privileged group):
 
     1. **Disparate Impact (DI)** = selection_rate(unprivileged) / selection_rate(privileged)
@@ -134,6 +160,13 @@ def build_prompt(
 
     Return ONLY valid JSON (no markdown fences, no commentary outside the JSON) with this structure:
     {{
+      "reference_audit_spec": {{
+        "name": "<short name>",
+        "core_metrics": ["<metric>", "..."],
+        "required_response_elements": ["<element>", "..."],
+        "why_this_spec": "<paragraph>",
+        "supporting_research": ["<paper citation>", "..."]
+      }},
       "metrics": [
         {{
           "attribute": "<attr name>",
@@ -152,7 +185,8 @@ def build_prompt(
           "severity": "<CRITICAL|HIGH|MODERATE|LOW>",
           "what_is_wrong": "<paragraph>",
           "why_is_wrong": "<paragraph>",
-          "how_to_fix": "<paragraph>"
+          "how_to_fix": "<paragraph>",
+          "supporting_research": ["<paper citation>", "..."]
         }}
       ]
     }}
@@ -172,6 +206,22 @@ RETRY_BACKOFF_BASE = 30  # seconds
 # Gemini 2.0 Flash pricing (per 1M tokens, as of Feb 2025)
 PRICE_INPUT_PER_M = 0.10   # $0.10 per 1M input tokens
 PRICE_OUTPUT_PER_M = 0.40  # $0.40 per 1M output tokens
+
+
+def estimate_cost(prompt: str, max_output_tokens: int = DEFAULT_MAX_OUTPUT_TOKENS) -> dict[str, float]:
+    """Project request cost using a simple chars-to-tokens heuristic."""
+    input_tokens = math.ceil(len(prompt) / 4)
+    output_tokens = max_output_tokens
+    input_cost = (input_tokens / 1_000_000) * PRICE_INPUT_PER_M
+    output_cost = (output_tokens / 1_000_000) * PRICE_OUTPUT_PER_M
+    return {
+        "projected_input_tokens": input_tokens,
+        "projected_output_tokens": output_tokens,
+        "projected_total_tokens": input_tokens + output_tokens,
+        "projected_input_cost_usd": round(input_cost, 6),
+        "projected_output_cost_usd": round(output_cost, 6),
+        "projected_total_cost_usd": round(input_cost + output_cost, 6),
+    }
 
 
 def call_gemini(prompt: str, api_key: str, model: str = GEMINI_MODEL) -> tuple[dict, dict]:
@@ -255,7 +305,7 @@ def call_gemini(prompt: str, api_key: str, model: str = GEMINI_MODEL) -> tuple[d
 
 def _format_usage_block(usage: dict) -> list[str]:
     """Format usage stats into markdown lines."""
-    return [
+    lines = [
         "## Napkin Math",
         "",
         "| Metric | Value |",
@@ -271,6 +321,35 @@ def _format_usage_block(usage: dict) -> list[str]:
         f"| **Total est. cost** | **${usage['total_cost_usd']:.4f}** |",
         "",
     ]
+    projection = usage.get("projection")
+    if projection:
+        lines.extend([
+            "## Preflight Estimate",
+            "",
+            "| Metric | Value |",
+            "|---|---|",
+            f"| Projected input tokens | {projection['projected_input_tokens']:,} |",
+            f"| Assumed max output tokens | {projection['projected_output_tokens']:,} |",
+            f"| Projected total cost ceiling | ${projection['projected_total_cost_usd']:.4f} |",
+            "",
+        ])
+    stage_timings = usage.get("stage_timings_s")
+    if stage_timings:
+        lines.extend([
+            "## Stage Timings",
+            "",
+            "| Stage | Seconds |",
+            "|---|---:|",
+            f"| Load predictions | {stage_timings.get('load_predictions', 0):.2f} |",
+            f"| Research retrieval | {stage_timings.get('research_retrieval', 0):.2f} |",
+            f"| Prompt build | {stage_timings.get('prompt_build', 0):.2f} |",
+            f"| API call | {stage_timings.get('api_call', 0):.2f} |",
+            f"| Report generation | {stage_timings.get('report_generation', 0):.2f} |",
+            f"| Comparison generation | {stage_timings.get('comparison_generation', 0):.2f} |",
+            f"| Total benchmark | {stage_timings.get('total_benchmark', 0):.2f} |",
+            "",
+        ])
+    return lines
 
 
 def generate_llm_report(gemini_result: dict, dataset_name: str,
@@ -286,6 +365,30 @@ def generate_llm_report(gemini_result: dict, dataset_name: str,
 
     if usage_stats:
         lines.extend(_format_usage_block(usage_stats))
+
+    ref_spec = gemini_result.get("reference_audit_spec")
+    if ref_spec:
+        lines.append("## Reference Audit Specification")
+        lines.append("")
+        lines.append(f"**Name:** {ref_spec.get('name', 'N/A')}")
+        lines.append("")
+        if ref_spec.get("core_metrics"):
+            lines.append("**Core metrics:** " + ", ".join(ref_spec["core_metrics"]))
+            lines.append("")
+        if ref_spec.get("required_response_elements"):
+            lines.append(
+                "**Required response elements:** "
+                + ", ".join(ref_spec["required_response_elements"])
+            )
+            lines.append("")
+        if ref_spec.get("why_this_spec"):
+            lines.append(ref_spec["why_this_spec"])
+            lines.append("")
+        if ref_spec.get("supporting_research"):
+            lines.append("**Supporting research:**")
+            for citation in ref_spec["supporting_research"]:
+                lines.append(f"- {citation}")
+            lines.append("")
 
     # Metrics table
     lines.append("## Computed Metrics")
@@ -322,6 +425,12 @@ def generate_llm_report(gemini_result: dict, dataset_name: str,
         lines.append("")
         lines.append(q["how_to_fix"])
         lines.append("")
+        if q.get("supporting_research"):
+            lines.append("### Supporting research")
+            lines.append("")
+            for citation in q["supporting_research"]:
+                lines.append(f"- {citation}")
+            lines.append("")
 
     return "\n".join(lines)
 
@@ -532,13 +641,16 @@ def run_llm_benchmark(
     dataset_name: str = "Dataset",
 ) -> Path:
     """Run the full LLM benchmark and write reports. Returns comparison path."""
+    benchmark_t0 = time.time()
     api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         raise RuntimeError(
             "GEMINI_API_KEY not set. Export it or add to a .env file."
         )
 
+    t0 = time.time()
     predictions_df = pd.read_csv(predictions_path)
+    load_predictions_s = time.time() - t0
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -548,7 +660,15 @@ def run_llm_benchmark(
         target_col,
         pred_col,
     )
+    t0 = time.time()
+    research_evidence = gather_research_context(
+        dataset_name=dataset_name,
+        protected_attrs=list(protected_configs.keys()),
+        max_papers=6,
+    )
+    research_retrieval_s = time.time() - t0
 
+    t0 = time.time()
     prompt = build_prompt(
         csv_text=csv_text,
         protected_configs=protected_configs,
@@ -556,13 +676,35 @@ def run_llm_benchmark(
         target_col=target_col,
         pred_col=pred_col,
         favorable_label=favorable_label,
+        research_context=format_evidence_for_prompt(research_evidence),
+    )
+    prompt_build_s = time.time() - t0
+    projection = estimate_cost(prompt)
+    log.info(
+        "Gemini preflight: "
+        f"{len(predictions_df):,} rows | {len(prompt):,} prompt chars | "
+        f"{projection['projected_input_tokens']:,} projected input tok | "
+        f"{projection['projected_output_tokens']:,} assumed max output tok | "
+        f"${projection['projected_total_cost_usd']:.4f} projected cost ceiling"
     )
 
     # Save prompt for reproducibility
     (out_dir / "llm_prompt.txt").write_text(prompt, encoding="utf-8")
     log.info(f"Prompt saved to {out_dir / 'llm_prompt.txt'}")
+    (out_dir / "semantic_scholar_context.json").write_text(
+        json.dumps(research_evidence, indent=2),
+        encoding="utf-8",
+    )
+    log.info(f"Research context saved to {out_dir / 'semantic_scholar_context.json'}")
+    (out_dir / "llm_napkin_math.json").write_text(
+        json.dumps({"projection": projection}, indent=2),
+        encoding="utf-8",
+    )
 
+    t0 = time.time()
     gemini_result, usage_stats = call_gemini(prompt, api_key)
+    api_call_s = time.time() - t0
+    usage_stats["projection"] = projection
 
     # Save raw JSON response + usage stats
     (out_dir / "llm_raw_response.json").write_text(
@@ -571,12 +713,15 @@ def run_llm_benchmark(
     )
 
     # Generate standalone LLM report
+    t0 = time.time()
     llm_report = generate_llm_report(gemini_result, dataset_name, usage_stats)
     llm_report_path = out_dir / "llm_fairness_report.md"
     llm_report_path.write_text(llm_report, encoding="utf-8")
+    report_generation_s = time.time() - t0
     log.info(f"LLM report saved to {llm_report_path}")
 
     # Generate comparison
+    t0 = time.time()
     comparison = generate_comparison(
         gemini_result=gemini_result,
         our_fairness_csv=Path(fairness_csv_path),
@@ -586,6 +731,25 @@ def run_llm_benchmark(
     )
     comparison_path = out_dir / "benchmark_comparison.md"
     comparison_path.write_text(comparison, encoding="utf-8")
+    comparison_generation_s = time.time() - t0
+    usage_stats["stage_timings_s"] = {
+        "load_predictions": round(load_predictions_s, 2),
+        "research_retrieval": round(research_retrieval_s, 2),
+        "prompt_build": round(prompt_build_s, 2),
+        "api_call": round(api_call_s, 2),
+        "report_generation": round(report_generation_s, 2),
+        "comparison_generation": round(comparison_generation_s, 2),
+        "total_benchmark": round(time.time() - benchmark_t0, 2),
+    }
+    (out_dir / "llm_napkin_math.json").write_text(
+        json.dumps({"projection": projection, "usage": usage_stats}, indent=2),
+        encoding="utf-8",
+    )
+    log.info(
+        "Gemini benchmark complete: "
+        f"api={api_call_s:.1f}s total={usage_stats['stage_timings_s']['total_benchmark']:.1f}s "
+        f"actual_cost=${usage_stats['total_cost_usd']:.4f}"
+    )
     log.info(f"Benchmark comparison saved to {comparison_path}")
 
     return comparison_path
