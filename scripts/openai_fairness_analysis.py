@@ -802,8 +802,8 @@ def generate_llm_report(
             lines.append(
                 f"| {g['group']} | {g['n']} "
                 f"| {g['selection_rate']:.4f} "
-                f"| {g['disparate_impact']:.4f} if g['disparate_impact'] is not None else 'N/A'} "
-                f"| {g['demographic_parity_diff']:.4f} if g['demographic_parity_diff'] is not None else 'N/A'} "
+                f"| {f'{g['disparate_impact']:.4f}' if g['disparate_impact'] is not None else 'N/A'} "
+                f"| {f'{g['demographic_parity_diff']:.4f}' if g['demographic_parity_diff'] is not None else 'N/A'} "
                 f"| {'No ⚠' if g['unreliable'] else 'Yes'} |"
             )
         if inter["worst_group"]:
