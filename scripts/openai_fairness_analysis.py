@@ -26,7 +26,8 @@ from typing import Any
 
 import pandas as pd
 
-from scholarly_evidence import gather_research_context, format_evidence_for_prompt
+from llm_benchmark_common import build_context_and_baseline, score_llm_output
+from scholarly_evidence import format_evidence_for_prompt
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,7 +47,9 @@ MAX_RETRIES = 3
 RETRY_BACKOFF_BASE = 20
 PRICE_INPUT_PER_M = 10.00
 PRICE_OUTPUT_PER_M = 40.00
-DEFAULT_MAX_COST_USD = 50.0
+CAD_TO_USD = 0.74
+DEFAULT_MAX_COST_CAD = 50.0
+DEFAULT_MAX_COST_USD = round(DEFAULT_MAX_COST_CAD * CAD_TO_USD, 2)
 DEFAULT_MAX_OUTPUT_TOKENS = 5000
 
 FAIRNESS_CONTEXT = """\
@@ -81,33 +84,6 @@ OUTPUT_SCHEMA = {
                 ],
                 "additionalProperties": False,
             },
-            "metrics": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "attribute": {"type": "string"},
-                        "privileged_value": {"type": "string"},
-                        "disparate_impact": {"type": "number"},
-                        "demographic_parity_diff": {"type": "number"},
-                        "equal_opportunity_diff": {"type": "number"},
-                        "average_odds_diff": {"type": "number"},
-                        "theil_index": {"type": "number"},
-                        "bias_flag": {"type": "boolean"},
-                    },
-                    "required": [
-                        "attribute",
-                        "privileged_value",
-                        "disparate_impact",
-                        "demographic_parity_diff",
-                        "equal_opportunity_diff",
-                        "average_odds_diff",
-                        "theil_index",
-                        "bias_flag",
-                    ],
-                    "additionalProperties": False,
-                },
-            },
             "qualitative": {
                 "type": "array",
                 "items": {
@@ -131,48 +107,30 @@ OUTPUT_SCHEMA = {
                     "additionalProperties": False,
                 },
             },
+            "cross_attribute_summary": {"type": "string"},
         },
-        "required": ["reference_audit_spec", "metrics", "qualitative"],
+        "required": ["reference_audit_spec", "qualitative", "cross_attribute_summary"],
         "additionalProperties": False,
     },
 }
 
 
-def _csv_for_prompt(df: pd.DataFrame, protected_attrs: list[str], target_col: str, pred_col: str) -> str:
-    cols = [target_col, pred_col] + protected_attrs
-    cols = [c for c in cols if c in df.columns]
-    return df[cols].to_csv(index=False)
-
-
 def build_prompt(
-    csv_text: str,
-    protected_configs: dict[str, str],
+    context_payload: dict[str, object],
     dataset_name: str,
-    target_col: str,
-    pred_col: str,
-    favorable_label: int,
     research_context: str,
 ) -> str:
-    attr_desc = "\n".join(
-        f"  - `{attr}` (privileged value: `{priv}`)" for attr, priv in protected_configs.items()
-    )
-
+    context_json = json.dumps(context_payload, indent=2)
     return textwrap.dedent(f"""\
     You are an AI fairness auditor.
 
-    You are given raw model prediction data, fairness toolkit context, and research
-    evidence retrieved from Semantic Scholar. Your job is to independently analyse
-    this dataset for bias. You do NOT have access to our pre-computed fairness
-    metrics or qualitative report.
+    Python has already computed the fairness metrics and quantitative group
+    breakdowns. Do NOT recompute them. Your job is to interpret that context,
+    define a strong remediation-ready reference audit specification, and provide
+    qualitative fairness analysis.
 
     ## Dataset
     Name: {dataset_name}
-    Target column: `{target_col}`
-    Prediction column: `{pred_col}`
-    Favorable label: {favorable_label}
-
-    Protected attributes and privileged values:
-    {attr_desc}
 
     ## Fairness toolkit context
     {FAIRNESS_CONTEXT}
@@ -182,33 +140,55 @@ def build_prompt(
     standard and recommending mitigations.
     {research_context}
 
-    ## Raw prediction data (CSV)
-    ```
-    {csv_text}
+    ## Deterministic fairness context (Python-computed)
+    ```json
+    {context_json}
     ```
 
     ## Your task
-    First, define a remediation-ready reference audit specification: the set of
-    metrics and response elements an audit should include to support future
-    remediation.
-
-    Then, for each protected attribute, compute these metrics from the raw data:
-    1. Disparate Impact (DI)
-    2. Demographic Parity Difference (DPD)
-    3. Equal Opportunity Difference (EOD)
-    4. Average Odds Difference (AOD)
-    5. Theil Index
-
-    For multi-group attributes, use the group with the LOWEST selection rate as the
-    unprivileged group. Round all floats to 4 decimal places. bias_flag should be
-    true if DI < 0.8, false otherwise.
-
-    Then provide, for each attribute:
+    Define a remediation-ready reference audit specification, then provide, for
+    each attribute:
     - What is wrong
     - Why it is wrong
     - How to fix it
-    - Severity: CRITICAL (DI < 0.72), HIGH (0.72 <= DI < 0.80), MODERATE (0.80 <= DI < 0.95), LOW (DI >= 0.95)
+    - Severity consistent with the provided DI thresholds
     - Supporting research citations based on the evidence above
+
+    Return ONLY valid JSON matching the required schema.
+    """)
+
+
+def build_refinement_prompt(
+    context_payload: dict[str, object],
+    previous_output: dict[str, object],
+    dataset_name: str,
+    cycle_idx: int,
+    research_context: str,
+) -> str:
+    context_json = json.dumps(context_payload, indent=2)
+    previous_json = json.dumps(previous_output, indent=2)
+    return textwrap.dedent(f"""\
+    You are refining a previous AI fairness audit for cycle {cycle_idx}.
+    Improve the previous output using the same deterministic fairness context and
+    research evidence. Do not recompute metrics. Focus on clearer causal
+    reasoning, more concrete mitigations, better research grounding, and severity
+    labels that match the provided thresholds.
+
+    ## Dataset
+    Name: {dataset_name}
+
+    ## Research evidence (Semantic Scholar)
+    {research_context}
+
+    ## Deterministic fairness context
+    ```json
+    {context_json}
+    ```
+
+    ## Previous output to improve
+    ```json
+    {previous_json}
+    ```
 
     Return ONLY valid JSON matching the required schema.
     """)
@@ -327,7 +307,7 @@ def _format_usage_block(usage: dict) -> list[str]:
             f"| Projected input tokens | {projection['projected_input_tokens']:,} |",
             f"| Max output tokens | {projection['projected_output_tokens']:,} |",
             f"| Projected total cost ceiling | ${projection['projected_total_cost_usd']:.4f} |",
-            f"| Configured max cost | ${usage['max_cost_usd']:.2f} |",
+            f"| Configured max cost | ${usage['max_cost_usd']:.2f} USD (approx. ${usage.get('max_cost_cad', DEFAULT_MAX_COST_CAD):.2f} CAD) |",
             "",
         ])
     stage_timings = usage.get("stage_timings_s")
@@ -338,7 +318,7 @@ def _format_usage_block(usage: dict) -> list[str]:
             "| Stage | Seconds |",
             "|---|---:|",
             f"| Load predictions | {stage_timings.get('load_predictions', 0):.2f} |",
-            f"| Research retrieval | {stage_timings.get('research_retrieval', 0):.2f} |",
+            f"| Build metric context | {stage_timings.get('build_metric_context', 0):.2f} |",
             f"| Prompt build | {stage_timings.get('prompt_build', 0):.2f} |",
             f"| API call | {stage_timings.get('api_call', 0):.2f} |",
             f"| Report generation | {stage_timings.get('report_generation', 0):.2f} |",
@@ -349,21 +329,62 @@ def _format_usage_block(usage: dict) -> list[str]:
     return lines
 
 
-def generate_llm_report(result: dict, dataset_name: str, model: str, usage_stats: dict | None = None) -> str:
+def generate_llm_report(
+    result: dict,
+    context_payload: dict,
+    cycle_scores: list[dict],
+    dataset_name: str,
+    model: str,
+    usage_stats: dict | None = None,
+) -> str:
     lines = [
         f"# LLM Fairness Analysis (OpenAI): {dataset_name}",
         "",
         f"**Model:** {model}",
-        "**Method:** Independent analysis using raw data, fairness context, and Semantic Scholar evidence",
+        "**Method:** Deterministic metrics + qualitative reasoning/refinement cycles",
         "",
     ]
     if usage_stats:
         lines.extend(_format_usage_block(usage_stats))
 
+    lines += [
+        "## Deterministic Metric Context",
+        "",
+        "| Attribute | Privileged | DI | DPD | EOD | AOD | Theil |",
+        "|---|---|---:|---:|---:|---:|---:|",
+    ]
+    for attr in context_payload.get("attributes", []):
+        metrics = attr["metrics"]
+        lines.append(
+            f"| {attr['attribute']} | {attr['privileged_value']} "
+            f"| {_fmt_num(metrics.get('disparate_impact'))} "
+            f"| {_fmt_num(metrics.get('demographic_parity_diff'))} "
+            f"| {_fmt_num(metrics.get('equal_opportunity_diff'))} "
+            f"| {_fmt_num(metrics.get('average_odds_diff'))} "
+            f"| {_fmt_num(metrics.get('theil_index'))} |"
+        )
+    lines.append("")
+
+    lines += [
+        "## Cycle Scores",
+        "",
+        "| Cycle | Total Score | Completeness | Severity | Cause Alignment | Mitigation | Research |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    for score in cycle_scores:
+        subs = score["score"]["subscores"]
+        lines.append(
+            f"| {score['cycle']} | {score['score']['total_score']:.1f} | "
+            f"{subs['completeness']:.1f} | {subs['severity_agreement']:.1f} | "
+            f"{subs['cause_alignment']:.1f} | {subs['mitigation_specificity']:.1f} | "
+            f"{subs['research_grounding']:.1f} |"
+        )
+    lines.append("")
+
     ref_spec = result.get("reference_audit_spec")
     if ref_spec:
         lines += [
-            "## Reference Audit Specification",
+            "## Final Reference Audit Specification",
             "",
             f"**Name:** {ref_spec.get('name', 'N/A')}",
             "",
@@ -379,19 +400,6 @@ def generate_llm_report(result: dict, dataset_name: str, model: str, usage_stats
             for citation in ref_spec["supporting_research"]:
                 lines.append(f"- {citation}")
             lines.append("")
-
-    lines.append("## Computed Metrics")
-    lines.append("")
-    lines.append("| Attribute | Privileged | DI | DPD | EOD | AOD | Theil | Bias? |")
-    lines.append("|---|---|---:|---:|---:|---:|---:|---|")
-    for m in result.get("metrics", []):
-        lines.append(
-            f"| {m['attribute']} | {m['privileged_value']} | {m['disparate_impact']:.4f} "
-            f"| {m['demographic_parity_diff']:.4f} | {m['equal_opportunity_diff']:.4f} "
-            f"| {m['average_odds_diff']:.4f} | {m['theil_index']:.4f} "
-            f"| {'Yes' if m['bias_flag'] else 'No'} |"
-        )
-    lines.append("")
 
     for q in result.get("qualitative", []):
         lines += [
@@ -418,6 +426,9 @@ def generate_llm_report(result: dict, dataset_name: str, model: str, usage_stats
                 lines.append(f"- {citation}")
             lines.append("")
 
+    if result.get("cross_attribute_summary"):
+        lines += ["## Cross-attribute summary", "", result["cross_attribute_summary"], ""]
+
     return "\n".join(lines)
 
 
@@ -438,6 +449,11 @@ def _safe_float(val) -> float | None:
         return float(val)
     except (TypeError, ValueError):
         return None
+
+
+def _fmt_num(val) -> str:
+    safe = _safe_float(val)
+    return f"{safe:.4f}" if safe is not None else "--"
 
 
 def _normalize_severity(value: str) -> str:
@@ -478,66 +494,44 @@ def _extract_qualitative_sections(report_md: str) -> dict[str, dict[str, str]]:
 
 def generate_comparison(
     result: dict,
-    our_fairness_csv: Path,
+    baseline_payload: dict,
     our_qualitative_report: Path,
     dataset_name: str,
+    cycle_scores: list[dict],
     usage_stats: dict | None = None,
 ) -> str:
-    our_df = pd.read_csv(our_fairness_csv)
     our_qual = our_qualitative_report.read_text(encoding="utf-8") if our_qualitative_report.exists() else ""
 
     lines = [
         f"# Benchmark Comparison: {dataset_name}",
         "",
-        "Deterministic pipeline (AIF360) vs. OpenAI LLM (raw data + fairness context + Semantic Scholar; no access to our calculations).",
+        "Deterministic pipeline vs. OpenAI qualitative benchmark over fixed self-refinement cycles.",
         "",
     ]
     if usage_stats:
         lines.extend(_format_usage_block(usage_stats))
 
     lines += [
-        "## Metric Comparison",
+        "## Cycle Improvement",
         "",
-        "| Attribute | Metric | Our Pipeline | OpenAI LLM | Delta |",
-        "|---|---|---:|---:|---:|",
+        "| Cycle | Total Score | Summary |",
+        "|---|---:|---|",
     ]
-    metric_map = {
-        "disparate_impact": "DisparateImpact",
-        "demographic_parity_diff": "DemographicParityDiff",
-        "equal_opportunity_diff": "EqualOpportunityDiff",
-        "average_odds_diff": "AverageOddsDiff",
-        "theil_index": "TheilIndex",
-    }
-    display_names = {
-        "disparate_impact": "Disparate Impact",
-        "demographic_parity_diff": "Demographic Parity Diff",
-        "equal_opportunity_diff": "Equal Opportunity Diff",
-        "average_odds_diff": "Average Odds Diff",
-        "theil_index": "Theil Index",
-    }
-    for item in result.get("metrics", []):
-        attr = item["attribute"]
-        our_row = _find_our_row(our_df, attr)
-        for llm_key, our_key in metric_map.items():
-            llm_val = item.get(llm_key)
-            our_val = _safe_float(our_row.get(our_key)) if our_row is not None else None
-            llm_str = f"{llm_val:.4f}" if llm_val is not None else "--"
-            our_str = f"{our_val:.4f}" if our_val is not None else "--"
-            delta_str = f"{(llm_val - our_val):+.4f}" if llm_val is not None and our_val is not None else "--"
-            lines.append(f"| {attr} | {display_names[llm_key]} | {our_str} | {llm_str} | {delta_str} |")
+    for score in cycle_scores:
+        lines.append(f"| {score['cycle']} | {score['score']['total_score']:.1f} | {score['score']['summary']} |")
     lines.append("")
 
+    baseline_by_attr = {row["attribute"]: row for row in baseline_payload.get("attributes", [])}
     lines += [
         "## Severity Comparison",
         "",
-        "| Attribute | Our Pipeline | OpenAI LLM | Agreement? |",
+        "| Attribute | Deterministic Baseline | OpenAI | Agreement? |",
         "|---|---|---|---|",
     ]
-    our_severities = _extract_severities(our_qual)
     for q in result.get("qualitative", []):
         attr = q["attribute"]
         llm_sev = q["severity"]
-        our_sev = our_severities.get(attr, our_severities.get(attr + "_original", "--"))
+        our_sev = baseline_by_attr.get(attr, {}).get("severity", "--")
         agree = "Yes" if _normalize_severity(llm_sev) == _normalize_severity(our_sev) else "No"
         lines.append(f"| {attr} | {our_sev} | {llm_sev} | {agree} |")
     lines.append("")
@@ -547,24 +541,15 @@ def generate_comparison(
     for q in result.get("qualitative", []):
         attr = q["attribute"]
         our_sec = our_sections.get(attr, our_sections.get(attr + "_original", {}))
+        baseline = baseline_by_attr.get(attr, {})
         lines += [
             f"### {attr}",
             "",
-            "#### What is wrong",
-            "",
-            f"**Our pipeline:** {our_sec.get('what_is_wrong', 'N/A')}",
-            "",
-            f"**OpenAI:** {q['what_is_wrong']}",
-            "",
-            "#### Why it is wrong",
-            "",
-            f"**Our pipeline:** {our_sec.get('why_is_wrong', 'N/A')}",
+            f"**Deterministic root causes:** {'; '.join(baseline.get('root_causes', [])) or our_sec.get('why_is_wrong', 'N/A')}",
             "",
             f"**OpenAI:** {q['why_is_wrong']}",
             "",
-            "#### How to fix it",
-            "",
-            f"**Our pipeline:** {our_sec.get('how_to_fix', 'N/A')}",
+            f"**Deterministic mitigations:** {'; '.join(baseline.get('mitigations', [])) or our_sec.get('how_to_fix', 'N/A')}",
             "",
             f"**OpenAI:** {q['how_to_fix']}",
             "",
@@ -585,6 +570,7 @@ def run_llm_benchmark(
     model: str = DEFAULT_MODEL,
     max_cost_usd: float = DEFAULT_MAX_COST_USD,
     max_output_tokens: int = DEFAULT_MAX_OUTPUT_TOKENS,
+    cycles: int = 3,
 ) -> Path:
     benchmark_t0 = time.time()
     api_key = os.environ.get("OPENAI_API_KEY", "")
@@ -594,25 +580,25 @@ def run_llm_benchmark(
     t0 = time.time()
     predictions_df = pd.read_csv(predictions_path)
     load_predictions_s = time.time() - t0
+    fairness_df = pd.read_csv(fairness_csv_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    csv_text = _csv_for_prompt(predictions_df, list(protected_configs.keys()), target_col, pred_col)
     t0 = time.time()
-    research_evidence = gather_research_context(
-        dataset_name=dataset_name,
-        protected_attrs=list(protected_configs.keys()),
-        max_papers=6,
-    )
-    research_retrieval_s = time.time() - t0
-    t0 = time.time()
-    prompt = build_prompt(
-        csv_text=csv_text,
+    context_payload, baseline_payload, research_evidence = build_context_and_baseline(
+        predictions_df=predictions_df,
+        fairness_df=fairness_df,
         protected_configs=protected_configs,
-        dataset_name=dataset_name,
         target_col=target_col,
         pred_col=pred_col,
         favorable_label=favorable_label,
+        dataset_name=dataset_name,
+    )
+    metric_context_s = time.time() - t0
+    t0 = time.time()
+    prompt = build_prompt(
+        context_payload=context_payload,
+        dataset_name=dataset_name,
         research_context=format_evidence_for_prompt(research_evidence),
     )
     prompt_build_s = time.time() - t0
@@ -622,40 +608,83 @@ def run_llm_benchmark(
         f"{len(predictions_df):,} rows | {len(prompt):,} prompt chars | "
         f"{projection['projected_input_tokens']:,} input tok + "
         f"{projection['projected_output_tokens']:,} output tok = "
-        f"${projection['projected_total_cost_usd']:.4f}"
+        f"${projection['projected_total_cost_usd']:.4f} | {cycles} cycles"
     )
-    if projection["projected_total_cost_usd"] > max_cost_usd:
+    projected_total = projection["projected_total_cost_usd"] * cycles
+    if projected_total > max_cost_usd:
         raise RuntimeError(
-            "Projected OpenAI request cost "
-            f"${projection['projected_total_cost_usd']:.4f} exceeds cap ${max_cost_usd:.2f}. "
+            "Projected OpenAI run cost "
+            f"${projected_total:.4f} exceeds cap ${max_cost_usd:.2f}. "
             "Reduce prompt size or max_output_tokens."
         )
 
     (out_dir / "llm_prompt.txt").write_text(prompt, encoding="utf-8")
     (out_dir / "semantic_scholar_context.json").write_text(json.dumps(research_evidence, indent=2), encoding="utf-8")
+    (out_dir / "llm_context_payload.json").write_text(json.dumps(context_payload, indent=2), encoding="utf-8")
+    (out_dir / "llm_baseline_payload.json").write_text(json.dumps(baseline_payload, indent=2), encoding="utf-8")
     (out_dir / "llm_napkin_math.json").write_text(
-        json.dumps({"projection": projection, "max_cost_usd": max_cost_usd}, indent=2),
+        json.dumps({"projection": projection, "projected_run_cost_usd": projected_total, "max_cost_usd": max_cost_usd}, indent=2),
         encoding="utf-8",
     )
 
-    t0 = time.time()
-    result, usage_stats = call_openai(
-        prompt,
-        api_key,
-        model,
-        max_output_tokens=max_output_tokens,
-    )
-    api_call_s = time.time() - t0
+    prompt_log = [prompt]
+    cycle_outputs: list[dict] = []
+    cycle_scores: list[dict] = []
+    total_api_call_s = 0.0
+    usage_stats: dict | None = None
+    result: dict = {}
+    current_prompt = prompt
+    for cycle_idx in range(1, cycles + 1):
+        t0 = time.time()
+        result, cycle_usage = call_openai(
+            current_prompt,
+            api_key,
+            model,
+            max_output_tokens=max_output_tokens,
+        )
+        cycle_api_call_s = time.time() - t0
+        total_api_call_s += cycle_api_call_s
+        usage_stats = cycle_usage
+        score = score_llm_output(result, baseline_payload)
+        cycle_outputs.append({
+            "cycle": cycle_idx,
+            "result": result,
+            "usage": cycle_usage,
+            "score": score,
+        })
+        cycle_scores.append({
+            "cycle": cycle_idx,
+            "score": score,
+        })
+        log.info(f"OpenAI cycle {cycle_idx}/{cycles}: score={score['total_score']:.1f}/100")
+        if cycle_idx < cycles:
+            current_prompt = build_refinement_prompt(
+                context_payload=context_payload,
+                previous_output=result,
+                dataset_name=dataset_name,
+                cycle_idx=cycle_idx + 1,
+                research_context=format_evidence_for_prompt(research_evidence),
+            )
+            prompt_log.append(current_prompt)
+
+    api_call_s = total_api_call_s
+    usage_stats = usage_stats or {}
     usage_stats["projection"] = projection
     usage_stats["max_cost_usd"] = max_cost_usd
+    usage_stats["max_cost_cad"] = round(max_cost_usd / CAD_TO_USD, 2)
+    usage_stats["projected_run_cost_usd"] = projected_total
+    (out_dir / "llm_prompt.txt").write_text(
+        "\n\n".join(prompt_log),
+        encoding="utf-8",
+    )
 
     (out_dir / "llm_raw_response.json").write_text(
-        json.dumps({"result": result, "usage": usage_stats}, indent=2),
+        json.dumps({"result": result, "cycles": cycle_outputs, "usage": usage_stats}, indent=2),
         encoding="utf-8",
     )
 
     t0 = time.time()
-    llm_report = generate_llm_report(result, dataset_name, model, usage_stats)
+    llm_report = generate_llm_report(result, context_payload, cycle_scores, dataset_name, model, usage_stats)
     llm_report_path = out_dir / "llm_fairness_report.md"
     llm_report_path.write_text(llm_report, encoding="utf-8")
     report_generation_s = time.time() - t0
@@ -663,9 +692,10 @@ def run_llm_benchmark(
     t0 = time.time()
     comparison = generate_comparison(
         result=result,
-        our_fairness_csv=Path(fairness_csv_path),
+        baseline_payload=baseline_payload,
         our_qualitative_report=Path(qualitative_report_path),
         dataset_name=dataset_name,
+        cycle_scores=cycle_scores,
         usage_stats=usage_stats,
     )
     comparison_path = out_dir / "benchmark_comparison.md"
@@ -673,7 +703,7 @@ def run_llm_benchmark(
     comparison_generation_s = time.time() - t0
     usage_stats["stage_timings_s"] = {
         "load_predictions": round(load_predictions_s, 2),
-        "research_retrieval": round(research_retrieval_s, 2),
+        "build_metric_context": round(metric_context_s, 2),
         "prompt_build": round(prompt_build_s, 2),
         "api_call": round(api_call_s, 2),
         "report_generation": round(report_generation_s, 2),
@@ -681,7 +711,7 @@ def run_llm_benchmark(
         "total_benchmark": round(time.time() - benchmark_t0, 2),
     }
     (out_dir / "llm_napkin_math.json").write_text(
-        json.dumps({"projection": projection, "usage": usage_stats}, indent=2),
+        json.dumps({"projection": projection, "projected_run_cost_usd": projected_total, "usage": usage_stats}, indent=2),
         encoding="utf-8",
     )
     log.info(
@@ -705,8 +735,14 @@ def main() -> None:
     parser.add_argument("--out_dir", default=".", help="Output directory")
     parser.add_argument("--dataset_name", default="Dataset", help="Name for the report header")
     parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI model to use")
-    parser.add_argument("--max_cost_usd", type=float, default=DEFAULT_MAX_COST_USD, help="Abort if projected request cost exceeds this amount")
+    parser.add_argument(
+        "--max_cost_usd",
+        type=float,
+        default=DEFAULT_MAX_COST_USD,
+        help="Abort if projected request cost exceeds this USD amount (default ~= 50 CAD)",
+    )
     parser.add_argument("--max_output_tokens", type=int, default=DEFAULT_MAX_OUTPUT_TOKENS, help="Maximum completion tokens for the OpenAI response")
+    parser.add_argument("--cycles", type=int, default=3, help="Number of fixed self-refinement cycles")
     args = parser.parse_args()
 
     configs: dict[str, str] = {}
@@ -730,6 +766,7 @@ def main() -> None:
         model=args.model,
         max_cost_usd=args.max_cost_usd,
         max_output_tokens=args.max_output_tokens,
+        cycles=args.cycles,
     )
 
 

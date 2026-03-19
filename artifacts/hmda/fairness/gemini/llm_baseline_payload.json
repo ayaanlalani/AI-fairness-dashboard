@@ -1,0 +1,75 @@
+{
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "race",
+      "severity": "MODERATE (borderline)",
+      "root_cause_labels": [
+        "historical_label_bias",
+        "representation_bias"
+      ],
+      "root_causes": [
+        "Historical / label bias: the ground-truth labels themselves show a significant disparity across groups. The model is learning to replicate outcomes that may embed past discriminatory decisions.",
+        "Representation bias: severely underrepresented groups make the model less reliable for those populations and can amplify existing disparities."
+      ],
+      "mitigations": [
+        "Pre-processing -- Reweighing (aif360.algorithms.preprocessing.Reweighing): assign sample weights that compensate for historical label imbalance across groups before training.",
+        "Data collection: gather more samples from underrepresented groups. In the interim, use class-weighted training (class_weight='balanced' in scikit-learn) to upweight minority-group errors."
+      ],
+      "research_titles": [
+        "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
+        "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
+        "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment"
+      ]
+    },
+    {
+      "attribute": "sex",
+      "severity": "MODERATE (borderline)",
+      "root_cause_labels": [],
+      "root_causes": [],
+      "mitigations": [
+        "Post-processing -- Calibrated Equalized Odds (aif360.algorithms.postprocessing.CalibratedEqOddsPostprocessing): a minimal intervention that adjusts thresholds to bring DI above the 0.8 threshold while preserving calibration."
+      ],
+      "research_titles": [
+        "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
+        "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
+        "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment"
+      ]
+    },
+    {
+      "attribute": "age_group",
+      "severity": "LOW (fair)",
+      "root_cause_labels": [
+        "historical_label_bias"
+      ],
+      "root_causes": [
+        "Historical / label bias: the ground-truth labels themselves show a significant disparity across groups. The model is learning to replicate outcomes that may embed past discriminatory decisions."
+      ],
+      "mitigations": [
+        "Pre-processing -- Reweighing (aif360.algorithms.preprocessing.Reweighing): assign sample weights that compensate for historical label imbalance across groups before training."
+      ],
+      "research_titles": [
+        "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
+        "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
+        "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment"
+      ]
+    }
+  ]
+}

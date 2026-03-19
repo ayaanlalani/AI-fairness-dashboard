@@ -38,6 +38,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from llm_benchmark_common import build_context_and_baseline, score_llm_output
 from scholarly_evidence import gather_research_context, format_evidence_for_prompt
 
 logging.basicConfig(
@@ -79,86 +80,46 @@ def _csv_for_prompt(df: pd.DataFrame, protected_attrs: list[str],
 
 
 def build_prompt(
-    csv_text: str,
-    protected_configs: dict[str, str],
+    context_payload: dict[str, object],
     dataset_name: str,
-    target_col: str,
-    pred_col: str,
-    favorable_label: int,
     research_context: str = "",
 ) -> str:
-    """Build the Gemini prompt.
-
-    The LLM receives raw data only and is told to use fairlearn definitions.
-    """
-    attr_desc = "\n".join(
-        f"  - `{attr}` (privileged value: `{priv}`)"
-        for attr, priv in protected_configs.items()
-    )
-
+    """Build the initial Gemini prompt using deterministic metrics context."""
+    context_json = json.dumps(context_payload, indent=2)
     return textwrap.dedent(f"""\
-    You are an AI fairness auditor. You are given a CSV of model predictions with
-    ground-truth labels and protected attributes. Your job is to independently
-    analyse this data for bias using the dataset itself, the fairness toolkit
-    context below, and the research evidence provided. You do NOT have access to
-    our pre-computed fairness metrics or qualitative analysis.
+    You are an AI fairness auditor. Python has already computed the fairness
+    metrics and quantitative group breakdowns. Do NOT recompute the math. Your
+    job is to provide the strongest possible qualitative analysis, define a
+    remediation-ready reference audit specification, and give mitigation advice.
 
     ## Dataset
     Name: {dataset_name}
-    Target column: `{target_col}` (ground truth)
-    Prediction column: `{pred_col}` (model output)
-    Favorable label: {favorable_label}
-
-    Protected attributes and their privileged values:
-    {attr_desc}
 
     ## Fairness toolkit context
     {AIF360_CONTEXT}
 
     ## Research evidence (Semantic Scholar)
-    Use this as supporting evidence when you define the audit standard and justify
-    mitigations. Do not just repeat paper titles; use them to support your reasoning.
+    Use this as supporting evidence. Do not just list papers; use them to justify
+    the audit structure and mitigation recommendations.
     {research_context}
 
-    ## Raw prediction data (CSV)
-    ```
-    {csv_text}
+    ## Deterministic fairness context (Python-computed)
+    ```json
+    {context_json}
     ```
 
     ## Your task
-
-    First, define a remediation-ready **reference audit specification**: the set
-    of metrics and response elements an audit should include to support future
-    remediation. Ground this in the research evidence above and your reasoning.
-
-    Then, for EACH protected attribute listed above, compute the following fairness
-    metrics (compare unprivileged group(s) vs the privileged group):
-
-    1. **Disparate Impact (DI)** = selection_rate(unprivileged) / selection_rate(privileged)
-       Equivalent to fairlearn.metrics.selection_rate ratio.
-       For multi-group attributes, use the group with the LOWEST selection rate as the unprivileged group.
-    2. **Demographic Parity Difference (DPD)** = selection_rate(unprivileged) - selection_rate(privileged)
-       Equivalent to fairlearn.metrics.demographic_parity_difference.
-    3. **Equal Opportunity Difference (EOD)** = TPR(unprivileged) - TPR(privileged)
-       Equivalent to fairlearn.metrics.equalized_odds_difference restricted to the positive class.
-    4. **Average Odds Difference (AOD)** = 0.5 * ((FPR_unpriv - FPR_priv) + (TPR_unpriv - TPR_priv))
-       Equivalent to the average of TPR and FPR gaps from fairlearn.metrics.equalized_odds_difference.
-    5. **Theil Index** = (1/N) * sum( (y_pred_i / mean(y_pred)) * ln(y_pred_i / mean(y_pred)) )
-       where y_pred are the binary predictions. If mean is 0 or all predictions
-       are the same, report 0.
-
-    Then produce a qualitative fairness analysis covering:
-    - **What is wrong**: describe the disparities you found in the data
-    - **Why it is wrong**: root causes (data imbalance, historical bias, proxy features, etc.)
-    - **How to fix it**: specific mitigation strategies referencing **fairlearn** algorithms
-      (e.g. fairlearn.reductions.ExponentiatedGradient, fairlearn.postprocessing.ThresholdOptimizer,
-       fairlearn.reductions.GridSearch, etc.)
-    - **Severity**: classify each attribute as CRITICAL (DI < 0.72), HIGH (0.72 <= DI < 0.80),
-      MODERATE (0.80 <= DI < 0.95), or LOW (DI >= 0.95)
+    1. Define a remediation-ready **reference audit specification**.
+    2. For each protected attribute, explain:
+       - what is wrong
+       - why it is wrong
+       - how to fix it
+       - severity, consistent with the provided DI thresholds
+    3. Use named mitigation algorithms where possible.
+    4. Support the audit specification and attribute-level recommendations with research citations.
 
     ## Required output format
-
-    Return ONLY valid JSON (no markdown fences, no commentary outside the JSON) with this structure:
+    Return ONLY valid JSON with this structure:
     {{
       "reference_audit_spec": {{
         "name": "<short name>",
@@ -167,18 +128,6 @@ def build_prompt(
         "why_this_spec": "<paragraph>",
         "supporting_research": ["<paper citation>", "..."]
       }},
-      "metrics": [
-        {{
-          "attribute": "<attr name>",
-          "privileged_value": "<value>",
-          "disparate_impact": <float>,
-          "demographic_parity_diff": <float>,
-          "equal_opportunity_diff": <float>,
-          "average_odds_diff": <float>,
-          "theil_index": <float>,
-          "bias_flag": <bool>
-        }}
-      ],
       "qualitative": [
         {{
           "attribute": "<attr name>",
@@ -188,11 +137,47 @@ def build_prompt(
           "how_to_fix": "<paragraph>",
           "supporting_research": ["<paper citation>", "..."]
         }}
-      ]
+      ],
+      "cross_attribute_summary": "<paragraph>"
     }}
+    """)
 
-    bias_flag should be true if DI < 0.8, false otherwise.
-    Round all floats to 4 decimal places.
+
+def build_refinement_prompt(
+    context_payload: dict[str, object],
+    previous_output: dict[str, object],
+    dataset_name: str,
+    cycle_idx: int,
+    research_context: str = "",
+) -> str:
+    context_json = json.dumps(context_payload, indent=2)
+    previous_json = json.dumps(previous_output, indent=2)
+    return textwrap.dedent(f"""\
+    You are refining a previous AI fairness audit for cycle {cycle_idx}.
+    Improve the previous output using the same deterministic fairness context and
+    research evidence. Do not recompute metrics. Focus on:
+    - clearer causal reasoning tied to the provided metric context
+    - stronger, more specific mitigation advice
+    - better use of research support
+    - consistent severity labels
+
+    ## Dataset
+    Name: {dataset_name}
+
+    ## Research evidence (Semantic Scholar)
+    {research_context}
+
+    ## Deterministic fairness context
+    ```json
+    {context_json}
+    ```
+
+    ## Previous output to improve
+    ```json
+    {previous_json}
+    ```
+
+    Return ONLY valid JSON in the exact same structure as before.
     """)
 
 
@@ -222,6 +207,35 @@ def estimate_cost(prompt: str, max_output_tokens: int = DEFAULT_MAX_OUTPUT_TOKEN
         "projected_output_cost_usd": round(output_cost, 6),
         "projected_total_cost_usd": round(input_cost + output_cost, 6),
     }
+
+
+def _extract_json_candidate(raw: str) -> str:
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = re.sub(r"^```(?:json)?\s*\n?", "", raw)
+        raw = re.sub(r"\n?```\s*$", "", raw)
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        return raw[start:end + 1]
+    return raw
+
+
+def _sanitize_json_candidate(raw: str) -> str:
+    candidate = _extract_json_candidate(raw)
+    candidate = candidate.replace("\r", " ").replace("\n", " ").replace("\t", " ")
+    candidate = re.sub(r"[\x00-\x08\x0b-\x1f]", " ", candidate)
+    candidate = re.sub(r"\s{2,}", " ", candidate)
+    return candidate.strip()
+
+
+def _parse_gemini_json(raw: str) -> dict:
+    candidate = _extract_json_candidate(raw)
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        sanitized = _sanitize_json_candidate(raw)
+        return json.loads(sanitized)
 
 
 def call_gemini(prompt: str, api_key: str, model: str = GEMINI_MODEL) -> tuple[dict, dict]:
@@ -285,14 +299,9 @@ def call_gemini(prompt: str, api_key: str, model: str = GEMINI_MODEL) -> tuple[d
         f"est. cost ${total_cost:.4f}"
     )
 
-    raw = response.text.strip()
-
-    if raw.startswith("```"):
-        raw = re.sub(r"^```(?:json)?\s*\n?", "", raw)
-        raw = re.sub(r"\n?```\s*$", "", raw)
-
     try:
-        return json.loads(raw), usage_stats
+        raw = response.text.strip()
+        return _parse_gemini_json(raw), usage_stats
     except json.JSONDecodeError as e:
         log.error(f"Failed to parse Gemini response as JSON: {e}")
         log.error(f"Raw response (first 500 chars): {raw[:500]}")
@@ -341,7 +350,7 @@ def _format_usage_block(usage: dict) -> list[str]:
             "| Stage | Seconds |",
             "|---|---:|",
             f"| Load predictions | {stage_timings.get('load_predictions', 0):.2f} |",
-            f"| Research retrieval | {stage_timings.get('research_retrieval', 0):.2f} |",
+            f"| Build metric context | {stage_timings.get('build_metric_context', 0):.2f} |",
             f"| Prompt build | {stage_timings.get('prompt_build', 0):.2f} |",
             f"| API call | {stage_timings.get('api_call', 0):.2f} |",
             f"| Report generation | {stage_timings.get('report_generation', 0):.2f} |",
@@ -352,203 +361,173 @@ def _format_usage_block(usage: dict) -> list[str]:
     return lines
 
 
-def generate_llm_report(gemini_result: dict, dataset_name: str,
-                        usage_stats: dict | None = None) -> str:
-    """Convert Gemini's JSON response into a standalone markdown report."""
+def generate_llm_report(
+    final_result: dict,
+    context_payload: dict,
+    cycle_scores: list[dict],
+    dataset_name: str,
+    usage_stats: dict | None = None,
+) -> str:
     lines = [
         f"# LLM Fairness Analysis (Gemini): {dataset_name}",
         "",
         f"**Model:** {GEMINI_MODEL}",
-        f"**Method:** Independent analysis using fairlearn (metrics and mitigations)",
+        "**Method:** Deterministic metrics + qualitative reasoning/refinement cycles",
         "",
     ]
-
     if usage_stats:
         lines.extend(_format_usage_block(usage_stats))
 
-    ref_spec = gemini_result.get("reference_audit_spec")
-    if ref_spec:
-        lines.append("## Reference Audit Specification")
-        lines.append("")
-        lines.append(f"**Name:** {ref_spec.get('name', 'N/A')}")
-        lines.append("")
-        if ref_spec.get("core_metrics"):
-            lines.append("**Core metrics:** " + ", ".join(ref_spec["core_metrics"]))
-            lines.append("")
-        if ref_spec.get("required_response_elements"):
-            lines.append(
-                "**Required response elements:** "
-                + ", ".join(ref_spec["required_response_elements"])
-            )
-            lines.append("")
-        if ref_spec.get("why_this_spec"):
-            lines.append(ref_spec["why_this_spec"])
-            lines.append("")
-        if ref_spec.get("supporting_research"):
-            lines.append("**Supporting research:**")
-            for citation in ref_spec["supporting_research"]:
-                lines.append(f"- {citation}")
-            lines.append("")
-
-    # Metrics table
-    lines.append("## Computed Metrics")
-    lines.append("")
-    lines.append("| Attribute | Privileged | DI | DPD | EOD | AOD | Theil | Bias? |")
-    lines.append("|---|---|---:|---:|---:|---:|---:|---|")
-
-    for m in gemini_result.get("metrics", []):
+    lines.extend([
+        "## Deterministic Metric Context",
+        "",
+        "| Attribute | Privileged | DI | DPD | EOD | AOD | Theil |",
+        "|---|---|---:|---:|---:|---:|---:|",
+    ])
+    for attr in context_payload.get("attributes", []):
+        metrics = attr["metrics"]
         lines.append(
-            f"| {m['attribute']} | {m['privileged_value']} "
-            f"| {m['disparate_impact']:.4f} "
-            f"| {m['demographic_parity_diff']:.4f} "
-            f"| {m['equal_opportunity_diff']:.4f} "
-            f"| {m['average_odds_diff']:.4f} "
-            f"| {m['theil_index']:.4f} "
-            f"| {'Yes' if m['bias_flag'] else 'No'} |"
+            f"| {attr['attribute']} | {attr['privileged_value']} "
+            f"| {_fmt_num(metrics.get('disparate_impact'))} "
+            f"| {_fmt_num(metrics.get('demographic_parity_diff'))} "
+            f"| {_fmt_num(metrics.get('equal_opportunity_diff'))} "
+            f"| {_fmt_num(metrics.get('average_odds_diff'))} "
+            f"| {_fmt_num(metrics.get('theil_index'))} |"
         )
     lines.append("")
 
-    # Qualitative sections
-    for q in gemini_result.get("qualitative", []):
-        lines.append("---")
-        lines.append(f"## {q['attribute']}  (severity: {q['severity']})")
+    lines.extend([
+        "## Cycle Scores",
+        "",
+        "| Cycle | Total Score | Completeness | Severity | Cause Alignment | Mitigation | Research |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ])
+    for score in cycle_scores:
+        subs = score["score"]["subscores"]
+        lines.append(
+            f"| {score['cycle']} | {score['score']['total_score']:.1f} | "
+            f"{subs['completeness']:.1f} | {subs['severity_agreement']:.1f} | "
+            f"{subs['cause_alignment']:.1f} | {subs['mitigation_specificity']:.1f} | "
+            f"{subs['research_grounding']:.1f} |"
+        )
+    lines.append("")
+
+    ref_spec = final_result.get("reference_audit_spec", {})
+    lines.extend([
+        "## Final Reference Audit Specification",
+        "",
+        f"**Name:** {ref_spec.get('name', 'N/A')}",
+        "",
+        "**Core metrics:** " + ", ".join(ref_spec.get("core_metrics", [])),
+        "",
+        "**Required response elements:** " + ", ".join(ref_spec.get("required_response_elements", [])),
+        "",
+        ref_spec.get("why_this_spec", ""),
+        "",
+    ])
+    if ref_spec.get("supporting_research"):
+        lines.append("**Supporting research:**")
+        for citation in ref_spec["supporting_research"]:
+            lines.append(f"- {citation}")
         lines.append("")
-        lines.append("### What is wrong")
-        lines.append("")
-        lines.append(q["what_is_wrong"])
-        lines.append("")
-        lines.append("### Why it is wrong")
-        lines.append("")
-        lines.append(q["why_is_wrong"])
-        lines.append("")
-        lines.append("### How to fix it")
-        lines.append("")
-        lines.append(q["how_to_fix"])
-        lines.append("")
+
+    for q in final_result.get("qualitative", []):
+        lines.extend([
+            "---",
+            f"## {q['attribute']}  (severity: {q['severity']})",
+            "",
+            "### What is wrong",
+            "",
+            q["what_is_wrong"],
+            "",
+            "### Why it is wrong",
+            "",
+            q["why_is_wrong"],
+            "",
+            "### How to fix it",
+            "",
+            q["how_to_fix"],
+            "",
+        ])
         if q.get("supporting_research"):
             lines.append("### Supporting research")
             lines.append("")
             for citation in q["supporting_research"]:
                 lines.append(f"- {citation}")
             lines.append("")
-
+    if final_result.get("cross_attribute_summary"):
+        lines.extend([
+            "## Cross-attribute summary",
+            "",
+            final_result["cross_attribute_summary"],
+            "",
+        ])
     return "\n".join(lines)
 
 
 def generate_comparison(
-    gemini_result: dict,
-    our_fairness_csv: Path,
+    final_result: dict,
+    baseline_payload: dict,
     our_qualitative_report: Path,
     dataset_name: str,
+    cycle_scores: list[dict],
     usage_stats: dict | None = None,
 ) -> str:
-    """Build a side-by-side comparison markdown report."""
-    our_df = pd.read_csv(our_fairness_csv)
     our_qual = our_qualitative_report.read_text(encoding="utf-8") if our_qualitative_report.exists() else ""
-
     lines = [
         f"# Benchmark Comparison: {dataset_name}",
         "",
-        "Deterministic pipeline (AIF360) vs. Gemini LLM (fairlearn only -- no access to our calculations).",
+        "Deterministic pipeline vs. Gemini qualitative benchmark over fixed self-refinement cycles.",
         "",
     ]
-
     if usage_stats:
         lines.extend(_format_usage_block(usage_stats))
 
-    # ── metric comparison table ───────────────────────────────────────
-    lines.append("## Metric Comparison")
-    lines.append("")
-    lines.append("| Attribute | Metric | Our Pipeline | Gemini LLM | Delta |")
-    lines.append("|---|---|---:|---:|---:|")
-
-    metric_map = {
-        "disparate_impact": "DisparateImpact",
-        "demographic_parity_diff": "DemographicParityDiff",
-        "equal_opportunity_diff": "EqualOpportunityDiff",
-        "average_odds_diff": "AverageOddsDiff",
-        "theil_index": "TheilIndex",
-    }
-    display_names = {
-        "disparate_impact": "Disparate Impact",
-        "demographic_parity_diff": "Demographic Parity Diff",
-        "equal_opportunity_diff": "Equal Opportunity Diff",
-        "average_odds_diff": "Average Odds Diff",
-        "theil_index": "Theil Index",
-    }
-
-    for gem_m in gemini_result.get("metrics", []):
-        attr = gem_m["attribute"]
-        our_row = _find_our_row(our_df, attr)
-
-        for gem_key, our_key in metric_map.items():
-            gem_val = gem_m.get(gem_key)
-            our_val = _safe_float(our_row.get(our_key)) if our_row is not None else None
-
-            gem_str = f"{gem_val:.4f}" if gem_val is not None else "--"
-            our_str = f"{our_val:.4f}" if our_val is not None else "--"
-
-            if gem_val is not None and our_val is not None:
-                delta = gem_val - our_val
-                delta_str = f"{delta:+.4f}"
-            else:
-                delta_str = "--"
-
-            lines.append(f"| {attr} | {display_names[gem_key]} | {our_str} | {gem_str} | {delta_str} |")
-
+    lines.extend([
+        "## Cycle Improvement",
+        "",
+        "| Cycle | Total Score | Summary |",
+        "|---|---:|---|",
+    ])
+    for score in cycle_scores:
+        lines.append(f"| {score['cycle']} | {score['score']['total_score']:.1f} | {score['score']['summary']} |")
     lines.append("")
 
-    # ── severity comparison ───────────────────────────────────────────
-    lines.append("## Severity Comparison")
-    lines.append("")
-    lines.append("| Attribute | Our Pipeline | Gemini LLM | Agreement? |")
-    lines.append("|---|---|---|---|")
-
-    our_severities = _extract_severities(our_qual)
-
-    for q in gemini_result.get("qualitative", []):
+    baseline_by_attr = {row["attribute"]: row for row in baseline_payload.get("attributes", [])}
+    lines.extend([
+        "## Severity Comparison",
+        "",
+        "| Attribute | Deterministic Baseline | Gemini | Agreement? |",
+        "|---|---|---|---|",
+    ])
+    for q in final_result.get("qualitative", []):
         attr = q["attribute"]
+        baseline = baseline_by_attr.get(attr, {})
+        our_sev = baseline.get("severity", "--")
         gem_sev = q["severity"]
-        our_sev = our_severities.get(attr, our_severities.get(attr + "_original", "--"))
         agree = "Yes" if _normalize_severity(gem_sev) == _normalize_severity(our_sev) else "No"
         lines.append(f"| {attr} | {our_sev} | {gem_sev} | {agree} |")
-
-    lines.append("")
-
-    # ── qualitative narrative comparison ──────────────────────────────
-    lines.append("## Qualitative Narrative Comparison")
     lines.append("")
 
     our_sections = _extract_qualitative_sections(our_qual)
-
-    for q in gemini_result.get("qualitative", []):
+    lines.append("## Qualitative Narrative Comparison")
+    lines.append("")
+    for q in final_result.get("qualitative", []):
         attr = q["attribute"]
-        lines.append(f"### {attr}")
-        lines.append("")
-
         our_sec = our_sections.get(attr, our_sections.get(attr + "_original", {}))
-
-        lines.append("#### What is wrong")
-        lines.append("")
-        lines.append(f"**Our pipeline:** {our_sec.get('what_is_wrong', 'N/A')}")
-        lines.append("")
-        lines.append(f"**Gemini:** {q['what_is_wrong']}")
-        lines.append("")
-
-        lines.append("#### Why it is wrong")
-        lines.append("")
-        lines.append(f"**Our pipeline:** {our_sec.get('why_is_wrong', 'N/A')}")
-        lines.append("")
-        lines.append(f"**Gemini:** {q['why_is_wrong']}")
-        lines.append("")
-
-        lines.append("#### How to fix it")
-        lines.append("")
-        lines.append(f"**Our pipeline:** {our_sec.get('how_to_fix', 'N/A')}")
-        lines.append("")
-        lines.append(f"**Gemini:** {q['how_to_fix']}")
-        lines.append("")
-
+        baseline = baseline_by_attr.get(attr, {})
+        lines.extend([
+            f"### {attr}",
+            "",
+            f"**Deterministic root causes:** {'; '.join(baseline.get('root_causes', [])) or 'N/A'}",
+            "",
+            f"**Gemini why it is wrong:** {q['why_is_wrong']}",
+            "",
+            f"**Deterministic mitigations:** {'; '.join(baseline.get('mitigations', [])) or our_sec.get('how_to_fix', 'N/A')}",
+            "",
+            f"**Gemini how to fix it:** {q['how_to_fix']}",
+            "",
+        ])
     return "\n".join(lines)
 
 
@@ -576,6 +555,11 @@ def _safe_float(val) -> float | None:
         return None if math.isnan(f) else f
     except (ValueError, TypeError):
         return None
+
+
+def _fmt_num(val) -> str:
+    safe = _safe_float(val)
+    return f"{safe:.4f}" if safe is not None else "--"
 
 
 def _normalize_severity(s: str) -> str:
@@ -639,6 +623,7 @@ def run_llm_benchmark(
     protected_configs: dict[str, str],
     out_dir: str | Path,
     dataset_name: str = "Dataset",
+    cycles: int = 3,
 ) -> Path:
     """Run the full LLM benchmark and write reports. Returns comparison path."""
     benchmark_t0 = time.time()
@@ -651,31 +636,26 @@ def run_llm_benchmark(
     t0 = time.time()
     predictions_df = pd.read_csv(predictions_path)
     load_predictions_s = time.time() - t0
+    fairness_df = pd.read_csv(fairness_csv_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    csv_text = _csv_for_prompt(
-        predictions_df,
-        list(protected_configs.keys()),
-        target_col,
-        pred_col,
-    )
     t0 = time.time()
-    research_evidence = gather_research_context(
-        dataset_name=dataset_name,
-        protected_attrs=list(protected_configs.keys()),
-        max_papers=6,
-    )
-    research_retrieval_s = time.time() - t0
-
-    t0 = time.time()
-    prompt = build_prompt(
-        csv_text=csv_text,
+    context_payload, baseline_payload, research_evidence = build_context_and_baseline(
+        predictions_df=predictions_df,
+        fairness_df=fairness_df,
         protected_configs=protected_configs,
-        dataset_name=dataset_name,
         target_col=target_col,
         pred_col=pred_col,
         favorable_label=favorable_label,
+        dataset_name=dataset_name,
+    )
+    metric_context_s = time.time() - t0
+
+    t0 = time.time()
+    prompt = build_prompt(
+        context_payload=context_payload,
+        dataset_name=dataset_name,
         research_context=format_evidence_for_prompt(research_evidence),
     )
     prompt_build_s = time.time() - t0
@@ -685,7 +665,8 @@ def run_llm_benchmark(
         f"{len(predictions_df):,} rows | {len(prompt):,} prompt chars | "
         f"{projection['projected_input_tokens']:,} projected input tok | "
         f"{projection['projected_output_tokens']:,} assumed max output tok | "
-        f"${projection['projected_total_cost_usd']:.4f} projected cost ceiling"
+        f"${projection['projected_total_cost_usd']:.4f} projected cost ceiling | "
+        f"{cycles} cycles"
     )
 
     # Save prompt for reproducibility
@@ -696,25 +677,77 @@ def run_llm_benchmark(
         encoding="utf-8",
     )
     log.info(f"Research context saved to {out_dir / 'semantic_scholar_context.json'}")
+    (out_dir / "llm_context_payload.json").write_text(
+        json.dumps(context_payload, indent=2),
+        encoding="utf-8",
+    )
+    (out_dir / "llm_baseline_payload.json").write_text(
+        json.dumps(baseline_payload, indent=2),
+        encoding="utf-8",
+    )
     (out_dir / "llm_napkin_math.json").write_text(
         json.dumps({"projection": projection}, indent=2),
         encoding="utf-8",
     )
 
-    t0 = time.time()
-    gemini_result, usage_stats = call_gemini(prompt, api_key)
-    api_call_s = time.time() - t0
+    prompt_log = [prompt]
+    cycle_outputs: list[dict] = []
+    cycle_scores: list[dict] = []
+    total_api_call_s = 0.0
+    usage_stats: dict | None = None
+    gemini_result: dict = {}
+    current_prompt = prompt
+    for cycle_idx in range(1, cycles + 1):
+        t0 = time.time()
+        gemini_result, cycle_usage = call_gemini(current_prompt, api_key)
+        cycle_api_call_s = time.time() - t0
+        total_api_call_s += cycle_api_call_s
+        usage_stats = cycle_usage
+        score = score_llm_output(gemini_result, baseline_payload)
+        cycle_outputs.append({
+            "cycle": cycle_idx,
+            "result": gemini_result,
+            "usage": cycle_usage,
+            "score": score,
+        })
+        cycle_scores.append({
+            "cycle": cycle_idx,
+            "score": score,
+        })
+        log.info(f"Gemini cycle {cycle_idx}/{cycles}: score={score['total_score']:.1f}/100")
+        if cycle_idx < cycles:
+            current_prompt = build_refinement_prompt(
+                context_payload=context_payload,
+                previous_output=gemini_result,
+                dataset_name=dataset_name,
+                cycle_idx=cycle_idx + 1,
+                research_context=format_evidence_for_prompt(research_evidence),
+            )
+            prompt_log.append(current_prompt)
+
+    api_call_s = total_api_call_s
+    usage_stats = usage_stats or {}
     usage_stats["projection"] = projection
+    (out_dir / "llm_prompt.txt").write_text(
+        "\n\n".join(prompt_log),
+        encoding="utf-8",
+    )
 
     # Save raw JSON response + usage stats
     (out_dir / "llm_raw_response.json").write_text(
-        json.dumps({"result": gemini_result, "usage": usage_stats}, indent=2),
+        json.dumps({"result": gemini_result, "cycles": cycle_outputs, "usage": usage_stats}, indent=2),
         encoding="utf-8",
     )
 
     # Generate standalone LLM report
     t0 = time.time()
-    llm_report = generate_llm_report(gemini_result, dataset_name, usage_stats)
+    llm_report = generate_llm_report(
+        final_result=gemini_result,
+        context_payload=context_payload,
+        cycle_scores=cycle_scores,
+        dataset_name=dataset_name,
+        usage_stats=usage_stats,
+    )
     llm_report_path = out_dir / "llm_fairness_report.md"
     llm_report_path.write_text(llm_report, encoding="utf-8")
     report_generation_s = time.time() - t0
@@ -723,10 +756,11 @@ def run_llm_benchmark(
     # Generate comparison
     t0 = time.time()
     comparison = generate_comparison(
-        gemini_result=gemini_result,
-        our_fairness_csv=Path(fairness_csv_path),
+        final_result=gemini_result,
+        baseline_payload=baseline_payload,
         our_qualitative_report=Path(qualitative_report_path),
         dataset_name=dataset_name,
+        cycle_scores=cycle_scores,
         usage_stats=usage_stats,
     )
     comparison_path = out_dir / "benchmark_comparison.md"
@@ -734,7 +768,7 @@ def run_llm_benchmark(
     comparison_generation_s = time.time() - t0
     usage_stats["stage_timings_s"] = {
         "load_predictions": round(load_predictions_s, 2),
-        "research_retrieval": round(research_retrieval_s, 2),
+        "build_metric_context": round(metric_context_s, 2),
         "prompt_build": round(prompt_build_s, 2),
         "api_call": round(api_call_s, 2),
         "report_generation": round(report_generation_s, 2),
@@ -782,6 +816,8 @@ def main() -> None:
                         help="Output directory")
     parser.add_argument("--dataset_name", default="Dataset",
                         help="Name for the report header")
+    parser.add_argument("--cycles", type=int, default=3,
+                        help="Number of fixed self-refinement cycles")
     args = parser.parse_args()
 
     configs: dict[str, str] = {}
@@ -802,6 +838,7 @@ def main() -> None:
         protected_configs=configs,
         out_dir=args.out_dir,
         dataset_name=args.dataset_name,
+        cycles=args.cycles,
     )
 
 

@@ -409,6 +409,19 @@ def generate_qualitative_report(
     lines.append(f"**Overall selection rate:** {overall_sel:.1%}")
     lines.append("")
 
+    lines.extend([
+        "## Reference Audit Specification",
+        "",
+        "**Name:** Deterministic Remediation Audit",
+        "",
+        "**Core metrics:** Disparate Impact, Demographic Parity Difference, Equal Opportunity Difference, Average Odds Difference, Theil Index",
+        "",
+        "**Required response elements:** per-group breakdown, severity classification, root-cause analysis, mitigation recommendations, research-backed justification",
+        "",
+        "This deterministic baseline pairs quantitative disparity metrics with interpretable causal diagnostics and concrete mitigation options so the output is directly usable for remediation planning and LLM benchmark scoring.",
+        "",
+    ])
+
     for attr in protected_attrs:
         if attr not in predictions_df.columns:
             log.warning(f"Attribute '{attr}' not in predictions; skipping")

@@ -11,7 +11,9 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 import urllib.parse
+import urllib.error
 import urllib.request
 from typing import Any
 
@@ -21,6 +23,18 @@ SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 DEFAULT_FIELDS = (
     "title,year,authors,abstract,url,venue,citationCount,externalIds,paperId"
 )
+REQUEST_INTERVAL_S = 1.1
+MAX_RETRIES = 3
+_LAST_REQUEST_TS = 0.0
+
+
+def _respect_rate_limit() -> None:
+    global _LAST_REQUEST_TS
+    now = time.monotonic()
+    wait_s = REQUEST_INTERVAL_S - (now - _LAST_REQUEST_TS)
+    if wait_s > 0:
+        time.sleep(wait_s)
+    _LAST_REQUEST_TS = time.monotonic()
 
 
 def search_semantic_scholar(
@@ -42,12 +56,25 @@ def search_semantic_scholar(
     if api_key:
         req.add_header("x-api-key", api_key)
 
-    try:
-        with urllib.request.urlopen(req, timeout=timeout_s) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-    except Exception as exc:
-        log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
-        return []
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            _respect_rate_limit()
+            with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+                payload = json.loads(resp.read().decode("utf-8"))
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code == 429 and attempt < MAX_RETRIES:
+                wait_s = REQUEST_INTERVAL_S * (2 ** attempt)
+                log.warning(
+                    f"Semantic Scholar rate limited for '{query}'. Retrying in {wait_s:.1f}s ..."
+                )
+                time.sleep(wait_s)
+                continue
+            log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
+            return []
+        except Exception as exc:
+            log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
+            return []
 
     papers: list[dict[str, Any]] = []
     for item in payload.get("data", []):
@@ -122,6 +149,7 @@ def gather_research_context(
     queries = build_default_queries(dataset_name, protected_attrs)
     if extra_queries:
         queries.extend(extra_queries)
+    queries = list(dict.fromkeys(queries))
 
     seen: set[str] = set()
     papers: list[dict[str, Any]] = []

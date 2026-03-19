@@ -1,0 +1,44 @@
+{
+  "projection": {
+    "projected_input_tokens": 1973,
+    "projected_output_tokens": 5000,
+    "projected_total_tokens": 6973,
+    "projected_input_cost_usd": 0.01973,
+    "projected_output_cost_usd": 0.2,
+    "projected_total_cost_usd": 0.21973
+  },
+  "projected_run_cost_usd": 0.65919,
+  "usage": {
+    "model": "o3",
+    "attempts": 1,
+    "wall_clock_s": 29.73,
+    "input_tokens": 3862,
+    "output_tokens": 2182,
+    "total_tokens": 6044,
+    "input_cost_usd": 0.03862,
+    "output_cost_usd": 0.08728,
+    "total_cost_usd": 0.1259,
+    "price_input_per_m": 10.0,
+    "price_output_per_m": 40.0,
+    "projection": {
+      "projected_input_tokens": 1973,
+      "projected_output_tokens": 5000,
+      "projected_total_tokens": 6973,
+      "projected_input_cost_usd": 0.01973,
+      "projected_output_cost_usd": 0.2,
+      "projected_total_cost_usd": 0.21973
+    },
+    "max_cost_usd": 37.0,
+    "max_cost_cad": 50.0,
+    "projected_run_cost_usd": 0.65919,
+    "stage_timings_s": {
+      "load_predictions": 0.0,
+      "build_metric_context": 9.52,
+      "prompt_build": 0.0,
+      "api_call": 75.39,
+      "report_generation": 0.0,
+      "comparison_generation": 0.0,
+      "total_benchmark": 84.92
+    }
+  }
+}

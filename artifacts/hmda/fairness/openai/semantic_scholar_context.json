@@ -1,0 +1,92 @@
+[
+  {
+    "paper_id": "c41f9c5c5fff18dd742908efdf7c2683f4b70ddd",
+    "title": "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
+    "year": 2025,
+    "venue": "INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT",
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/c41f9c5c5fff18dd742908efdf7c2683f4b70ddd",
+    "abstract": "As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by introducing the Bias Detection Dashboard\u2014a Python-based tool built with Pandas, Seaborn, Matplotlib, Fairlearn, and Streamlit. The dashboard helps users identify data imbalances, compute fairness metrics like disparate impact, and detect sensitive attributes before model training. A case study in HR recruitment shows how it flagged gender bias and guided corrective steps. The research also introduces the Ethical AI Triangle\u2014bias, fairness, and privacy\u2014as key pillars that must be balanced. It calls for ethical practices across the AI lifecycle, diversity in teams, and transparent systems to build responsible, trustworthy AI.\n\nKeywords- Artificial Intelligence, algorithmic bias, data privacy, Bias Detection Dashboard, fairness metrics, gender bias, Ethical AI Triangle, responsible AI.",
+    "authors": [
+      "S. Sucharita",
+      "Prof. Kamalakanta Shaw"
+    ],
+    "query": "algorithmic fairness bias detection mitigation machine learning"
+  },
+  {
+    "paper_id": "bf11c75b72d2e8e6a65fa653fedde256277f5397",
+    "title": "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
+    "year": 2025,
+    "venue": "",
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/bf11c75b72d2e8e6a65fa653fedde256277f5397",
+    "abstract": "At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic fairness and bias mitigation are among the most important but challenging issues at hand. The goal of this book is to provide a holistic view across various disciplines of the ethical base, detection methods, and technical measures for trustworthy AI systems. Starting from a solid foundation of statistical bias, transparency systems and fairness-aware ML models, this book methodically looks at state-of-the-art methodologies, where we highlight their shortcomings and introduce a unified model framework for detecting bias and transparent algorithms. Moving beyond technical diagnoses, it examines key sociotechnical and policy tools that are required to implement AI responsibly, providing guidance to researchers, engineers, policy makers, and organizational leaders. Literature review has been driven following the experimental case, the fairness trade-offs, intersectional bias, explainability and regulatory compliance are discussed in depth by the authors. This work underscores that fairness in automated decision-making systems depends not only on algorithmic accuracy, but also institutional will and stakeholder engagement. The chapters in this book function as both an academic primer and a resourceful handbook, transitioning readers through an ever-growing ethical AI terrain. Whether you are a data scientist building and deploying an algorithm that encourages ethical speech, or a regulator working to create and refine guidelines around such algorithms, this book provides you with both the tools and the understanding you need for ethical technology development and deployment.",
+    "authors": [
+      "Jayesh Rane",
+      "Reshma Amol Chaudhari",
+      "N. Rane"
+    ],
+    "query": "algorithmic fairness bias detection mitigation machine learning"
+  },
+  {
+    "paper_id": "aeaffe41e8ee8adc7aa2b58c45202b8c930ebc19",
+    "title": "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment",
+    "year": 2025,
+    "venue": "BioData Mining",
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/aeaffe41e8ee8adc7aa2b58c45202b8c930ebc19",
+    "abstract": "Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine learning framework for predicting antenatal care uptake among women in Ghana, integrating explainability, bias mitigation, and causal inference to support ethical artificial intelligence (AI) deployment in low- and middle-income countries. Using the 2022 Ghana Demographic and Health Survey (n\u2009=\u20093,314 eligible women with a recent live birth), we applied multiple imputation by chained equations (m\u2009=\u200910), appropriate categorical encoding, and synthetic minority oversampling (SMOTE) within training folds. Four supervised models (logistic regression, random forest, XGBoost, support vector machine) underwent stratified 5\u2011fold nested cross\u2011validation with cost\u2011sensitive threshold optimization (selected probability threshold\u2009=\u20090.45). Explainability (SHAP), fairness auditing (AIF360; metrics: statistical parity difference, disparate impact, equal opportunity difference, average odds difference, theil index), preprocessing mitigation (reweighing), counterfactual explanations (DiCE), and cautious treatment effect estimation (causal forests within a double machine learning framework) were integrated. Performance metrics included accuracy, precision, recall, F1, ROC\u2011AUC, minority class PR\u2011AUC, balanced accuracy, calibration (Brier score), and decision curve net benefit. The optimized random forest model achieved the highest accuracy (0.68) and recall (0.84) in identifying women with inadequate ANC contacts. Calibration was strong, with a brier score of 0.158, a calibration slope of 0.97, and an intercept of \u2212\u20090.02. Fairness auditing revealed baseline disparities in model predictions across wealth, region, ethnicity, and religion, with a statistical parity difference for wealth status of 0.182 and a Disparate Impact of 1.62. Following reweighting, disparate impact improved into the fairness range (0.92; within the recommended 0.8\u20131.25 interval), and statistical parity difference reduced to \u2212\u20090.028. Counterfactual analysis indicated that education, wealth, media exposure, and health worker contacts were the most modifiable factors for improving ANC uptake. Exploratory causal inference using double machine learning suggested that improving wealth status and education could be associated with a 16% (Average Treatment Effect [ATE]\u2009=\u20090.163) and 14% (ATE\u2009=\u20090.142) increase, respectively, in the probability of adequate ANC, with greater effects observed among urban and educated subgroups. Adjusted odds ratio (AOR) analysis showed that women in the richest quintile were nearly twice as likely to receive adequate ANC (AOR\u2009=\u20091.91, 95% CI: 1.44\u20132.53; p\u2009<\u20090.001), while those in the poorest quintile had significantly lower odds (AOR\u2009=\u20090.58, 95% CI: 0.45\u20130.75; p\u2009<\u20090.001). Additional significant predictors included health insurance coverage (AOR\u2009=\u20091.74, 95% CI: 1.19\u20132.55), health worker contacts (AOR\u2009=\u20091.33, 95% CI: 1.11\u20131.58), and pregnancy intention (AOR\u2009=\u20091.54, 95% CI: 1.30\u20131.82). This integrated, fairness-aware machine learning framework suggest robust, equitable, and actionable prediction of ANC uptake among Ghanaian women. Key modifiable determinants include wealth, education, and healthcare access barriers. The framework offers a replicable, ethical blueprint for transparent and fair AI deployment in maternal health, supporting targeted interventions to advance universal access to quality care in Ghana. Policymakers and health managers can leverage these AI tools to identify high-risk women, monitor intervention impacts, and allocate resources more equitably, advancing progress toward universal access to quality maternal care in Ghana.",
+    "authors": [
+      "Augustus Osborne",
+      "Kobloobase O. Usani"
+    ],
+    "query": "AIF360 fairlearn bias mitigation demographic parity equal opportunity"
+  },
+  {
+    "paper_id": "9a250df458d676629354ee0f609a26ae446a6060",
+    "title": "Bias Mitigation in Federated Healthcare Cloud Models",
+    "year": 2025,
+    "venue": "Journal of Medical and Health Studies",
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/9a250df458d676629354ee0f609a26ae446a6060",
+    "abstract": "Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, heterogeneity in hospital data, which is created by differences in demographics, diagnostic practices, and treatment procedures, may create bias in algorithms and produce unfair or unfair predictive results. The proposed study is aimed at identifying and preventing bias in federated healthcare cloud models to provide equal decision-making opportunities to various groups of people. Fairness measures like demographic parity and equalized odds are used in bias detection, which is accompanied by model performance audits across institutions. Mitigation techniques consist of reweighting data, training with fairness constraints and subsequent calibration of post-processing to achieve a tradeoff of predictive accuracy against fairness goals. Secure aggregation methods are also examined in order to preserve privacy and make collaborative fairness auditing possible in clouds. The experimental evidence shows that the inclusion of bias mitigation measures leads to a large boost in enhancing fairness without reducing the overall model utility, which makes federated learning a more trustworthy choice in practical healthcare settings.",
+    "authors": [
+      "VijayaAshwin Jagadeesan"
+    ],
+    "query": "AIF360 fairlearn bias mitigation demographic parity equal opportunity"
+  },
+  {
+    "paper_id": "29a91395de9d92cd8b4afb017367b8cd649dbb1a",
+    "title": "Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review.",
+    "year": 2025,
+    "venue": "American Journal of Obstetrics & Gynecology MFM",
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/29a91395de9d92cd8b4afb017367b8cd649dbb1a",
+    "abstract": "OBJECTIVES\nFetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it does not necessarily indicate pathological growth restriction. Given the increasing interest in machine learning (ML) for predicting FGR/SGA, this study systematically reviews ML applications in this domain, evaluating their methodological rigor and reporting quality, following standardized guidelines.\n\n\nDATA SOURCES\nThe systematic search was conducted in MEDLINE and Scopus on June 21, 2024, following PRISMA 2020 guidelines.\n\n\nSTUDY ELIGIBILITY CRITERIA\nEligible studies implemented ML models for FGR/SGA prediction using routinely available clinical variables and reported at least one area under the receiver operating characteristic (AUROC) and/or accuracy. Exclusions included preprints, conference abstracts, systematic reviews, animal studies, and models relying exclusively on biomarkers or genomics, as not part of the clinical practice.\n\n\nSTUDY APPRAISAL AND SYNTHESIS METHODS\nTwo independent reviewers screened articles with the help of the Rayyan software. Risk of bias was assessed using the PROBAST checklist. Adherence to the guidelines on the transparent reporting of a multivariable prediction model for individual prognosis or diagnosis\u202f+\u202fartificial intelligence (TRIPOD+AI) was evaluated across methods, results, and discussion sections using a 4-point Likert scale. Sample size adequacy was assessed for each study accounting for outcome type, predictors, and outcome prevalence.\n\n\nRESULTS\nThe search identified 272 studies, with 20 meeting the inclusion criteria. Definitions of FGR/SGA were inconsistent, particularly in technical journals. Adherence to TRIPOD+AI guidelines was variable, as no model reported on fairness or heterogeneity across relevant subgroups, and only 15% reported on calibration. Only 30% of studies met the minimum sample size required for ML models, indicating potential overfitting and limited generalizability.\n\n\nCONCLUSIONS\nDespite the potential of ML models in predicting FGR/SGA, key limitations persist, including inconsistent outcome definitions, underpowered models, and suboptimal reporting of calibration and clinical applicability. Future studies should emphasize standardized definitions, robust sample sizes, and comprehensive reporting to enhance model reliability and clinical translation.",
+    "authors": [
+      "G. Zamagni",
+      "C. Fregona",
+      "Moira Barbieri",
+      "M. S. Scalia",
+      "L. Monasta"
+    ],
+    "query": "proxy discrimination machine learning fairness sample size subgroup reliability"
+  },
+  {
+    "paper_id": "918812929b00385f6a6097579ffab8140f7abe57",
+    "title": "Technical benchmarking of eight machine\u2011learning algorithms versus penalized logistic regression for predicting in\u2011hospital death in 117,765 u.S. CLL/SLL admissions",
+    "year": 2025,
+    "venue": "Blood",
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/918812929b00385f6a6097579ffab8140f7abe57",
+    "abstract": "\n \n \n Background\u2002Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head-to-head comparison between eight modern ML learners and a survey-weighted, ridge-penalized logistic baseline in a national cohort of chronic lymphocytic leukemia/small lymphocytic lymphoma (CLL/SLL) admissions.\n Methods\u2002We extracted 117,765 adult CLL/SLL hospitalizations from the 2016-2022 U.S. National Inpatient Sample. Fifty-nine binary ICD-10 features (52 chronic Elixhauser/Charlson comorbidities, 7 acute complications) served as inputs for: (i) ridge logistic regression (baseline); and (ii) elastic-net, LightGBM, XGBoost, random-forest (ranger), multilayer perceptron (MLP), multivariate adaptive regression splines (MARS), k-nearest-neighbors (k-NN) and radial-kernel support-vector machine (SVM). Hyper-parameters were optimized by Bayesian search (20 iterations, five-fold cross-validation) with survey weights preserved throughout. Models were trained on 2016-2020 data and prospectively validated on 2021-2022. We reported discrimination (1,000-bootstrap AUROC with DeLong tests), calibration (intercept, slope, Brier), operating statistics at the Youden cut-point, decision-curve net benefit (5\u201325\u202f% thresholds) and equity across 23 age-sex\u2013race-payer-region strata. Shapley additive explanations (SHAP) profiled feature importance for LightGBM.\n Results\u2002Crude in-hospital mortality was 5.8\u202f%. Ridge achieved AUROC\u202f0.851; LightGBM modestly improved this to\u202f0.854 (\u0394\u202f0.003; p\u202f<\u202f0.01) . XGBoost and ranger registered 0.842 and 0.841, whereas elastic-net matched ridge at 0.851; MLP, MARS, k-NN and SVM ranged 0.726\u20130.849. Calibration slopes clustered near 1.0 (ridge 0.99, LightGBM 0.95) with Brier differences\u202f<\u202f0.002 across models.\n At the Youden threshold ridge flagged 8.4\u202f% of admissions (sensitivity\u202f0.634, specificity\u202f0.882, PPV\u202f24.2\u202f%); LightGBM raised sensitivity to\u202f0.659 but fired 14\u202f% more alerts and lowered PPV to\u202f22.6\u202f%. Decision-curve analysis converted that trade-off into \u22640.004 incremental net benefit - <\u00bd additional death detected per 100 admissions - across 5\u201325\u202f% thresholds .\n Performance was stable across demographics: the mean inter-model \u0394AUROC was 0.006, and only the Native-American stratum showed \u0394\u202f>\u202f0.02. SHAP confirmed biological face validity - acute respiratory failure, sepsis, acute kidney injury, pneumonia and tumor-lysis syndrome drove risk in LightGBM, mirroring ridge coefficients and revealing no hidden proxies. Runtime and memory footprints scaled with algorithmic complexity; ridge completed training in 11\u202fs on a standard laptop versus 3.4\u202fmin for LightGBM and >15\u202fmin for SVM.\n Conclusions\u2002Across 117,765 nationally representative CLL/SLL admissions, a transparent ridge-penalized logistic model equaled or exceeded six of eight contemporary ML algorithms and trailed the best performer by just 0.003 AUROC. LightGBM's marginal discrimination gain translated into minimal clinical benefit while imposing greater computational cost, lower precision and higher alert burden. Given the convergent feature hierarchies, near-identical calibration and robust subgroup equity, a parsimony-first deployment strategy - ridge or grouped-LASSO score in routine care, ML pipelines reserved for settings that can justify infrastructure and explainability overhead - aligns with emerging WHO/FDA guidance on trustworthy AI. Prospective, multi-site impact studies should test whether such transparent tools improve triage decisions and patient outcomes while maintaining algorithmic fairness.\n",
+    "authors": [
+      "Xiaoyi Zhang",
+      "Abhishek Kumar",
+      "L. Xiao",
+      "Toru Yoshino",
+      "Anushri Soni"
+    ],
+    "query": "proxy discrimination machine learning fairness sample size subgroup reliability"
+  }
+]

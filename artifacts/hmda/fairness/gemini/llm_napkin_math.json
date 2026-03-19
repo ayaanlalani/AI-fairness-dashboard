@@ -1,0 +1,10 @@
+{
+  "projection": {
+    "projected_input_tokens": 2533,
+    "projected_output_tokens": 5000,
+    "projected_total_tokens": 7533,
+    "projected_input_cost_usd": 0.000253,
+    "projected_output_cost_usd": 0.002,
+    "projected_total_cost_usd": 0.002253
+  }
+}

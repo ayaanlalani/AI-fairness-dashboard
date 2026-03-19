@@ -38,6 +38,10 @@ PYTHON = f'"{sys.executable}"'
 # ═══════════════════════════════════════════════════════════════════════
 
 ARTIFACTS = ROOT / "artifacts"
+DEFAULT_STEP_TIMEOUT_S = 300
+TRAIN_STEP_TIMEOUT_S = 1200
+FAIRNESS_STEP_TIMEOUT_S = 1200
+LLM_BENCHMARK_TIMEOUT_S = 1200
 
 DATASETS: dict[str, dict] = {
     "german_credit": {
@@ -58,6 +62,7 @@ DATASETS: dict[str, dict] = {
             ),
             "llm_benchmark": (
                 "mkdir -p metrics/fairness/gemini metrics/fairness/openai && "
+                "gemini_status=0; openai_status=0; "
                 f"{PYTHON} ../scripts/llm_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
@@ -66,7 +71,7 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
                 " --out_dir metrics/fairness/gemini"
                 " --dataset_name 'German Credit'"
-                " && "
+                " || gemini_status=$?; "
                 f"{PYTHON} ../scripts/openai_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
@@ -75,7 +80,9 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
                 " --out_dir metrics/fairness/openai"
                 " --dataset_name 'German Credit'"
-                " --max_cost_usd 50"
+                " --max_cost_usd 37.00"
+                " || openai_status=$?; "
+                "test $gemini_status -eq 0 -a $openai_status -eq 0"
             ),
         },
     },
@@ -97,6 +104,7 @@ DATASETS: dict[str, dict] = {
             ),
             "llm_benchmark": (
                 "mkdir -p metrics/fairness/gemini metrics/fairness/openai && "
+                "gemini_status=0; openai_status=0; "
                 f"{PYTHON} ../scripts/llm_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
@@ -105,7 +113,7 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs 'race:White,sex:Male,age_group:mid'"
                 " --out_dir metrics/fairness/gemini"
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
-                " && "
+                " || gemini_status=$?; "
                 f"{PYTHON} ../scripts/openai_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
@@ -114,7 +122,9 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs 'race:White,sex:Male,age_group:mid'"
                 " --out_dir metrics/fairness/openai"
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
-                " --max_cost_usd 50"
+                " --max_cost_usd 37.00"
+                " || openai_status=$?; "
+                "test $gemini_status -eq 0 -a $openai_status -eq 0"
             ),
         },
     },
@@ -164,6 +174,14 @@ STEP_ORDER = ["clean", "train", "fairness", "qualitative", "llm_benchmark", "vis
 def run_step(dataset_name: str, step_name: str, cmd: str, cwd: Path) -> bool:
     """Run a single pipeline step. Returns True on success."""
     header = f"[{dataset_name} / {step_name}]"
+    if step_name == "llm_benchmark":
+        timeout_s = LLM_BENCHMARK_TIMEOUT_S
+    elif step_name == "fairness":
+        timeout_s = FAIRNESS_STEP_TIMEOUT_S
+    elif step_name == "train":
+        timeout_s = TRAIN_STEP_TIMEOUT_S
+    else:
+        timeout_s = DEFAULT_STEP_TIMEOUT_S
     log.info(f"{header} Starting...")
     log.info(f"{header} cwd={cwd}")
     log.info(f"{header} cmd={cmd}")
@@ -175,7 +193,7 @@ def run_step(dataset_name: str, step_name: str, cmd: str, cwd: Path) -> bool:
             cwd=cwd,
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=timeout_s,
         )
         if result.stdout.strip():
             for line in result.stdout.strip().split("\n"):
@@ -191,7 +209,7 @@ def run_step(dataset_name: str, step_name: str, cmd: str, cwd: Path) -> bool:
         log.info(f"{header} OK")
         return True
     except subprocess.TimeoutExpired:
-        log.error(f"{header} TIMEOUT (>300s)")
+        log.error(f"{header} TIMEOUT (>{timeout_s}s)")
         return False
     except Exception as e:
         log.error(f"{header} ERROR: {e}")
@@ -285,8 +303,10 @@ def consolidate(datasets_run: list[str]) -> None:
     for provider in ["gemini", "openai"]:
         benchmark_lines = [f"# Cross-Dataset {provider.title()} LLM Benchmark Comparison", ""]
         for ds_name in datasets_run:
-            ds_dir = ROOT / DATASETS[ds_name]["dir"]
-            bench_path = ds_dir / "metrics" / "fairness" / provider / "benchmark_comparison.md"
+            bench_path = ARTIFACTS / ds_name / "fairness" / provider / "benchmark_comparison.md"
+            if not bench_path.exists():
+                ds_dir = ROOT / DATASETS[ds_name]["dir"]
+                bench_path = ds_dir / "metrics" / "fairness" / provider / "benchmark_comparison.md"
             if bench_path.exists():
                 content = bench_path.read_text(encoding="utf-8")
                 benchmark_lines.append(content)
@@ -381,8 +401,8 @@ def main() -> None:
         )
         log.info(f"  {ds_name:25s} [{status}]  {steps_str}")
 
-    if not args.no_consolidate and succeeded:
-        consolidate(succeeded)
+    if not args.no_consolidate and datasets_to_run:
+        consolidate(datasets_to_run)
 
     # ── visualize (runs once across all datasets) ─────────────────
     if "visualize" in steps_to_run and succeeded:

@@ -1,0 +1,655 @@
+    You are an AI fairness auditor.
+
+    Python has already computed the fairness metrics and quantitative group
+    breakdowns. Do NOT recompute them. Your job is to interpret that context,
+    define a strong remediation-ready reference audit specification, and provide
+    qualitative fairness analysis.
+
+    ## Dataset
+    Name: German Credit
+
+    ## Fairness toolkit context
+    Reference fairness toolkit context:
+- AIF360 common mitigations: Reweighing, DisparateImpactRemover, PrejudiceRemover,
+  EqOddsPostprocessing, CalibratedEqOddsPostprocessing.
+- Fairlearn common mitigations: ExponentiatedGradient, GridSearch, ThresholdOptimizer.
+- Use these only as reference concepts. You still need to reason from the dataset provided.
+
+
+    ## Research evidence (Semantic Scholar)
+    Use this as supporting evidence when defining the remediation-ready audit
+    standard and recommending mitigations.
+    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
+    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
+[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
+    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
+[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
+    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
+[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
+    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
+[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
+    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
+[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
+    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+
+    ## Deterministic fairness context (Python-computed)
+    ```json
+    {
+  "dataset_name": "German Credit",
+  "favorable_label": 1,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "Sex_original",
+      "privileged_value": "male",
+      "metrics": {
+        "disparate_impact": 0.8595,
+        "demographic_parity_diff": -0.1152,
+        "equal_opportunity_diff": -0.0512,
+        "average_odds_diff": 0.1256,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "male",
+          "n": 139,
+          "pct_of_total": 69.5,
+          "base_rate": 0.7122,
+          "selection_rate": 0.8201,
+          "tpr": 0.9293,
+          "fpr": 0.55
+        },
+        {
+          "group": "female",
+          "n": 61,
+          "pct_of_total": 30.5,
+          "base_rate": 0.6721,
+          "selection_rate": 0.7049,
+          "tpr": 0.878,
+          "fpr": 0.35
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "AgeGroup_original",
+      "privileged_value": "40_plus",
+      "metrics": {
+        "disparate_impact": 0.8212,
+        "demographic_parity_diff": -0.1586,
+        "equal_opportunity_diff": -0.0513,
+        "average_odds_diff": 0.1649,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "under_40",
+          "n": 129,
+          "pct_of_total": 64.5,
+          "base_rate": 0.6589,
+          "selection_rate": 0.7287,
+          "tpr": 0.8941,
+          "fpr": 0.4091
+        },
+        {
+          "group": "40_plus",
+          "n": 71,
+          "pct_of_total": 35.5,
+          "base_rate": 0.7746,
+          "selection_rate": 0.8873,
+          "tpr": 0.9455,
+          "fpr": 0.6875
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "foreign_worker_original",
+      "privileged_value": "0",
+      "metrics": {
+        "disparate_impact": 0.9402,
+        "demographic_parity_diff": -0.0498,
+        "equal_opportunity_diff": -0.0889,
+        "average_odds_diff": -0.2013,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "1",
+          "n": 194,
+          "pct_of_total": 97.0,
+          "base_rate": 0.6959,
+          "selection_rate": 0.7835,
+          "tpr": 0.9111,
+          "fpr": 0.4915
+        },
+        {
+          "group": "0",
+          "n": 6,
+          "pct_of_total": 3.0,
+          "base_rate": 0.8333,
+          "selection_rate": 0.8333,
+          "tpr": 1.0,
+          "fpr": 0.0
+        }
+      ],
+      "imbalance_findings": [
+        "Severe size imbalance: 1 has 194 records vs 0 with 6 (32x ratio). Metrics for the smaller group have wide confidence intervals.",
+        "Groups with fewer than 30 records (unreliable metrics): 0."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}
+    ```
+
+    ## Your task
+    Define a remediation-ready reference audit specification, then provide, for
+    each attribute:
+    - What is wrong
+    - Why it is wrong
+    - How to fix it
+    - Severity consistent with the provided DI thresholds
+    - Supporting research citations based on the evidence above
+
+    Return ONLY valid JSON matching the required schema.
+
+
+    You are refining a previous AI fairness audit for cycle 2.
+    Improve the previous output using the same deterministic fairness context and
+    research evidence. Do not recompute metrics. Focus on clearer causal
+    reasoning, more concrete mitigations, better research grounding, and severity
+    labels that match the provided thresholds.
+
+    ## Dataset
+    Name: German Credit
+
+    ## Research evidence (Semantic Scholar)
+    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
+    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
+[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
+    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
+[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
+    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
+[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
+    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
+[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
+    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
+[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
+    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+
+    ## Deterministic fairness context
+    ```json
+    {
+  "dataset_name": "German Credit",
+  "favorable_label": 1,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "Sex_original",
+      "privileged_value": "male",
+      "metrics": {
+        "disparate_impact": 0.8595,
+        "demographic_parity_diff": -0.1152,
+        "equal_opportunity_diff": -0.0512,
+        "average_odds_diff": 0.1256,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "male",
+          "n": 139,
+          "pct_of_total": 69.5,
+          "base_rate": 0.7122,
+          "selection_rate": 0.8201,
+          "tpr": 0.9293,
+          "fpr": 0.55
+        },
+        {
+          "group": "female",
+          "n": 61,
+          "pct_of_total": 30.5,
+          "base_rate": 0.6721,
+          "selection_rate": 0.7049,
+          "tpr": 0.878,
+          "fpr": 0.35
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "AgeGroup_original",
+      "privileged_value": "40_plus",
+      "metrics": {
+        "disparate_impact": 0.8212,
+        "demographic_parity_diff": -0.1586,
+        "equal_opportunity_diff": -0.0513,
+        "average_odds_diff": 0.1649,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "under_40",
+          "n": 129,
+          "pct_of_total": 64.5,
+          "base_rate": 0.6589,
+          "selection_rate": 0.7287,
+          "tpr": 0.8941,
+          "fpr": 0.4091
+        },
+        {
+          "group": "40_plus",
+          "n": 71,
+          "pct_of_total": 35.5,
+          "base_rate": 0.7746,
+          "selection_rate": 0.8873,
+          "tpr": 0.9455,
+          "fpr": 0.6875
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "foreign_worker_original",
+      "privileged_value": "0",
+      "metrics": {
+        "disparate_impact": 0.9402,
+        "demographic_parity_diff": -0.0498,
+        "equal_opportunity_diff": -0.0889,
+        "average_odds_diff": -0.2013,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "1",
+          "n": 194,
+          "pct_of_total": 97.0,
+          "base_rate": 0.6959,
+          "selection_rate": 0.7835,
+          "tpr": 0.9111,
+          "fpr": 0.4915
+        },
+        {
+          "group": "0",
+          "n": 6,
+          "pct_of_total": 3.0,
+          "base_rate": 0.8333,
+          "selection_rate": 0.8333,
+          "tpr": 1.0,
+          "fpr": 0.0
+        }
+      ],
+      "imbalance_findings": [
+        "Severe size imbalance: 1 has 194 records vs 0 with 6 (32x ratio). Metrics for the smaller group have wide confidence intervals.",
+        "Groups with fewer than 30 records (unreliable metrics): 0."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}
+    ```
+
+    ## Previous output to improve
+    ```json
+    {
+  "reference_audit_spec": {
+    "name": "German Credit \u2013 Remediation-Ready Fairness Audit v1.0",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "Credit-scoring decisions have direct financial consequences. The selected metrics jointly capture allocation imbalance (DI, DPD), error-rate asymmetry (EOD, AOD) and overall outcome inequality (Theil). The required response elements make the audit actionable by linking quantitative evidence with causal hypotheses and mitigation levers.",
+    "supporting_research": [
+      "Sucharita & Shaw 2025 \u2013 Bias Detection and Mitigation in AI: A Framework for Fair and Inclusive ML Models [1]",
+      "Rane et al. 2025 \u2013 Ethical Considerations and Bias Detection in AI/ML Applications [2]"
+    ]
+  },
+  "qualitative": [
+    {
+      "attribute": "Sex_original",
+      "severity": "moderate",
+      "what_is_wrong": "Women receive favorable credit decisions at a 14.1 pp lower rate than men (DI = 0.86; DPD = -0.115). Although true-positive rates are fairly close (-5.1 pp), false-positive rate is 20 pp lower for women, indicating stricter acceptance thresholds.",
+      "why_is_wrong": "Historical lending practices and feature correlations with sex (e.g., employment type or housing status) likely encode structural gender bias. Model training on such data reproduces the imbalance, violating discrimination guidelines highlighted by EU Equal Treatment directives.",
+      "how_to_fix": "1) Pre-processing: apply Reweighing or DisparateImpactRemover to decorrelate sex from label.\n2) In-processing: train a fairness-constrained model via ExponentiatedGradient with parity constraints.\n3) Post-processing: CalibratedEqOddsPostprocessing if regulatory timelines prevent model retraining.\n4) Data: audit and, where legal, drop proxy variables highly correlated with sex.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 Framework emphasises reweighing to counter historic bias [1]",
+        "Rane et al. 2025 \u2013 Highlights necessity of parity-constrained optimisation for finance [2]"
+      ]
+    },
+    {
+      "attribute": "AgeGroup_original",
+      "severity": "moderate",
+      "what_is_wrong": "Applicants under 40 have a 16 pp lower selection rate than older applicants (DI = 0.82; DPD = -0.159). False-positive rate is 28 pp lower for younger applicants, showing the model is more lenient toward 40+ group.",
+      "why_is_wrong": "Age correlates with credit history length and asset ownership; using raw features without age-regularisation embeds systemic advantages of older populations. This contravenes many jurisdictions\u2019 anti-age-discrimination statutes.",
+      "how_to_fix": "1) Pre-processing: bin-wise resampling or reweighing to balance age influence.\n2) In-processing: integrate fairness regulariser such as PrejudiceRemover penalising age-label mutual information.\n3) Policy: introduce age-neutral explanatory features (e.g., income-to-debt ratio) rather than raw tenure-based measures.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 Demonstrates mutual-information regularisation efficacy [1]",
+        "Osborne & Usani 2025 \u2013 Shows causal feature selection improves fairness across age cohorts [3]"
+      ]
+    },
+    {
+      "attribute": "foreign_worker_original",
+      "severity": "moderate (metrics unreliable)",
+      "what_is_wrong": "Observed DI = 0.94 (moderate disparity) but group size is extremely imbalanced (194 vs 6). Metrics have wide confidence intervals, masking potential discrimination.",
+      "why_is_wrong": "Tiny representation of domestic non-foreign workers (n = 6) prevents reliable metric estimation. Dataset bias stems from sample collection rather than model behaviour alone, risking under-detected harm.",
+      "how_to_fix": "1) Data augmentation: collect additional records for domestic workers to reach statistical power (>30 samples).\n2) Sensitivity analysis: run bootstrapped DI intervals.\n3) If data collection infeasible, apply robust optimisation methods (e.g., worst-case constraints in GridSearch) to guarantee fairness under sampling uncertainty.",
+      "supporting_research": [
+        "Jagadeesan 2025 \u2013 Emphasises data-imbalance driven bias and recommends robust optimisation [4]",
+        "Rane et al. 2025 \u2013 Notes minimum sample thresholds for credible fairness assessment [2]"
+      ]
+    }
+  ],
+  "cross_attribute_summary": "All three protected attributes exhibit moderate disparate impact against non-privileged groups. The common pattern is stricter acceptance thresholds (lower FPR) for disadvantaged cohorts, indicating that the scoring model inherits historical bias embedded in correlated financial features. The most acute risk is under-representation (foreign_worker) which can hide larger disparities. Remediation should prioritise dataset re-balancing, pre- and in-processing mitigation (reweighing, prejudice remover, fairness-constrained optimisation) and rigorous post-mitigation re-evaluation against the specified core metrics."
+}
+    ```
+
+    Return ONLY valid JSON matching the required schema.
+
+
+    You are refining a previous AI fairness audit for cycle 3.
+    Improve the previous output using the same deterministic fairness context and
+    research evidence. Do not recompute metrics. Focus on clearer causal
+    reasoning, more concrete mitigations, better research grounding, and severity
+    labels that match the provided thresholds.
+
+    ## Dataset
+    Name: German Credit
+
+    ## Research evidence (Semantic Scholar)
+    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
+    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
+[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
+    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
+[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
+    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
+[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
+    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
+[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
+    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
+[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
+    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+
+    ## Deterministic fairness context
+    ```json
+    {
+  "dataset_name": "German Credit",
+  "favorable_label": 1,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "Sex_original",
+      "privileged_value": "male",
+      "metrics": {
+        "disparate_impact": 0.8595,
+        "demographic_parity_diff": -0.1152,
+        "equal_opportunity_diff": -0.0512,
+        "average_odds_diff": 0.1256,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "male",
+          "n": 139,
+          "pct_of_total": 69.5,
+          "base_rate": 0.7122,
+          "selection_rate": 0.8201,
+          "tpr": 0.9293,
+          "fpr": 0.55
+        },
+        {
+          "group": "female",
+          "n": 61,
+          "pct_of_total": 30.5,
+          "base_rate": 0.6721,
+          "selection_rate": 0.7049,
+          "tpr": 0.878,
+          "fpr": 0.35
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "AgeGroup_original",
+      "privileged_value": "40_plus",
+      "metrics": {
+        "disparate_impact": 0.8212,
+        "demographic_parity_diff": -0.1586,
+        "equal_opportunity_diff": -0.0513,
+        "average_odds_diff": 0.1649,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "under_40",
+          "n": 129,
+          "pct_of_total": 64.5,
+          "base_rate": 0.6589,
+          "selection_rate": 0.7287,
+          "tpr": 0.8941,
+          "fpr": 0.4091
+        },
+        {
+          "group": "40_plus",
+          "n": 71,
+          "pct_of_total": 35.5,
+          "base_rate": 0.7746,
+          "selection_rate": 0.8873,
+          "tpr": 0.9455,
+          "fpr": 0.6875
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "foreign_worker_original",
+      "privileged_value": "0",
+      "metrics": {
+        "disparate_impact": 0.9402,
+        "demographic_parity_diff": -0.0498,
+        "equal_opportunity_diff": -0.0889,
+        "average_odds_diff": -0.2013,
+        "theil_index": 0.3084
+      },
+      "group_breakdown": [
+        {
+          "group": "1",
+          "n": 194,
+          "pct_of_total": 97.0,
+          "base_rate": 0.6959,
+          "selection_rate": 0.7835,
+          "tpr": 0.9111,
+          "fpr": 0.4915
+        },
+        {
+          "group": "0",
+          "n": 6,
+          "pct_of_total": 3.0,
+          "base_rate": 0.8333,
+          "selection_rate": 0.8333,
+          "tpr": 1.0,
+          "fpr": 0.0
+        }
+      ],
+      "imbalance_findings": [
+        "Severe size imbalance: 1 has 194 records vs 0 with 6 (32x ratio). Metrics for the smaller group have wide confidence intervals.",
+        "Groups with fewer than 30 records (unreliable metrics): 0."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}
+    ```
+
+    ## Previous output to improve
+    ```json
+    {
+  "reference_audit_spec": {
+    "name": "German Credit \u2013 Remediation-Ready Fairness Audit v2.0",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "Credit scoring affects access to essential financial services. The five metrics jointly capture allocation bias (DI, DPD), error-rate bias (EOD, AOD) and overall welfare inequality (Theil). Pairing them with qualitative root-cause reasoning and concrete remedies makes the audit immediately actionable for developers and compliance teams.",
+    "supporting_research": [
+      "Sucharita & Shaw 2025 \u2013 Bias Detection and Mitigation in AI: A Framework for Fair and Inclusive ML Models [1]",
+      "Rane et al. 2025 \u2013 Ethical Considerations and Bias Detection in AI/ML Applications [2]",
+      "Osborne & Usani 2025 \u2013 Fairness-aware ML with causal feature selection [3]",
+      "Jagadeesan 2025 \u2013 Bias Mitigation in Federated Healthcare Cloud Models (data imbalance & robust optimisation) [4]"
+    ]
+  },
+  "qualitative": [
+    {
+      "attribute": "Sex_original",
+      "severity": "moderate",
+      "what_is_wrong": "Women face a 14 percentage-point lower approval rate than men (DI = 0.86; DPD = -0.115). Although true-positive rates differ by only 5 pp, the false-positive rate is 20 pp lower for women, signalling systematically tighter acceptance thresholds that can amplify historical gender gaps in credit access.",
+      "why_is_wrong": "Causal chain: (1) Historical lending data reflect structural gender inequities (shorter employment histories, wage gaps). (2) Several input features (e.g., \u2018job_status\u2019, \u2018housing\u2019, \u2018credit_history\u2019) are partially proxies for sex. (3) The learning algorithm minimises error without fairness constraints, so proxy features carry forward the historic bias, violating EU Equal Treatment directives and fair lending regulations.",
+      "how_to_fix": "Data-level  \u2022 Apply Reweighing to up-weight female approved cases, reducing label\u2013sex mutual information (Sucharita & Shaw [1]).  \u2022 Conduct causal feature screening: drop or transform features with high conditional mutual information with sex but low incremental predictive value (Osborne & Usani [3]).\nModel-level  \u2022 Train an Exponentiated-Gradient classifier with demographic-parity or equal-opportunity constraints, tuning the \u03bb parameter on validation to keep DI \u2265 0.9 without large AUC loss.\nPost-hoc  \u2022 If immediate retraining is blocked, deploy Calibrated Equal Odds Post-processing to adjust decision thresholds per group while preserving calibration.\nGovernance  \u2022 Add a recurring fairness check in the model-monitoring pipeline that halts deployment if DI drops below 0.8.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 Shows reweighing reduces gender bias in finance [1]",
+        "Rane et al. 2025 \u2013 Recommends parity-constrained optimisation for high-stakes decisions [2]",
+        "Osborne & Usani 2025 \u2013 Causal feature selection limits proxy discrimination [3]"
+      ]
+    },
+    {
+      "attribute": "AgeGroup_original",
+      "severity": "moderate",
+      "what_is_wrong": "Applicants under 40 experience a 16 pp lower selection rate than older customers (DI = 0.82). Error analysis shows the model is 28 pp less likely to issue false positives for the younger group, effectively giving older applicants more \u2018benefit of the doubt\u2019.",
+      "why_is_wrong": "Length of credit history, total assets, and tenure are positively correlated with age; they act as causal mediators sending age information into the model. Because the target label (\u2018good credit\u2019) was defined using historic repayment that itself rewards longer credit histories, younger applicants are doubly penalised (label bias + feature bias). This breaches anti-age discrimination rules in many jurisdictions.",
+      "how_to_fix": "Data-level  \u2022 Perform stratified re-sampling so that each age bin has comparable distribution of favourable labels before training.\nRepresentation-level  \u2022 Replace raw tenure-based variables with rate-based or normalised counterparts (e.g., \u2018credit_history_length / applicant_age\u2019) to decorrelate from age.\nAlgorithm-level  \u2022 Add a PrejudiceRemover regulariser to penalise age\u2013prediction mutual information; empirically shown to work in finance (Sucharita & Shaw [1]).\nCausal checks  \u2022 Use invariant risk minimisation to train on age-stratified environments; maintain performance on \u2018leave-one-age-group-out\u2019 validation (Osborne & Usani [3]).",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 Mutual-information regularisation effectiveness [1]",
+        "Osborne & Usani 2025 \u2013 Causal invariance for demographic generalisation [3]",
+        "Rane et al. 2025 \u2013 Highlights age as protected trait in credit context [2]"
+      ]
+    },
+    {
+      "attribute": "foreign_worker_original",
+      "severity": "moderate (low-confidence)",
+      "what_is_wrong": "DI = 0.94 suggests only mild disparity, but the domestic-worker group has just 6 observations v. 194 foreign workers (32\u00d7 imbalance). Metrics therefore carry wide confidence intervals; true disparity could be materially larger or smaller.",
+      "why_is_wrong": "The dataset sampling frame under-captures domestic non-foreign workers. Such extreme imbalance obscures whether the model is genuinely fair or simply uninformed about this subgroup, risking undetected harm when deployed on populations with larger domestic segments.",
+      "how_to_fix": "Data  \u2022 Collect or purchase additional examples for domestic workers until n \u2265 30 (rule-of-thumb for stable disparity estimation; Rane et al. [2]).  \u2022 Alternatively, use synthetic minority oversampling (SMOTE-NC) followed by importance re-weighting to avoid duplicate information.\nEstimation  \u2022 Report bootstrapped confidence intervals for DI and EOD; flag the attribute if the lower bound < 0.8.\nModel  \u2022 Adopt robust optimisation with worst-case group constraints (Jagadeesan [4]) so that even poorly represented groups cannot exceed specified disparity thresholds.\nDeployment  \u2022 Log all predictions with group labels (where legally permissible) and run weekly fairness drift tests; trigger retraining if domestic-group selection rate deviates > 10 pp from baseline.",
+      "supporting_research": [
+        "Jagadeesan 2025 \u2013 Robust optimisation under sample uncertainty [4]",
+        "Rane et al. 2025 \u2013 Recommends minimum sample size for credible audits [2]",
+        "Sucharita & Shaw 2025 \u2013 Notes data imbalance as root of hidden bias [1]"
+      ]
+    }
+  ],
+  "cross_attribute_summary": "All three audited attributes fall into the \u2018moderate\u2019 severity band per the DI thresholds (0.80 \u2264 DI < 0.95). A common causal pattern emerges: historical and proxy features leak protected information, causing tighter acceptance thresholds (lower FPR) for disadvantaged cohorts. For Sex and Age, disparities are measurement-stable and need algorithmic fixes combined with causal feature review. For foreign_worker the dominant issue is extreme group under-representation, making the current fairness signal unreliable; data collection is the primary remedy. Across attributes, we recommend a layered mitigation strategy\u2014(1) balance or reweigh data, (2) introduce causal or normalised representations, (3) train with fairness constraints, and (4) install continuous monitoring with confidence-interval-aware alerts\u2014to achieve sustained compliance with fair lending standards."
+}
+    ```
+
+    Return ONLY valid JSON matching the required schema.

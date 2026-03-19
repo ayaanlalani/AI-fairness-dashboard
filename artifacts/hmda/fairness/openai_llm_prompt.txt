@@ -1,0 +1,788 @@
+    You are an AI fairness auditor.
+
+    Python has already computed the fairness metrics and quantitative group
+    breakdowns. Do NOT recompute them. Your job is to interpret that context,
+    define a strong remediation-ready reference audit specification, and provide
+    qualitative fairness analysis.
+
+    ## Dataset
+    Name: HMDA Mortgage Lending (Georgia)
+
+    ## Fairness toolkit context
+    Reference fairness toolkit context:
+- AIF360 common mitigations: Reweighing, DisparateImpactRemover, PrejudiceRemover,
+  EqOddsPostprocessing, CalibratedEqOddsPostprocessing.
+- Fairlearn common mitigations: ExponentiatedGradient, GridSearch, ThresholdOptimizer.
+- Use these only as reference concepts. You still need to reason from the dataset provided.
+
+
+    ## Research evidence (Semantic Scholar)
+    Use this as supporting evidence when defining the remediation-ready audit
+    standard and recommending mitigations.
+    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
+    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
+[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
+    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
+[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
+    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
+[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
+    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
+[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
+    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
+[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
+    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+
+    ## Deterministic fairness context (Python-computed)
+    ```json
+    {
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "favorable_label": 1,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "race",
+      "privileged_value": "White",
+      "metrics": {
+        "disparate_impact": 0.8956,
+        "demographic_parity_diff": -0.0776,
+        "equal_opportunity_diff": 0.0025,
+        "average_odds_diff": -0.0117,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "White",
+          "n": 1252,
+          "pct_of_total": 57.0,
+          "base_rate": 0.7572,
+          "selection_rate": 0.7428,
+          "tpr": 0.9705,
+          "fpr": 0.0329
+        },
+        {
+          "group": "Black",
+          "n": 748,
+          "pct_of_total": 34.1,
+          "base_rate": 0.6417,
+          "selection_rate": 0.6444,
+          "tpr": 0.975,
+          "fpr": 0.0522
+        },
+        {
+          "group": "Asian",
+          "n": 173,
+          "pct_of_total": 7.9,
+          "base_rate": 0.7977,
+          "selection_rate": 0.7861,
+          "tpr": 0.9638,
+          "fpr": 0.0857
+        },
+        {
+          "group": "American Indian",
+          "n": 10,
+          "pct_of_total": 0.5,
+          "base_rate": 0.4,
+          "selection_rate": 0.4,
+          "tpr": 1.0,
+          "fpr": 0.0
+        },
+        {
+          "group": "Multiracial",
+          "n": 8,
+          "pct_of_total": 0.4,
+          "base_rate": 0.375,
+          "selection_rate": 0.375,
+          "tpr": 1.0,
+          "fpr": 0.0
+        },
+        {
+          "group": "Pacific Islander",
+          "n": 5,
+          "pct_of_total": 0.2,
+          "base_rate": 0.6,
+          "selection_rate": 0.6,
+          "tpr": 1.0,
+          "fpr": 0.0
+        }
+      ],
+      "imbalance_findings": [
+        "Severe size imbalance: White has 1252 records vs Pacific Islander with 5 (250x ratio). Metrics for the smaller group have wide confidence intervals.",
+        "Groups with fewer than 30 records (unreliable metrics): American Indian, Multiracial, Pacific Islander.",
+        "Base-rate disparity in the ground truth: Asian has 79.8% favorable outcomes vs Multiracial at 37.5% (gap = 42.3%). The model may be correctly learning a real disparity in historical outcomes, but this historical pattern itself may reflect systemic bias."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "sex",
+      "privileged_value": "Male",
+      "metrics": {
+        "disparate_impact": 0.9291,
+        "demographic_parity_diff": -0.0518,
+        "equal_opportunity_diff": -0.0076,
+        "average_odds_diff": 0.0084,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "Male",
+          "n": 1276,
+          "pct_of_total": 58.1,
+          "base_rate": 0.7375,
+          "selection_rate": 0.7312,
+          "tpr": 0.9745,
+          "fpr": 0.0478
+        },
+        {
+          "group": "Female",
+          "n": 920,
+          "pct_of_total": 41.9,
+          "base_rate": 0.6902,
+          "selection_rate": 0.6793,
+          "tpr": 0.9669,
+          "fpr": 0.0386
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "age_group",
+      "privileged_value": "mid",
+      "metrics": {
+        "disparate_impact": 1.0138,
+        "demographic_parity_diff": 0.0097,
+        "equal_opportunity_diff": 0.0008,
+        "average_odds_diff": 0.015,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "mid",
+          "n": 1121,
+          "pct_of_total": 51.0,
+          "base_rate": 0.7083,
+          "selection_rate": 0.7047,
+          "tpr": 0.971,
+          "fpr": 0.0581
+        },
+        {
+          "group": "senior",
+          "n": 611,
+          "pct_of_total": 27.8,
+          "base_rate": 0.6792,
+          "selection_rate": 0.6661,
+          "tpr": 0.9735,
+          "fpr": 0.0153
+        },
+        {
+          "group": "young",
+          "n": 464,
+          "pct_of_total": 21.1,
+          "base_rate": 0.7909,
+          "selection_rate": 0.778,
+          "tpr": 0.97,
+          "fpr": 0.0515
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}
+    ```
+
+    ## Your task
+    Define a remediation-ready reference audit specification, then provide, for
+    each attribute:
+    - What is wrong
+    - Why it is wrong
+    - How to fix it
+    - Severity consistent with the provided DI thresholds
+    - Supporting research citations based on the evidence above
+
+    Return ONLY valid JSON matching the required schema.
+
+
+    You are refining a previous AI fairness audit for cycle 2.
+    Improve the previous output using the same deterministic fairness context and
+    research evidence. Do not recompute metrics. Focus on clearer causal
+    reasoning, more concrete mitigations, better research grounding, and severity
+    labels that match the provided thresholds.
+
+    ## Dataset
+    Name: HMDA Mortgage Lending (Georgia)
+
+    ## Research evidence (Semantic Scholar)
+    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
+    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
+[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
+    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
+[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
+    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
+[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
+    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
+[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
+    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
+[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
+    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+
+    ## Deterministic fairness context
+    ```json
+    {
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "favorable_label": 1,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "race",
+      "privileged_value": "White",
+      "metrics": {
+        "disparate_impact": 0.8956,
+        "demographic_parity_diff": -0.0776,
+        "equal_opportunity_diff": 0.0025,
+        "average_odds_diff": -0.0117,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "White",
+          "n": 1252,
+          "pct_of_total": 57.0,
+          "base_rate": 0.7572,
+          "selection_rate": 0.7428,
+          "tpr": 0.9705,
+          "fpr": 0.0329
+        },
+        {
+          "group": "Black",
+          "n": 748,
+          "pct_of_total": 34.1,
+          "base_rate": 0.6417,
+          "selection_rate": 0.6444,
+          "tpr": 0.975,
+          "fpr": 0.0522
+        },
+        {
+          "group": "Asian",
+          "n": 173,
+          "pct_of_total": 7.9,
+          "base_rate": 0.7977,
+          "selection_rate": 0.7861,
+          "tpr": 0.9638,
+          "fpr": 0.0857
+        },
+        {
+          "group": "American Indian",
+          "n": 10,
+          "pct_of_total": 0.5,
+          "base_rate": 0.4,
+          "selection_rate": 0.4,
+          "tpr": 1.0,
+          "fpr": 0.0
+        },
+        {
+          "group": "Multiracial",
+          "n": 8,
+          "pct_of_total": 0.4,
+          "base_rate": 0.375,
+          "selection_rate": 0.375,
+          "tpr": 1.0,
+          "fpr": 0.0
+        },
+        {
+          "group": "Pacific Islander",
+          "n": 5,
+          "pct_of_total": 0.2,
+          "base_rate": 0.6,
+          "selection_rate": 0.6,
+          "tpr": 1.0,
+          "fpr": 0.0
+        }
+      ],
+      "imbalance_findings": [
+        "Severe size imbalance: White has 1252 records vs Pacific Islander with 5 (250x ratio). Metrics for the smaller group have wide confidence intervals.",
+        "Groups with fewer than 30 records (unreliable metrics): American Indian, Multiracial, Pacific Islander.",
+        "Base-rate disparity in the ground truth: Asian has 79.8% favorable outcomes vs Multiracial at 37.5% (gap = 42.3%). The model may be correctly learning a real disparity in historical outcomes, but this historical pattern itself may reflect systemic bias."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "sex",
+      "privileged_value": "Male",
+      "metrics": {
+        "disparate_impact": 0.9291,
+        "demographic_parity_diff": -0.0518,
+        "equal_opportunity_diff": -0.0076,
+        "average_odds_diff": 0.0084,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "Male",
+          "n": 1276,
+          "pct_of_total": 58.1,
+          "base_rate": 0.7375,
+          "selection_rate": 0.7312,
+          "tpr": 0.9745,
+          "fpr": 0.0478
+        },
+        {
+          "group": "Female",
+          "n": 920,
+          "pct_of_total": 41.9,
+          "base_rate": 0.6902,
+          "selection_rate": 0.6793,
+          "tpr": 0.9669,
+          "fpr": 0.0386
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "age_group",
+      "privileged_value": "mid",
+      "metrics": {
+        "disparate_impact": 1.0138,
+        "demographic_parity_diff": 0.0097,
+        "equal_opportunity_diff": 0.0008,
+        "average_odds_diff": 0.015,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "mid",
+          "n": 1121,
+          "pct_of_total": 51.0,
+          "base_rate": 0.7083,
+          "selection_rate": 0.7047,
+          "tpr": 0.971,
+          "fpr": 0.0581
+        },
+        {
+          "group": "senior",
+          "n": 611,
+          "pct_of_total": 27.8,
+          "base_rate": 0.6792,
+          "selection_rate": 0.6661,
+          "tpr": 0.9735,
+          "fpr": 0.0153
+        },
+        {
+          "group": "young",
+          "n": 464,
+          "pct_of_total": 21.1,
+          "base_rate": 0.7909,
+          "selection_rate": 0.778,
+          "tpr": 0.97,
+          "fpr": 0.0515
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}
+    ```
+
+    ## Previous output to improve
+    ```json
+    {
+  "reference_audit_spec": {
+    "name": "HMDA-GA Mortgage Lending Fairness Audit \u2013 Remediation-Ready Spec v1.0",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "Mortgage lending decisions are legally sensitive (ECOA, FHA). A remediation-ready audit must pair quantitative disparity signals with root-cause analysis and actionable, evidence-backed mitigations so that lenders can satisfy regulatory scrutiny and implement corrective measures in production models.",
+    "supporting_research": [
+      "Sucharita & Shaw 2025 \u2013 Bias Detection and Mitigation in AI: A Framework for Fair and Inclusive ML Models",
+      "Rane et al. 2025 \u2013 Ethical Considerations and Bias Detection in AI/ML Applications"
+    ]
+  },
+  "qualitative": [
+    {
+      "attribute": "race",
+      "severity": "moderate",
+      "what_is_wrong": "Disparate Impact = 0.895 (<0.95) against non-White applicants. Selection rates for Black (0.644) and Asian applicants (0.786) trail the White privileged rate (0.743). Very small groups (\u226410 records) have unreliable but visibly lower selection (0.375-0.6).",
+      "why_is_wrong": "Mortgage credit is covered by U.S. fair-lending laws; even moderate disparities can trigger regulatory concern. Historical HMDA labels reflect legacy discrimination, so training on raw outcomes propagates structural bias (see Sucharita & Shaw 2025). Sample-size imbalance (250\u00d7 difference) further increases variance and masks harms to the smallest groups.",
+      "how_to_fix": "1. Data level \u2013 apply Reweighing or DisparateImpactRemover to reduce label-linked racial bias prior to training. 2. Algorithm level \u2013 use Fairlearn ExponentiatedGradient with Equal-Opportunity constraints on the race attribute. 3. Post-processing \u2013 if model already deployed, implement CalibratedEqualizedOdds to tune decision thresholds per race while maintaining overall recall. 4. Governance \u2013 collect additional data for under-represented groups or aggregate rare categories to achieve \u226530 instances for reliable monitoring.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 Sections 4.1 & 5 show reweighing reduces DI by >10 %.",
+        "Rane et al. 2025 \u2013 Table 2 recommends constraint-based learners like ExponentiatedGradient for finance."
+      ]
+    },
+    {
+      "attribute": "sex",
+      "severity": "moderate",
+      "what_is_wrong": "Disparate Impact = 0.929 (<0.95) against female applicants; selection rate difference is \u22125.2 pp. Although smaller than racial disparity, it still violates the organisation\u2019s moderate threshold.",
+      "why_is_wrong": "Sex-based lending bias is prohibited under ECOA. The model reflects historical approval patterns where female applicants faced slightly lower acceptance (base-rate 0.690 vs 0.738). Without correction, bias may widen when deployed at scale (Rane et al. 2025).",
+      "how_to_fix": "1. Add sex as a fairness constraint in an ExponentiatedGradient or GridSearch fair optimiser while preserving race constraint, producing multi-attribute fairness. 2. Conduct feature audit for proxy variables (e.g., spousal income fields) that might correlate with sex and drive disparity; consider dropping or orthogonalising them. 3. Regularly monitor selection-rate gap in production dashboards.",
+      "supporting_research": [
+        "Rane et al. 2025 \u2013 Section 3.3 notes proxy features amplify gender bias.",
+        "Sucharita & Shaw 2025 \u2013 Framework advocates multi-attribute constraint tuning."
+      ]
+    },
+    {
+      "attribute": "age_group",
+      "severity": "low",
+      "what_is_wrong": "Disparate Impact = 1.014 (>0.95) and other metrics near zero; no significant unfairness detected. However, \u2018senior\u2019 group has lower selection (0.666) than \u2018young\u2019 (0.778).",
+      "why_is_wrong": "Current disparities fall within acceptable range, but mortgage lending to seniors is scrutinised under ADEA. Continuous vigilance is needed because Theil index (0.484) indicates overall outcome entropy, signalling potential hidden stratification.",
+      "how_to_fix": "Maintain current model but: 1. Include age in periodic fairness dashboards. 2. Stress-test with ThresholdOptimizer to ensure future threshold shifts do not degrade senior approvals. 3. Document compliance with ADEA to regulators.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 Continuous monitoring recommendations (Section 6)."
+      ]
+    }
+  ],
+  "cross_attribute_summary": "Race and sex exhibit moderate disparate impact requiring remediation; age is currently acceptable but should be monitored. Largest risk lies in compounding effects: Black female or Black senior applicants may face dual penalties not visible in single-attribute metrics. Multi-attribute constrained optimisation and data re-balancing are recommended to achieve compliance across protected classes."
+}
+    ```
+
+    Return ONLY valid JSON matching the required schema.
+
+
+    You are refining a previous AI fairness audit for cycle 3.
+    Improve the previous output using the same deterministic fairness context and
+    research evidence. Do not recompute metrics. Focus on clearer causal
+    reasoning, more concrete mitigations, better research grounding, and severity
+    labels that match the provided thresholds.
+
+    ## Dataset
+    Name: HMDA Mortgage Lending (Georgia)
+
+    ## Research evidence (Semantic Scholar)
+    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
+    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
+[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
+    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
+[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
+    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
+[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
+    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
+[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
+    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
+[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
+    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+
+    ## Deterministic fairness context
+    ```json
+    {
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "favorable_label": 1,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "race",
+      "privileged_value": "White",
+      "metrics": {
+        "disparate_impact": 0.8956,
+        "demographic_parity_diff": -0.0776,
+        "equal_opportunity_diff": 0.0025,
+        "average_odds_diff": -0.0117,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "White",
+          "n": 1252,
+          "pct_of_total": 57.0,
+          "base_rate": 0.7572,
+          "selection_rate": 0.7428,
+          "tpr": 0.9705,
+          "fpr": 0.0329
+        },
+        {
+          "group": "Black",
+          "n": 748,
+          "pct_of_total": 34.1,
+          "base_rate": 0.6417,
+          "selection_rate": 0.6444,
+          "tpr": 0.975,
+          "fpr": 0.0522
+        },
+        {
+          "group": "Asian",
+          "n": 173,
+          "pct_of_total": 7.9,
+          "base_rate": 0.7977,
+          "selection_rate": 0.7861,
+          "tpr": 0.9638,
+          "fpr": 0.0857
+        },
+        {
+          "group": "American Indian",
+          "n": 10,
+          "pct_of_total": 0.5,
+          "base_rate": 0.4,
+          "selection_rate": 0.4,
+          "tpr": 1.0,
+          "fpr": 0.0
+        },
+        {
+          "group": "Multiracial",
+          "n": 8,
+          "pct_of_total": 0.4,
+          "base_rate": 0.375,
+          "selection_rate": 0.375,
+          "tpr": 1.0,
+          "fpr": 0.0
+        },
+        {
+          "group": "Pacific Islander",
+          "n": 5,
+          "pct_of_total": 0.2,
+          "base_rate": 0.6,
+          "selection_rate": 0.6,
+          "tpr": 1.0,
+          "fpr": 0.0
+        }
+      ],
+      "imbalance_findings": [
+        "Severe size imbalance: White has 1252 records vs Pacific Islander with 5 (250x ratio). Metrics for the smaller group have wide confidence intervals.",
+        "Groups with fewer than 30 records (unreliable metrics): American Indian, Multiracial, Pacific Islander.",
+        "Base-rate disparity in the ground truth: Asian has 79.8% favorable outcomes vs Multiracial at 37.5% (gap = 42.3%). The model may be correctly learning a real disparity in historical outcomes, but this historical pattern itself may reflect systemic bias."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "sex",
+      "privileged_value": "Male",
+      "metrics": {
+        "disparate_impact": 0.9291,
+        "demographic_parity_diff": -0.0518,
+        "equal_opportunity_diff": -0.0076,
+        "average_odds_diff": 0.0084,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "Male",
+          "n": 1276,
+          "pct_of_total": 58.1,
+          "base_rate": 0.7375,
+          "selection_rate": 0.7312,
+          "tpr": 0.9745,
+          "fpr": 0.0478
+        },
+        {
+          "group": "Female",
+          "n": 920,
+          "pct_of_total": 41.9,
+          "base_rate": 0.6902,
+          "selection_rate": 0.6793,
+          "tpr": 0.9669,
+          "fpr": 0.0386
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "age_group",
+      "privileged_value": "mid",
+      "metrics": {
+        "disparate_impact": 1.0138,
+        "demographic_parity_diff": 0.0097,
+        "equal_opportunity_diff": 0.0008,
+        "average_odds_diff": 0.015,
+        "theil_index": 0.4838
+      },
+      "group_breakdown": [
+        {
+          "group": "mid",
+          "n": 1121,
+          "pct_of_total": 51.0,
+          "base_rate": 0.7083,
+          "selection_rate": 0.7047,
+          "tpr": 0.971,
+          "fpr": 0.0581
+        },
+        {
+          "group": "senior",
+          "n": 611,
+          "pct_of_total": 27.8,
+          "base_rate": 0.6792,
+          "selection_rate": 0.6661,
+          "tpr": 0.9735,
+          "fpr": 0.0153
+        },
+        {
+          "group": "young",
+          "n": 464,
+          "pct_of_total": 21.1,
+          "base_rate": 0.7909,
+          "selection_rate": 0.778,
+          "tpr": 0.97,
+          "fpr": 0.0515
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}
+    ```
+
+    ## Previous output to improve
+    ```json
+    {
+  "reference_audit_spec": {
+    "name": "HMDA-GA Mortgage Lending Fairness Audit \u2013 Remediation-Ready Spec v1.1",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "Mortgage lending sits at the intersection of multiple U.S. fair-lending statutes (ECOA, FHA, ADEA). A defensible audit must pair quantitative disparity measurement with causal explanations and remediation steps that can be operationalised by risk, credit-modelling, and compliance teams.",
+    "supporting_research": [
+      "Sucharita & Shaw 2025 \u2013 Bias Detection and Mitigation in AI: A Framework for Fair and Inclusive ML Models",
+      "Rane et al. 2025 \u2013 Ethical Considerations and Bias Detection in AI/ML Applications",
+      "Osborne & Usani 2025 \u2013 Fairness-aware ML with Causal Inference for Ethical AI Deployment"
+    ]
+  },
+  "qualitative": [
+    {
+      "attribute": "race",
+      "severity": "moderate",
+      "what_is_wrong": "Disparate Impact is 0.896 (<0.95) for non-White applicants. Black applicants see \u221211.6 pp lower selection than Whites; Asians \u22125.7 pp. Tiny groups (\u226410) show \u22640.60 selection but are statistically unstable, hiding potential extreme harms.",
+      "why_is_wrong": "1. Historical labels: Approval outcomes in HMDA are themselves shaped by decades of red-lining and differential credit access; the model faithfully reproduces these structural inequities (Sucharita & Shaw 2025, \u00a74).\n2. Feature proxies: Location-based variables (e.g., census tract) and credit history length often correlate with race, acting as latent discriminatory pathways (Rane et al. 2025, Table 2).\n3. Data imbalance: A 250\u00d7 sample-size gap inflates variance for minority metrics, lowering the signal-to-noise ratio and masking disparate error rates (Osborne & Usani 2025, causal-variance findings).",
+      "how_to_fix": "Immediate (\u22641 qtr):\n\u2022 Post-processing \u2013 deploy CalibratedEqualizedOdds on the existing score to raise Black and Asian true-positive rates while capping false-positive inflation (<2 pp).\nShort-term (1\u20132 qtr):\n\u2022 Ingest additional minority applications via targeted outreach partnerships; alternatively apply Fair SMOTE-NC to synthetically balance training folds (Sucharita & Shaw 2025, \u00a75.2).\n\u2022 Retrain with ExponentiatedGradient under an Equal-Opportunity constraint on race; tune \u03bb on validation DI \u22650.95.\nLong-term (>2 qtr):\n\u2022 Re-architect the feature set using causal-filtering: remove or orthogonalise high-Shapley features whose causal parents trace back to protected race (Osborne & Usani 2025, Fig. 3 methodology).\n\u2022 Establish a race-disaggregated monitoring dashboard with Wilson-score CIs; freeze model if DI <0.8 or EOD >0.05.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 reweighing & Fair SMOTE-NC effectiveness figures",
+        "Rane et al. 2025 \u2013 proxy-feature audits as a regulatory expectation",
+        "Osborne & Usani 2025 \u2013 causal filtering reduces structural bias by 12 %"
+      ]
+    },
+    {
+      "attribute": "sex",
+      "severity": "moderate",
+      "what_is_wrong": "Disparate Impact is 0.929 against female applicants and demographic-parity gap \u22125.2 pp. Although numerically smaller than racial disparity, it still breaches the organisation\u2019s moderate threshold (>0.05 absolute DP gap or DI<0.95).",
+      "why_is_wrong": "1. Historical underwriting bias: Legacy training labels encode lower approval for women (base-rate 0.690 vs 0.738).\n2. Income composition features (e.g., \u2018primary wage-earner\u2019) serve as gender proxies, driving disparate predictions (Rane et al. 2025, \u00a73.3).\n3. Interaction effects: Female applicants of colour may experience compounded penalties unobserved in single-axis metrics (intersectional blind spot).",
+      "how_to_fix": "\u2022 Conduct feature attribution audit; drop or neutralise features with |Shap|>0.05 that have \u22650.3 Cram\u00e9r\u2019s V with sex.\n\u2022 Retrain using a multi-attribute ExponentiatedGradient optimiser jointly constraining race and sex (Sucharita & Shaw 2025 framework).\n\u2022 Production guard-rail: implement real-time KPI alert if sex-based DI falls below 0.9 for any 4-week rolling window.",
+      "supporting_research": [
+        "Rane et al. 2025 \u2013 proxy variables amplify gender bias",
+        "Sucharita & Shaw 2025 \u2013 multi-attribute constraint tuning case study"
+      ]
+    },
+    {
+      "attribute": "age_group",
+      "severity": "low",
+      "what_is_wrong": "Current metrics show near-parity (DI = 1.014). However, seniors have an 11.2 pp lower selection rate than young applicants and FPR disparity (5.8 % vs 1.5 %) indicates potential age-specific risk inflation.",
+      "why_is_wrong": "Even minor age differentials can violate ADEA. Lower FPR for seniors may stem from conservative credit-score cut-offs that penalise limited credit-seeking behaviour common among retirees (domain knowledge).",
+      "how_to_fix": "\u2022 Keep age constraint in monitoring, flag if DI <0.95.\n\u2022 Back-test alternative threshold curves to ensure the senior FPR does not spike under economic stress scenarios.\n\u2022 Document compliance rationale in model-risk file with ADEA citations.",
+      "supporting_research": [
+        "Sucharita & Shaw 2025 \u2013 continuous monitoring (\u00a76)"
+      ]
+    }
+  ],
+  "cross_attribute_summary": "Race and sex show moderate but regulatory-relevant disparate impact; age is acceptable yet warrants oversight due to ADEA. The primary causal driver is historical label bias compounded by proxy features and sample-size imbalance. Recommended mitigation is a phased approach: (1) short-term post-processing to halt ongoing harm, (2) mid-term data/algorithmic re-balancing with multi-attribute constraints, and (3) long-term causal feature governance. Intersectional analysis (e.g., Black-female, Black-senior) should be prioritised in the next audit cycle to capture compounded harms."
+}
+    ```
+
+    Return ONLY valid JSON matching the required schema.
