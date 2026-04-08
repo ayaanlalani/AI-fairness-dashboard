@@ -25,6 +25,7 @@ DEFAULT_FIELDS = (
 )
 REQUEST_INTERVAL_S = 1.1
 MAX_RETRIES = 3
+MIN_CITATION_COUNT = 5
 _LAST_REQUEST_TS = 0.0
 
 
@@ -144,27 +145,57 @@ def gather_research_context(
     extra_queries: list[str] | None = None,
     max_papers: int = 6,
     per_query_limit: int = 2,
+    min_citation_count: int = MIN_CITATION_COUNT,
 ) -> list[dict[str, Any]]:
-    """Collect a deduplicated set of papers across several fairness queries."""
+    """Collect papers across fairness queries with a citation-quality preference.
+
+    We first keep papers meeting the citation threshold to improve credibility.
+    If there are not enough, we backfill with lower-citation papers so recent but
+    relevant work is not excluded entirely.
+    """
     queries = build_default_queries(dataset_name, protected_attrs)
     if extra_queries:
         queries.extend(extra_queries)
     queries = list(dict.fromkeys(queries))
 
     seen: set[str] = set()
-    papers: list[dict[str, Any]] = []
+    preferred: list[dict[str, Any]] = []
+    fallback: list[dict[str, Any]] = []
 
     for query in queries:
-        if len(papers) >= max_papers:
+        if len(preferred) >= max_papers:
             break
         for paper in search_semantic_scholar(query, limit=per_query_limit):
             key = paper.get("paper_id") or paper.get("title", "").lower()
             if not key or key in seen:
                 continue
             seen.add(key)
-            papers.append(paper)
-            if len(papers) >= max_papers:
+            cites = int(paper.get("citation_count", 0) or 0)
+            paper["meets_citation_threshold"] = cites >= min_citation_count
+            if paper["meets_citation_threshold"]:
+                preferred.append(paper)
+            else:
+                fallback.append(paper)
+            if len(preferred) >= max_papers:
                 break
+
+    preferred.sort(key=lambda p: (int(p.get("citation_count", 0) or 0), int(p.get("year") or 0)), reverse=True)
+    fallback.sort(key=lambda p: (int(p.get("year") or 0), int(p.get("citation_count", 0) or 0)), reverse=True)
+
+    papers = preferred[:max_papers]
+    if len(papers) < max_papers:
+        papers.extend(fallback[: max_papers - len(papers)])
+
+    if papers:
+        preferred_count = sum(1 for paper in papers if paper.get("meets_citation_threshold"))
+        if preferred_count < len(papers):
+            log.info(
+                "Semantic Scholar context for %s used %d cited papers and %d fallback papers (<%d citations).",
+                dataset_name,
+                preferred_count,
+                len(papers) - preferred_count,
+                min_citation_count,
+            )
 
     return papers
 
