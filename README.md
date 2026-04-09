@@ -78,6 +78,36 @@ After each dataset exports `metrics/fairness/fairness_metrics.csv`, regenerate t
 python scripts/generate_consolidated_visuals.py --output_dir poster_assets
 ```
 
+## OpenAI Hybrid Self-Improvement (Deepnote)
+
+This repo includes a Deepnote-friendly runner that performs generator cycles,
+judge-model rubric scoring, reflection-based prompt updates, multi-run
+selection, refined guardrail proposal, and a validation rerun.
+
+Configuration files:
+- `configs/openai_hybrid_pilot.json` (pilot dataset, budget, experiment matrix)
+- `configs/report_quality_rubric.json` (judge rubric for report quality)
+- `configs/guardrails_baseline.json` (starting guardrails)
+
+Run:
+```bash
+python scripts/openai_hybrid_self_improve.py \
+  --config configs/openai_hybrid_pilot.json \
+  --rubric configs/report_quality_rubric.json \
+  --guardrails configs/guardrails_baseline.json \
+  --out_root artifacts
+```
+
+Required env var:
+```bash
+export OPENAI_API_KEY="..."
+```
+
+Outputs are written under:
+- `artifacts/<dataset>/fairness/openai_hybrid/<timestamp>/`
+- includes cycle logs, `run_registry.csv`, `guardrails_refined_v2.json`, and
+  `promotion_decision.json`
+
 ## Submission Bundle
 
 To package everything for submission while excluding the virtual environment and other large artifacts:
