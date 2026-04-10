@@ -86,6 +86,7 @@ selection, refined guardrail proposal, and a validation rerun.
 
 Configuration files:
 - `configs/openai_hybrid_pilot.json` (pilot dataset, budget, experiment matrix)
+- `configs/openai_hybrid_smoke.json` (one experiment, one cycle; use for a cheap smoke test)
 - `configs/report_quality_rubric.json` (judge rubric for report quality)
 - `configs/guardrails_baseline.json` (starting guardrails)
 
@@ -93,6 +94,16 @@ Run:
 ```bash
 python scripts/openai_hybrid_self_improve.py \
   --config configs/openai_hybrid_pilot.json \
+  --rubric configs/report_quality_rubric.json \
+  --guardrails configs/guardrails_baseline.json \
+  --out_root artifacts
+```
+
+Smoke test (same command, swap config):
+
+```bash
+python scripts/openai_hybrid_self_improve.py \
+  --config configs/openai_hybrid_smoke.json \
   --rubric configs/report_quality_rubric.json \
   --guardrails configs/guardrails_baseline.json \
   --out_root artifacts
