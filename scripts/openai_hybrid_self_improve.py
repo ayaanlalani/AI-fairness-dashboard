@@ -129,6 +129,22 @@ def _estimate_cost(prompt: str, max_output_tokens: int) -> float:
     return input_cost + output_cost
 
 
+def _project_experiment_usd(prompt: str, max_output_tokens: int, cycles: int) -> float:
+    """Heuristic cost estimate for one experiment (gen + judge, all cycles).
+
+    The judge input is larger than the generator prompt (rubric + baseline + full
+    generated JSON).  We approximate it as prompt + a 2000-char stub for the
+    generated output portion.  A 1.5× growth factor accounts for refinement
+    prompt expansion across cycles.  This will sometimes over-reject (experiment
+    skipped with budget remaining) but actual API token counts can still exceed
+    the projection — this reduces the risk of silent cap overrun, not eliminates it.
+    """
+    gen_projected = _estimate_cost(prompt, max_output_tokens=max_output_tokens)
+    judge_input_approx = prompt + ("x" * 2000)
+    judge_projected = _estimate_cost(judge_input_approx, max_output_tokens=1500)
+    return (gen_projected + judge_projected) * cycles * 1.5
+
+
 def _call_openai_json(
     prompt: str,
     api_key: str,
@@ -202,11 +218,19 @@ def _build_guardrail_text(guardrails: dict[str, Any]) -> str:
     )
 
 
-def _apply_guardrail_checks(result: dict[str, Any], guardrails: dict[str, Any]) -> dict[str, Any]:
+def _apply_guardrail_checks(
+    result: dict[str, Any],
+    guardrails: dict[str, Any],
+    min_cites_override: int | None = None,
+) -> dict[str, Any]:
     violations: list[str] = []
     forbidden = [s.lower() for s in guardrails.get("forbidden_patterns", [])]
     required = guardrails.get("required_per_attribute", [])
-    min_cites = int(guardrails.get("min_supporting_research_per_attribute", 0) or 0)
+    min_cites = (
+        min_cites_override
+        if min_cites_override is not None
+        else int(guardrails.get("min_supporting_research_per_attribute", 0) or 0)
+    )
     must_measurable = bool(guardrails.get("must_include_measurable_target", False))
     keywords = [k.lower() for k in guardrails.get("mitigation_must_include_keywords", [])]
 
@@ -264,16 +288,32 @@ def _run_single_experiment(
     judge_model: str,
     cycles: int,
     max_output_tokens: int,
-) -> dict[str, Any]:
-    run_dir = out_dir / exp["id"]
-    run_dir.mkdir(parents=True, exist_ok=True)
+    budget_remaining: float = float("inf"),
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    min_cites_override = exp["citation_min_count"] if "citation_min_count" in exp else None
+    reflection_strength = exp.get("reflection_strength", "medium")
 
     style_hint = _build_style_hint(exp.get("prompt_style", "baseline"))
     research_block = format_evidence_for_prompt(research_evidence)
     prompt = build_prompt(context_payload, dataset_cfg["dataset_name"], research_block) + f"\n\nStyle hint: {style_hint}\n"
     prompt += "\n" + _build_guardrail_text(guardrails)
 
-    projected = _estimate_cost(prompt, max_output_tokens=max_output_tokens) * cycles * 2.0
+    projected = _project_experiment_usd(prompt, max_output_tokens=max_output_tokens, cycles=cycles)
+    log.info(
+        "Experiment '%s' preflight: projected $%.4f (gen+judge×%d cycles×1.5 growth) | budget remaining $%.4f",
+        exp["id"], projected, cycles, budget_remaining,
+    )
+    if projected > budget_remaining:
+        log.warning("Skipping experiment '%s': projected $%.4f > remaining $%.4f", exp["id"], projected, budget_remaining)
+        return {
+            "run_id": exp["id"],
+            "skipped": True,
+            "skip_reason": "insufficient_budget",
+            "projected_cost_usd": round(projected, 4),
+        }, []
+
+    run_dir = out_dir / exp["id"]
+    run_dir.mkdir(parents=True, exist_ok=True)
     cycle_outputs: list[dict[str, Any]] = []
     cycle_scores: list[dict[str, Any]] = []
     judge_feedback_log: list[dict[str, Any]] = []
@@ -290,7 +330,7 @@ def _run_single_experiment(
             max_output_tokens=max_output_tokens,
         )
         deterministic_score = score_llm_output(generated, baseline_payload)
-        guardrail_score = _apply_guardrail_checks(generated, guardrails)
+        guardrail_score = _apply_guardrail_checks(generated, guardrails, min_cites_override=min_cites_override)
 
         judge_prompt = _build_judge_prompt(generated, baseline_payload, rubric)
         judge, judge_usage = _call_openai_json(
@@ -326,8 +366,17 @@ def _run_single_experiment(
         judge_feedback_log.append(judge)
         final_result = generated
         if cycle_idx < cycles:
-            deltas = "\n".join(f"- {d}" for d in judge.get("prompt_deltas", []))
-            updates = "\n".join(f"- {u}" for u in judge.get("guardrail_updates", []))
+            if reflection_strength == "high":
+                delta_list = judge.get("prompt_deltas", [])
+                update_list = judge.get("guardrail_updates", [])
+            elif reflection_strength == "low":
+                delta_list = judge.get("prompt_deltas", [])[:1]
+                update_list = judge.get("guardrail_updates", [])[:1]
+            else:  # medium (default)
+                delta_list = judge.get("prompt_deltas", [])[:3]
+                update_list = judge.get("guardrail_updates", [])[:3]
+            deltas = "\n".join(f"- {d}" for d in delta_list)
+            updates = "\n".join(f"- {u}" for u in update_list)
             prompt = build_refinement_prompt(
                 context_payload=context_payload,
                 previous_output=generated,
@@ -464,7 +513,11 @@ def run_hybrid_plan(config_path: Path, rubric_path: Path, guardrails_path: Path,
             judge_model=cfg.get("judge_model", "o3"),
             cycles=int(cfg.get("cycles", 3)),
             max_output_tokens=int(cfg.get("max_output_tokens", 3000)),
+            budget_remaining=budget_usd - spent,
         )
+        if summary.get("skipped"):
+            log.info("Experiment '%s' skipped: %s", summary["run_id"], summary.get("skip_reason"))
+            continue
         spent += summary["actual_cost_usd"]
         summary["budget_remaining_usd"] = round(max(0.0, budget_usd - spent), 4)
         registry.append(summary)
@@ -477,7 +530,7 @@ def run_hybrid_plan(config_path: Path, rubric_path: Path, guardrails_path: Path,
         raise RuntimeError("No experiments ran; check budget and config.")
 
     best = sorted(registry, key=lambda r: r["final_hybrid_score"], reverse=True)[0]
-    validation_cfg = {"id": "validation_best_v2", "prompt_style": "actionability"}
+    validation_cfg = {"id": "validation_best_v2", "prompt_style": "actionability", "reflection_strength": "high"}
     validation_summary, _ = _run_single_experiment(
         exp=validation_cfg,
         context_payload=context_payload,
@@ -492,22 +545,47 @@ def run_hybrid_plan(config_path: Path, rubric_path: Path, guardrails_path: Path,
         judge_model=cfg.get("judge_model", "o3"),
         cycles=int(cfg.get("cycles", 3)),
         max_output_tokens=int(cfg.get("max_output_tokens", 3000)),
+        budget_remaining=budget_usd - spent,
     )
 
-    decision = {
-        "promote_refined_default": validation_summary["final_hybrid_score"] >= best["final_hybrid_score"],
-        "baseline_best_run_id": best["run_id"],
-        "baseline_best_score": best["final_hybrid_score"],
-        "validation_run_id": validation_summary["run_id"],
-        "validation_score": validation_summary["final_hybrid_score"],
-        "delta": round(validation_summary["final_hybrid_score"] - best["final_hybrid_score"], 2),
-        "budget_usd": round(budget_usd, 2),
-        "total_spent_usd": round(spent + validation_summary["actual_cost_usd"], 4),
-    }
+    if validation_summary.get("skipped"):
+        validation_out: dict[str, Any] = {
+            "validation_skipped": True,
+            "skip_reason": validation_summary.get("skip_reason", "insufficient_budget"),
+            "remaining_usd": round(budget_usd - spent, 4),
+            "projected_validation_cost_usd": validation_summary.get("projected_cost_usd"),
+            "validation_run_id": None,
+            "validation_score": None,
+            "delta": None,
+        }
+        decision: dict[str, Any] = {
+            "promote_refined_default": False,
+            "skip_reason": "validation_not_run_insufficient_budget",
+            "baseline_best_run_id": best["run_id"],
+            "baseline_best_score": best["final_hybrid_score"],
+            "validation_run_id": None,
+            "validation_score": None,
+            "delta": None,
+            "budget_usd": round(budget_usd, 2),
+            "total_spent_usd": round(spent, 4),
+        }
+    else:
+        validation_out = {**validation_summary, "validation_skipped": False, "skip_reason": None}
+        decision = {
+            "promote_refined_default": validation_summary["final_hybrid_score"] >= best["final_hybrid_score"],
+            "skip_reason": None,
+            "baseline_best_run_id": best["run_id"],
+            "baseline_best_score": best["final_hybrid_score"],
+            "validation_run_id": validation_summary["run_id"],
+            "validation_score": validation_summary["final_hybrid_score"],
+            "delta": round(validation_summary["final_hybrid_score"] - best["final_hybrid_score"], 2),
+            "budget_usd": round(budget_usd, 2),
+            "total_spent_usd": round(spent + validation_summary["actual_cost_usd"], 4),
+        }
 
     (run_root / "run_registry.json").write_text(json.dumps(registry, indent=2), encoding="utf-8")
     pd.DataFrame(registry).to_csv(run_root / "run_registry.csv", index=False)
-    (run_root / "validation_summary.json").write_text(json.dumps(validation_summary, indent=2), encoding="utf-8")
+    (run_root / "validation_summary.json").write_text(json.dumps(validation_out, indent=2), encoding="utf-8")
     (run_root / "promotion_decision.json").write_text(json.dumps(decision, indent=2), encoding="utf-8")
     (run_root / "run_metadata.json").write_text(
         json.dumps(
