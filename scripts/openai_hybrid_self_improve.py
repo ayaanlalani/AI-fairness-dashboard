@@ -145,6 +145,10 @@ def _project_experiment_usd(prompt: str, max_output_tokens: int, cycles: int) ->
     return (gen_projected + judge_projected) * cycles * 1.5
 
 
+_MAX_RETRIES = 3
+_RETRY_BACKOFF_BASE = 20
+
+
 def _call_openai_json(
     prompt: str,
     api_key: str,
@@ -156,30 +160,49 @@ def _call_openai_json(
 
     client = OpenAI(api_key=api_key)
     t0 = time.time()
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a rigorous evaluator. Follow schema exactly."},
-            {"role": "user", "content": prompt},
-        ],
-        max_completion_tokens=max_output_tokens,
-        response_format={"type": "json_schema", "json_schema": schema},
-    )
-    usage = response.usage
-    input_tokens = getattr(usage, "prompt_tokens", 0) or 0
-    output_tokens = getattr(usage, "completion_tokens", 0) or 0
-    total_cost = (input_tokens / 1_000_000) * PRICE_INPUT_PER_M + (output_tokens / 1_000_000) * PRICE_OUTPUT_PER_M
-    raw = (response.choices[0].message.content or "").strip()
-    raw = re.sub(r"^```(?:json)?\s*\n?", "", raw)
-    raw = re.sub(r"\n?```\s*$", "", raw)
-    return json.loads(raw), {
-        "wall_clock_s": round(time.time() - t0, 2),
-        "input_tokens": input_tokens,
-        "output_tokens": output_tokens,
-        "total_tokens": input_tokens + output_tokens,
-        "total_cost_usd": round(total_cost, 6),
-        "model": model,
-    }
+    last_err: Exception | None = None
+
+    for attempt in range(1, _MAX_RETRIES + 1):
+        try:
+            log.info("Calling OpenAI (%s) [attempt %d/%d] ...", model, attempt, _MAX_RETRIES)
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": "You are a rigorous evaluator. Follow schema exactly."},
+                    {"role": "user", "content": prompt},
+                ],
+                max_completion_tokens=max_output_tokens,
+                response_format={"type": "json_schema", "json_schema": schema},
+            )
+            usage = response.usage
+            input_tokens = getattr(usage, "prompt_tokens", 0) or 0
+            output_tokens = getattr(usage, "completion_tokens", 0) or 0
+            total_cost = (input_tokens / 1_000_000) * PRICE_INPUT_PER_M + (output_tokens / 1_000_000) * PRICE_OUTPUT_PER_M
+            raw = (response.choices[0].message.content or "").strip()
+            raw = re.sub(r"^```(?:json)?\s*\n?", "", raw)
+            raw = re.sub(r"\n?```\s*$", "", raw)
+            if not raw:
+                raise ValueError("OpenAI returned an empty response body (200 OK but no content).")
+            return json.loads(raw), {
+                "wall_clock_s": round(time.time() - t0, 2),
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": input_tokens + output_tokens,
+                "total_cost_usd": round(total_cost, 6),
+                "model": model,
+                "attempts": attempt,
+            }
+        except Exception as e:
+            last_err = e
+            err_str = str(e)
+            if "429" in err_str or "rate" in err_str.lower() or "empty response" in err_str.lower():
+                wait = _RETRY_BACKOFF_BASE * attempt
+                log.warning("OpenAI call failed (attempt %d/%d): %s. Retrying in %ds ...", attempt, _MAX_RETRIES, err_str, wait)
+                time.sleep(wait)
+            else:
+                raise
+
+    raise RuntimeError(f"OpenAI call failed after {_MAX_RETRIES} attempts: {last_err}")
 
 
 def _build_style_hint(prompt_style: str) -> str:
