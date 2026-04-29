@@ -1,0 +1,23 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "foreign_worker_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gemini-2.5-flash",
+  "result": {},
+  "score": {
+    "total_score": 0.0,
+    "subscores": {
+      "completeness": 0.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 0.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 0.0/100. Completeness=0.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=0.0, Research grounding=0.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {}
+}

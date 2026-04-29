@@ -23,8 +23,10 @@ SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 DEFAULT_FIELDS = (
     "title,year,authors,abstract,url,venue,citationCount,externalIds,paperId"
 )
-REQUEST_INTERVAL_S = 1.1
-MAX_RETRIES = 3
+REQUEST_INTERVAL_S = 2.0
+MAX_RETRIES = 2
+_RATE_LIMIT_BACKOFF_S = 15  # base wait on 429; doubles each retry
+_CIRCUIT_OPEN = False  # once tripped, skip all Semantic Scholar calls this run
 MIN_CITATION_COUNT = 5
 _LAST_REQUEST_TS = 0.0
 
@@ -38,6 +40,12 @@ def _respect_rate_limit() -> None:
     _LAST_REQUEST_TS = time.monotonic()
 
 
+def _trip_circuit() -> None:
+    global _CIRCUIT_OPEN
+    _CIRCUIT_OPEN = True
+    log.warning("Semantic Scholar circuit breaker OPEN — skipping all remaining queries this run.")
+
+
 def search_semantic_scholar(
     query: str,
     limit: int = 3,
@@ -45,6 +53,9 @@ def search_semantic_scholar(
     timeout_s: int = 20,
 ) -> list[dict[str, Any]]:
     """Return simplified Semantic Scholar search results for a query."""
+    if _CIRCUIT_OPEN:
+        return []
+
     params = urllib.parse.urlencode({
         "query": query,
         "limit": limit,
@@ -65,13 +76,16 @@ def search_semantic_scholar(
             break
         except urllib.error.HTTPError as exc:
             if exc.code == 429 and attempt < MAX_RETRIES:
-                wait_s = REQUEST_INTERVAL_S * (2 ** attempt)
+                wait_s = _RATE_LIMIT_BACKOFF_S * (2 ** (attempt - 1))
                 log.warning(
-                    f"Semantic Scholar rate limited for '{query}'. Retrying in {wait_s:.1f}s ..."
+                    f"Semantic Scholar rate limited for '{query}'. Retrying in {wait_s:.0f}s ..."
                 )
                 time.sleep(wait_s)
                 continue
-            log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
+            if exc.code == 429:
+                _trip_circuit()
+            else:
+                log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
             return []
         except Exception as exc:
             log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
@@ -161,11 +175,24 @@ def gather_research_context(
     seen: set[str] = set()
     preferred: list[dict[str, Any]] = []
     fallback: list[dict[str, Any]] = []
+    consecutive_failures = 0
 
     for query in queries:
         if len(preferred) >= max_papers:
             break
-        for paper in search_semantic_scholar(query, limit=per_query_limit):
+        if consecutive_failures >= 2:
+            log.warning(
+                "Semantic Scholar circuit breaker: %d consecutive failures — "
+                "skipping remaining queries for this context.",
+                consecutive_failures,
+            )
+            break
+        results = search_semantic_scholar(query, limit=per_query_limit)
+        if not results:
+            consecutive_failures += 1
+            continue
+        consecutive_failures = 0
+        for paper in results:
             key = paper.get("paper_id") or paper.get("title", "").lower()
             if not key or key in seen:
                 continue
