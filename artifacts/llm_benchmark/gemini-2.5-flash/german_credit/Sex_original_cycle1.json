@@ -1,0 +1,39 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "Sex_original",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gemini-2.5-flash",
+  "result": {
+    "attribute": "Sex_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The model exhibits moderate disparate impact against the 'female' group. Females are selected at a rate that is approximately 86% of the male selection rate (Disparate Impact = 0.8595). This is further evidenced by a Demographic Parity Difference of -0.1152, indicating a substantial gap in selection rates where males receive favorable outcomes more often. There is also an Equal Opportunity Difference of -0.0512, meaning the model is less effective at correctly identifying positive outcomes for females among those who are truly positive (lower True Positive Rate for females). The Average Odds Difference of 0.1256 further confirms an overall disparity in error rates between the groups, with the male group generally experiencing more favorable error characteristics. The Theil Index of 0.3084 points to a notable level of inequality in outcome distribution.",
+    "why_is_wrong": "The observed disparities likely stem from a combination of factors. The model's lower True Positive Rate for females (0.878 vs. 0.9293 for males) suggests it is less accurate in identifying actual positive cases for this group. While females have a lower False Positive Rate (0.35 vs. 0.55 for males), this conservative prediction for females, combined with a higher leniency for males (higher FPR), contributes to the overall lower selection rate for females. This behavior is often indicative of historical biases embedded within the training data, where the female group might have been historically disadvantaged or underrepresented in favorable outcomes, leading the model to learn and perpetuate these patterns. The model might be poorly calibrated or generalize less effectively to the female demographic, leading to systematic under-prediction of favorable outcomes for this group.",
+    "how_to_fix": "To address the identified disparities, a multi-faceted approach leveraging fairness toolkits is recommended. For pre-processing, `Reweighing` from AIF360 can be applied to adjust the weights of training examples, giving more influence to the female group to counteract historical data biases. During model training (in-processing), techniques like `ExponentiatedGradient` or `GridSearch` from Fairlearn can be utilized. These methods train the model while explicitly optimizing for fairness metrics, such as demographic parity or equal opportunity. Alternatively, AIF360's `PrejudiceRemover` can be used to regularize the model against discriminatory patterns. For post-processing, given the significant Equal Opportunity Difference and Average Odds Difference, `EqOddsPostprocessing` or `CalibratedEqOddsPostprocessing` from AIF360 are highly suitable. These techniques adjust the model's predictions to satisfy equalized odds criteria. Additionally, Fairlearn's `ThresholdOptimizer` can be employed to set group-specific classification thresholds, which can help to balance selection rates and true positive rates across the 'Sex_original' attribute, directly mitigating the disparate impact and equal opportunity concerns."
+  },
+  "score": {
+    "total_score": 70.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 70.0/100. Completeness=35.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gemini-2.5-flash",
+    "attempts": 1,
+    "wall_clock_s": 16.95,
+    "input_tokens": 833,
+    "output_tokens": 651,
+    "total_tokens": 1484,
+    "input_cost_usd": 8.3e-05,
+    "output_cost_usd": 0.00026,
+    "total_cost_usd": 0.000344
+  }
+}
