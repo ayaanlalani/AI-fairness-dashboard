@@ -1,0 +1,23 @@
+{
+  "name": "fairness_guardrails_baseline_v1",
+  "forbidden_patterns": [
+    "cannot determine",
+    "insufficient information",
+    "as an ai language model"
+  ],
+  "required_per_attribute": [
+    "what_is_wrong",
+    "why_is_wrong",
+    "how_to_fix",
+    "supporting_research"
+  ],
+  "min_supporting_research_per_attribute": 1,
+  "mitigation_must_include_keywords": [
+    "reweighing",
+    "thresholdoptimizer",
+    "equalized odds",
+    "postprocessing",
+    "counterfactual"
+  ],
+  "must_include_measurable_target": true
+}

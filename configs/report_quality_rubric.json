@@ -1,0 +1,35 @@
+{
+  "name": "stakeholder_report_quality_v1",
+  "description": "Rubric optimized for stakeholder-facing fairness reports with actionable remediation.",
+  "dimensions": [
+    {
+      "id": "clarity",
+      "weight": 0.2,
+      "description": "Writing is concise, unambiguous, and understandable by non-technical stakeholders."
+    },
+    {
+      "id": "actionability",
+      "weight": 0.3,
+      "description": "Recommendations are concrete, prioritized, and measurable."
+    },
+    {
+      "id": "evidence_quality",
+      "weight": 0.2,
+      "description": "Claims are grounded in provided context and supported by credible research citations."
+    },
+    {
+      "id": "consistency",
+      "weight": 0.15,
+      "description": "Severity labels and narrative logic stay consistent across attributes."
+    },
+    {
+      "id": "non_contradiction",
+      "weight": 0.15,
+      "description": "No internal contradictions between diagnosis, severity, and mitigation."
+    }
+  ],
+  "scoring_scale": {
+    "min": 1,
+    "max": 5
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "pilot_dataset": "german_credit",
+  "budget_cad": 50.0,
+  "cad_to_usd": 0.74,
+  "budget_reserve_cad": 10.0,
+  "generator_model": "o3",
+  "judge_model": "o3",
+  "max_output_tokens": 2200,
+  "cycles": 2,
+  "experiments": [
+    {
+      "id": "baseline_v1",
+      "prompt_style": "baseline",
+      "citation_min_count": 5,
+      "reflection_strength": "medium"
+    },
+    {
+      "id": "actionability_v1",
+      "prompt_style": "actionability",
+      "citation_min_count": 5,
+      "reflection_strength": "high"
+    },
+    {
+      "id": "evidence_strict_v1",
+      "prompt_style": "evidence_strict",
+      "citation_min_count": 8,
+      "reflection_strength": "medium"
+    },
+    {
+      "id": "concise_ops_v1",
+      "prompt_style": "concise_ops",
+      "citation_min_count": 5,
+      "reflection_strength": "medium"
+    },
+    {
+      "id": "consistency_guarded_v1",
+      "prompt_style": "baseline",
+      "citation_min_count": 8,
+      "reflection_strength": "high"
+    }
+  ]
+}
