@@ -1,0 +1,46 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "Sex_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gemini-2.5-flash",
+  "result": {
+    "attribute": "Sex_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact for the 'Sex_original' attribute is 0.8595. This value indicates that the unprivileged group (female) receives the favorable outcome (selection rate) at approximately 85.95% the rate of the privileged group (male).",
+    "why_is_wrong": "A Disparate Impact value below 1.0 (specifically, below 0.8 according to common guidelines, or below 0.95 per the provided moderate threshold) suggests a potential disparity in outcomes where the unprivileged group is receiving favorable outcomes at a lower rate. This can signify indirect discrimination and may lead to inequitable treatment based on sex, violating principles of fairness in allocation or access.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "AIF360 toolkit documentation",
+      "Fairlearn toolkit documentation"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [
+    "AIF360 toolkit documentation",
+    "Fairlearn toolkit documentation"
+  ],
+  "usage": {
+    "model": "gemini-2.5-flash",
+    "attempts": 1,
+    "wall_clock_s": 10.38,
+    "input_tokens": 948,
+    "output_tokens": 236,
+    "total_tokens": 1184,
+    "input_cost_usd": 9.5e-05,
+    "output_cost_usd": 9.4e-05,
+    "total_cost_usd": 0.000189
+  }
+}

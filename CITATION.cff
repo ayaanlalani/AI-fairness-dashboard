@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite it using the metadata below."
+title: "Fairness Audit Benchmark for Lending Datasets"
+version: "0.1.0"
+date-released: "2026-05-01"
+abstract: "A reproducible artifact and evaluation protocol for testing whether LLM-based fairness auditors produce stable, statistically grounded, remediation-ready audits on German Credit and HMDA Georgia lending datasets."
+authors:
+  - name: "AI Fairness Dashboard Contributors"
+keywords:
+  - fairness
+  - lending
+  - audit
+  - benchmark
+  - OpenAI
+  - NeurIPS Evaluations and Datasets
+license: "MIT"
+preferred-citation:
+  type: conference-paper
+  title: "An Evaluation Protocol for LLM-Based Fairness Auditors on Lending Datasets"
+  authors:
+    - name: "AI Fairness Dashboard Contributors"
+  conference:
+    name: "NeurIPS 2026 Datasets and Benchmarks Track"
+  year: 2026

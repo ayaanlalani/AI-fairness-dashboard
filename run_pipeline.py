@@ -42,6 +42,7 @@ DEFAULT_STEP_TIMEOUT_S = 300
 TRAIN_STEP_TIMEOUT_S = 1200
 FAIRNESS_STEP_TIMEOUT_S = 1200
 LLM_BENCHMARK_TIMEOUT_S = 1200
+FOUR_CYCLE_BENCHMARK_TIMEOUT_S = 2400  # 4 cycles × N attrs × retries
 
 DATASETS: dict[str, dict] = {
     "german_credit": {
@@ -61,17 +62,7 @@ DATASETS: dict[str, dict] = {
                 " --dataset_name 'German Credit'"
             ),
             "llm_benchmark": (
-                "mkdir -p metrics/fairness/gemini metrics/fairness/openai && "
-                "gemini_status=0; openai_status=0; "
-                f"{PYTHON} ../scripts/llm_fairness_analysis.py"
-                " --predictions metrics/classification_predictions.csv"
-                " --fairness_csv metrics/fairness/fairness_metrics.csv"
-                " --qualitative_report metrics/fairness/qualitative_report.md"
-                " --target actual --pred_col predicted --favorable_label 1"
-                " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
-                " --out_dir metrics/fairness/gemini"
-                " --dataset_name 'German Credit'"
-                " || gemini_status=$?; "
+                "mkdir -p metrics/fairness/openai && "
                 f"{PYTHON} ../scripts/openai_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
@@ -81,8 +72,30 @@ DATASETS: dict[str, dict] = {
                 " --out_dir metrics/fairness/openai"
                 " --dataset_name 'German Credit'"
                 " --max_cost_usd 37.00"
-                " || openai_status=$?; "
-                "test $gemini_status -eq 0 -a $openai_status -eq 0"
+            ),
+            "benchmark": (
+                f"{PYTHON} ../scripts/llm_benchmark.py"
+                " --predictions metrics/classification_predictions.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 1"
+                " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
+                " --dataset_name 'German Credit'"
+                " --dataset_key german_credit"
+                " --out_root ../artifacts/llm_benchmark"
+                " --model gpt-4o"
+            ),
+            "legacy_gemini_benchmark": (
+                f"{PYTHON} ../scripts/llm_benchmark.py"
+                " --predictions metrics/classification_predictions.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 1"
+                " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
+                " --dataset_name 'German Credit'"
+                " --dataset_key german_credit"
+                " --out_root ../artifacts/llm_benchmark"
+                " --model gemini-2.5-flash"
             ),
         },
     },
@@ -103,17 +116,7 @@ DATASETS: dict[str, dict] = {
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
             ),
             "llm_benchmark": (
-                "mkdir -p metrics/fairness/gemini metrics/fairness/openai && "
-                "gemini_status=0; openai_status=0; "
-                f"{PYTHON} ../scripts/llm_fairness_analysis.py"
-                " --predictions metrics/classification_predictions.csv"
-                " --fairness_csv metrics/fairness/fairness_metrics.csv"
-                " --qualitative_report metrics/fairness/qualitative_report.md"
-                " --target actual --pred_col predicted --favorable_label 1"
-                " --protected_attrs 'race:White,sex:Male,age_group:mid'"
-                " --out_dir metrics/fairness/gemini"
-                " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
-                " || gemini_status=$?; "
+                "mkdir -p metrics/fairness/openai && "
                 f"{PYTHON} ../scripts/openai_fairness_analysis.py"
                 " --predictions metrics/classification_predictions.csv"
                 " --fairness_csv metrics/fairness/fairness_metrics.csv"
@@ -123,8 +126,30 @@ DATASETS: dict[str, dict] = {
                 " --out_dir metrics/fairness/openai"
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
                 " --max_cost_usd 37.00"
-                " || openai_status=$?; "
-                "test $gemini_status -eq 0 -a $openai_status -eq 0"
+            ),
+            "benchmark": (
+                f"{PYTHON} ../scripts/llm_benchmark.py"
+                " --predictions metrics/classification_predictions.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 1"
+                " --protected_attrs 'race:White,sex:Male,age_group:mid'"
+                " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
+                " --dataset_key hmda"
+                " --out_root ../artifacts/llm_benchmark"
+                " --model gpt-4o"
+            ),
+            "legacy_gemini_benchmark": (
+                f"{PYTHON} ../scripts/llm_benchmark.py"
+                " --predictions metrics/classification_predictions.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 1"
+                " --protected_attrs 'race:White,sex:Male,age_group:mid'"
+                " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
+                " --dataset_key hmda"
+                " --out_root ../artifacts/llm_benchmark"
+                " --model gemini-2.5-flash"
             ),
         },
     },
@@ -164,7 +189,15 @@ DATASETS: dict[str, dict] = {
     },
 }
 
-STEP_ORDER = ["clean", "train", "fairness", "qualitative", "llm_benchmark", "visualize"]
+STEP_ORDER = [
+    "clean",
+    "train",
+    "fairness",
+    "qualitative",
+    "llm_benchmark",
+    "benchmark",
+    "visualize",
+]
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -174,7 +207,9 @@ STEP_ORDER = ["clean", "train", "fairness", "qualitative", "llm_benchmark", "vis
 def run_step(dataset_name: str, step_name: str, cmd: str, cwd: Path) -> bool:
     """Run a single pipeline step. Returns True on success."""
     header = f"[{dataset_name} / {step_name}]"
-    if step_name == "llm_benchmark":
+    if step_name == "benchmark":
+        timeout_s = FOUR_CYCLE_BENCHMARK_TIMEOUT_S
+    elif step_name == "llm_benchmark":
         timeout_s = LLM_BENCHMARK_TIMEOUT_S
     elif step_name == "fairness":
         timeout_s = FAIRNESS_STEP_TIMEOUT_S
@@ -406,7 +441,7 @@ def main() -> None:
 
     # ── visualize (runs once across all datasets) ─────────────────
     if "visualize" in steps_to_run and succeeded:
-        viz_cmd = f'{PYTHON} scripts/visualize_benchmark.py'
+        viz_cmd = f'{PYTHON} scripts/visualize_openai_benchmark.py'
         run_step("all", "visualize", viz_cmd, ROOT)
 
     failed = [ds for ds in results if not all(results[ds].values())]

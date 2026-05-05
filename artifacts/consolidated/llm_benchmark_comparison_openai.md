@@ -1,4 +1,4 @@
-# Cross-Dataset Openai LLM Benchmark Comparison
+# Cross-Dataset OpenAI LLM Benchmark Comparison
 
 # Benchmark Comparison: German Credit
 

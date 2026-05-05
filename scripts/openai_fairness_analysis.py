@@ -3,13 +3,14 @@ openai_fairness_analysis.py
 
 OpenAI-powered LLM fairness benchmark.
 
-This script intentionally mirrors the Gemini benchmark methodology:
-- the LLM receives raw prediction data,
-- fairness toolkit context,
-- Semantic Scholar research evidence,
-- and protected attribute configuration.
+This is the primary LLM benchmark path for the artifact. Python computes the
+fairness metrics, group breakdowns, baseline severity labels, and research
+context first; OpenAI then interprets that fixed context and produces a
+remediation-ready qualitative audit.
 
-It does NOT receive our pre-computed fairness metrics or qualitative report.
+The OpenAI model is not presented as independently recomputing fairness
+metrics. The benchmark evaluates metric-grounded reasoning, stability,
+severity alignment, and mitigation specificity.
 """
 from __future__ import annotations
 

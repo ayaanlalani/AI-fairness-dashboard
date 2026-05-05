@@ -1,134 +1,179 @@
-# AI Fairness Dashboard
+# Fairness Audit Benchmark for Lending Datasets
 
-This repo hosts the pipelines we built in CMPT 310 to audit fairness across multiple real-world datasets (diabetes, healthcare insurance, German credit, and Lending Club). Each dataset folder contains scripts to clean data, train predictive models, and export bias diagnostics that feed into a shared set of poster-ready visuals.
+This repository contains a NeurIPS 2026 Evaluations & Datasets style artifact for testing whether LLM-based fairness auditors produce stable, statistically grounded, remediation-ready audits on lending datasets.
+
+The artifact has two linked parts:
+
+- A deterministic fairness audit pipeline for German Credit and HMDA Georgia.
+- An OpenAI-based LLM benchmark that receives Python-computed metric context and is evaluated on whether it produces consistent qualitative diagnoses, severity labels, and mitigation plans.
+
+Gemini outputs are retained only as secondary legacy comparison artifacts where they already exist. The primary benchmark path for this release is OpenAI.
+
+## Reviewer Quickstart
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+make smoke
+make fairness
+```
+
+The smoke test is local and does not call external APIs. The fairness run regenerates deterministic metrics for the two main lending datasets.
+
+To run the OpenAI benchmark, set an API key first:
+
+```bash
+export OPENAI_API_KEY="..."
+make benchmark
+```
+
+Optional literature retrieval can use:
+
+```bash
+export SEMANTIC_SCHOLAR_API_KEY="..."
+```
 
 ## Repository Layout
 
-- `diabetes_dataset/`, `Healthcare-insurance-dataset/`, `german_credit_dataset/`, `lending_club_dataset/`: end-to-end pipelines (cleaning, training, fairness scripts, metrics, and plots) for each dataset.
-- `scripts/generate_consolidated_visuals.py`: stacks the per-dataset fairness metrics into consolidated PNGs/CSV for the poster.
-- `poster_assets/`: latest consolidated plots (DI overview, gap panels, bias heatmap) plus `consolidated_fairness_metrics.csv`.
-- `requirements.txt`: frozen Python environment used to generate all results.
+- `run_pipeline.py`: central orchestrator for cleaning, training, deterministic fairness analysis, qualitative analysis, OpenAI benchmarking, and visualization.
+- `german_credit_dataset/`: German Credit preprocessing, model training, and fairness scripts.
+- `hmda_dataset/`: HMDA Georgia preprocessing, model training, and fairness scripts.
+- `scripts/openai_fairness_analysis.py`: primary OpenAI qualitative benchmark over deterministic metric context.
+- `scripts/llm_benchmark.py`: multi-cycle LLM benchmark runner; OpenAI is the artifact default, while Gemini can be selected explicitly for legacy comparison.
+- `configs/`: OpenAI pilot/smoke configs, report quality rubric, and guardrails.
+- `docs/data_cards/`: data cards for German Credit and HMDA Georgia.
+- `artifacts/german_credit/fairness/` and `artifacts/hmda/fairness/`: current deterministic and LLM audit outputs.
+- `artifacts/consolidated/`: cross-dataset summaries and OpenAI comparison reports.
+- `report/report.tex`: paper/report source.
 
-## Environment Setup
+Older course-project folders for diabetes, healthcare insurance, and Lending Club remain in the repository for provenance, but they are not the main NeurIPS artifact scope.
 
-1. Install Python 3.10+ (we developed in a venv sitting at `.venv/`).
-2. Create and activate a fresh virtual environment, then install dependencies:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
+## Setup
 
-## Reproducing Results
-
-All commands assume you are in the repo root with the virtual environment activated.
-
-### Diabetes
-```bash
-python diabetes_dataset/scripts/train_models.py \
-  --data_path diabetes_dataset/data/diabetes_cleaned.csv \
-  --out_dir diabetes_dataset/metrics \
-  --models_dir diabetes_dataset/models
-
-python diabetes_dataset/compute_fairness.py \
-  --predictions_dir diabetes_dataset/metrics \
-  --out_dir diabetes_dataset/metrics/fairness
-```
-
-### Healthcare Insurance
-```bash
-python Healthcare-insurance-dataset/scripts/train_models.py \
-  --data_dir Healthcare-insurance-dataset/processed \
-  --out_dir Healthcare-insurance-dataset/metrics \
-  --models_dir Healthcare-insurance-dataset/models
-
-python Healthcare-insurance-dataset/scripts/compute_fairness.py \
-  --predictions_dir Healthcare-insurance-dataset/metrics \
-  --out_dir Healthcare-insurance-dataset/metrics/fairness
-```
-
-### German Credit
-```bash
-python german_credit_dataset/scripts/compute_fairness.py \
-  --data_path german_credit_dataset/data/german_credit_CLEANED_dataset.csv \
-  --metrics_dir german_credit_dataset/metrics \
-  --fairness_dir german_credit_dataset/metrics/fairness
-```
-
-### Lending Club
-```bash
-python lending_club_dataset/data/clean_lending_club.py \
-  --input_path lending_club_dataset/data/loan.csv \
-  --out_dir lending_club_dataset/processed
-
-python lending_club_dataset/scripts/train_models.py \
-  --data_dir lending_club_dataset/processed \
-  --out_dir lending_club_dataset/metrics \
-  --models_dir lending_club_dataset/models
-
-python lending_club_dataset/scripts/compute_fairness.py \
-  --data_dir lending_club_dataset/processed \
-  --predictions_dir lending_club_dataset/metrics \
-  --out_dir lending_club_dataset/metrics/fairness
-```
-
-### Consolidated Poster Visuals
-After each dataset exports `metrics/fairness/fairness_metrics.csv`, regenerate the combined assets:
-```bash
-python scripts/generate_consolidated_visuals.py --output_dir poster_assets
-```
-
-## OpenAI Hybrid Self-Improvement (Deepnote)
-
-This repo includes a Deepnote-friendly runner that performs generator cycles,
-judge-model rubric scoring, reflection-based prompt updates, multi-run
-selection, refined guardrail proposal, and a validation rerun.
-
-Configuration files:
-- `configs/openai_hybrid_pilot.json` (pilot dataset, budget, experiment matrix)
-- `configs/openai_hybrid_smoke.json` (one experiment, one cycle; use for a cheap smoke test)
-- `configs/report_quality_rubric.json` (judge rubric for report quality)
-- `configs/guardrails_baseline.json` (starting guardrails)
-
-Run:
-```bash
-python scripts/openai_hybrid_self_improve.py \
-  --config configs/openai_hybrid_pilot.json \
-  --rubric configs/report_quality_rubric.json \
-  --guardrails configs/guardrails_baseline.json \
-  --out_root artifacts
-```
-
-Smoke test (same command, swap config):
+Python 3.10+ is recommended.
 
 ```bash
-python scripts/openai_hybrid_self_improve.py \
-  --config configs/openai_hybrid_smoke.json \
-  --rubric configs/report_quality_rubric.json \
-  --guardrails configs/guardrails_baseline.json \
-  --out_root artifacts
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Required env var:
+The same dependencies are declared in `pyproject.toml` for `uv` users:
+
+```bash
+uv sync
+```
+
+## Commands
+
+### Smoke Test
+
+```bash
+make smoke
+```
+
+Expected behavior: compile the main Python entrypoints and verify that the required datasets, configs, and artifact directories exist. This target does not run the OpenAI API.
+
+### Deterministic Fairness Pipeline
+
+```bash
+make fairness
+```
+
+Equivalent command:
+
+```bash
+python run_pipeline.py \
+  --datasets german_credit hmda \
+  --steps clean train fairness qualitative visualize
+```
+
+Expected outputs:
+
+- `german_credit_dataset/metrics/classification_predictions.csv`
+- `german_credit_dataset/metrics/fairness/fairness_metrics.csv`
+- `german_credit_dataset/metrics/fairness/qualitative_report.md`
+- `hmda_dataset/metrics/classification_predictions.csv`
+- `hmda_dataset/metrics/fairness/fairness_metrics.csv`
+- `hmda_dataset/metrics/fairness/qualitative_report.md`
+- consolidated copies under `artifacts/`
+
+### OpenAI Benchmark
+
 ```bash
 export OPENAI_API_KEY="..."
+make benchmark
 ```
 
-Outputs are written under:
-- `artifacts/<dataset>/fairness/openai_hybrid/<timestamp>/`
-- includes cycle logs, `run_registry.csv`, `guardrails_refined_v2.json`, and
-  `promotion_decision.json`
+Equivalent command:
 
-## Submission Bundle
-
-To package everything for submission while excluding the virtual environment and other large artifacts:
 ```bash
-cd ..
-zip -r AI-fairness-dashboard.zip AI-fairness-dashboard \
-  -x "AI-fairness-dashboard/.venv/*" \
-     "AI-fairness-dashboard/.git/*" \
-     "AI-fairness-dashboard/__pycache__/*"
+python run_pipeline.py \
+  --datasets german_credit hmda \
+  --steps llm_benchmark visualize
 ```
 
-The resulting `AI-fairness-dashboard.zip` contains all source, configs, scripts, metrics, and documentation needed to reproduce the fairness analysis.
+The OpenAI workflow receives deterministic metric and group-breakdown context prepared by Python. It is not presented as independently recomputing fairness metrics. Its benchmark role is to test whether an LLM can transform fixed quantitative evidence into stable, statistically grounded, remediation-ready audit narratives.
 
+Expected outputs:
+
+- `german_credit_dataset/metrics/fairness/openai/llm_context_payload.json`
+- `german_credit_dataset/metrics/fairness/openai/llm_fairness_report.md`
+- `german_credit_dataset/metrics/fairness/openai/benchmark_comparison.md`
+- `hmda_dataset/metrics/fairness/openai/llm_context_payload.json`
+- `hmda_dataset/metrics/fairness/openai/llm_fairness_report.md`
+- `hmda_dataset/metrics/fairness/openai/benchmark_comparison.md`
+- consolidated OpenAI reports under `artifacts/consolidated/`
+
+### Paper Build
+
+```bash
+make paper
+```
+
+Expected output:
+
+- `report/report.pdf`
+
+If `latexmk` is unavailable, run:
+
+```bash
+cd report
+pdflatex report.tex
+pdflatex report.tex
+```
+
+### Optional Legacy Gemini Comparison
+
+Gemini is not the primary benchmark for this artifact. Existing Gemini results are retained as secondary/legacy comparisons. To run the generic benchmark with Gemini explicitly:
+
+```bash
+GEMINI_API_KEY="..." python scripts/llm_benchmark.py ... --model gemini-2.5-flash
+```
+
+## Data
+
+Main datasets:
+
+- German Credit: UCI Statlog German Credit plus a local Kaggle-formatted CSV used for human-readable feature names.
+- HMDA Georgia: CFPB/FFIEC HMDA records filtered to originated and denied mortgage applications.
+
+See:
+
+- `docs/data_cards/german_credit.md`
+- `docs/data_cards/hmda_georgia.md`
+
+The repository license covers this code, documentation, and artifact scaffolding. Dataset files and derived records remain subject to their original source terms and access conditions; see the data cards for source-specific notes.
+
+## Reproducibility Notes
+
+- Random seeds are fixed at `42` in preprocessing/model scripts where train/test splits or model training require randomness.
+- Fairness metrics are computed by deterministic Python code, with AIF360 used when available and manual fallback logic otherwise.
+- OpenAI model outputs may vary across API/model versions even with fixed prompts. The benchmark therefore records prompts, context payloads, raw responses, model names, token usage, and cost estimates.
+- Small subgroup results, especially German Credit `foreign_worker` and rare HMDA race categories, should be treated as statistically fragile.
+
+## Citation
+
+Please cite this artifact using `CITATION.cff`.

@@ -1,0 +1,39 @@
+[project]
+name = "fairness-audit-lending-benchmark"
+version = "0.1.0"
+description = "NeurIPS 2026 Evaluations & Datasets artifact for deterministic and OpenAI-based fairness auditing on lending datasets."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "AI Fairness Dashboard Contributors" }
+]
+dependencies = [
+  "contourpy==1.3.3",
+  "cycler==0.12.1",
+  "fonttools==4.60.1",
+  "joblib==1.5.2",
+  "kiwisolver==1.4.9",
+  "matplotlib==3.10.7",
+  "numpy==2.3.4",
+  "packaging==25.0",
+  "pandas==2.3.3",
+  "pillow==12.0.0",
+  "pip==25.2",
+  "pyparsing==3.2.5",
+  "python-dateutil==2.9.0.post0",
+  "pytz==2025.2",
+  "scikit-learn==1.7.2",
+  "scipy==1.16.2",
+  "seaborn==0.13.2",
+  "six==1.17.0",
+  "threadpoolctl==3.6.0",
+  "tzdata==2025.2",
+  "google-genai==1.65.0",
+  "python-dotenv==1.2.1",
+  "openai>=1.0.0",
+  "ucimlrepo==0.0.7"
+]
+
+[tool.setuptools]
+py-modules = []
