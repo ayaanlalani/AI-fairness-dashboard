@@ -1,7 +1,7 @@
 """
 llm_benchmark.py  —  Section C benchmark (NeurIPS 2026).
 
-4-cycle LLM fairness benchmark with distinct prompt strategies:
+4-cycle OpenAI-primary LLM fairness benchmark with distinct prompt strategies:
   1. zero_shot       — direct audit request, no special framing
   2. chain_of_thought — explicit step-by-step reasoning scaffold
   3. self_critique   — LLM refines its own cycle-2 output
@@ -25,7 +25,11 @@ Usage:
     --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0' \\
     --dataset_name 'German Credit' \\
     --dataset_key german_credit \\
-    --out_root artifacts/llm_benchmark
+    --out_root artifacts/llm_benchmark \
+    --model gpt-4o
+
+Gemini remains available by passing --model gemini-2.5-flash for legacy
+comparison runs.
 """
 from __future__ import annotations
 
@@ -57,11 +61,12 @@ try:
 except ImportError:
     pass
 
+DEFAULT_MODEL = "gpt-4o"
 GEMINI_MODEL = "gemini-2.5-flash"
 PRICE_INPUT_PER_M = 0.10
 PRICE_OUTPUT_PER_M = 0.40
-MAX_RETRIES = 3
-RETRY_BACKOFF_BASE = 30
+MAX_RETRIES = 5
+RETRY_BACKOFF_BASE = 20
 
 REFUSAL_PHRASES = [
     "i cannot", "i can't", "i'm not able", "unable to",
@@ -298,12 +303,15 @@ def call_gemini(
             break
         except Exception as exc:
             err = str(exc)
-            if "429" in err or "ResourceExhausted" in err:
-                wait = RETRY_BACKOFF_BASE * attempt
-                log.warning(f"Rate-limited. Retrying in {wait}s …")
+            retryable = (
+                "429" in err or "ResourceExhausted" in err or
+                "503" in err or "UNAVAILABLE" in err or
+                "500" in err or "INTERNAL" in err
+            )
+            if retryable and attempt < MAX_RETRIES:
+                wait = RETRY_BACKOFF_BASE * (2 ** (attempt - 1))
+                log.warning(f"Gemini {err[:80].strip()} — retrying in {wait}s …")
                 time.sleep(wait)
-                if attempt == MAX_RETRIES:
-                    raise
             else:
                 raise
     elapsed = time.time() - t0
@@ -495,7 +503,7 @@ def run_attribute_benchmark(
     dataset_name: str,
     dataset_key: str,
     out_root: Path,
-    model: str = GEMINI_MODEL,
+    model: str = DEFAULT_MODEL,
 ) -> list[dict]:
     """Run all 4 cycles for a single protected attribute. Returns list of result dicts."""
     known_titles = [p.get("title", "") for p in research_evidence]
@@ -519,6 +527,8 @@ def run_attribute_benchmark(
             previous_output=prev_output,
         )
 
+        if cycle_idx > 1:
+            time.sleep(7)  # stay under 10 RPM (1 req / 6s with margin)
         try:
             llm_result, usage, raw_text = call_model(prompt, model)
         except Exception as exc:
@@ -577,7 +587,7 @@ def run_benchmark(
     dataset_name: str,
     dataset_key: str,
     out_root: str | Path = "artifacts/llm_benchmark",
-    model: str = GEMINI_MODEL,
+    model: str = DEFAULT_MODEL,
 ) -> Path:
     """Run the 4-cycle benchmark for every protected attribute in the dataset."""
     t0_total = time.time()
@@ -673,7 +683,7 @@ def _build_summary(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="4-cycle LLM fairness benchmark (NeurIPS Section C)",
+        description="4-cycle OpenAI-primary LLM fairness benchmark (NeurIPS Section C)",
     )
     parser.add_argument("--predictions", required=True)
     parser.add_argument("--fairness_csv", required=True)
@@ -688,7 +698,7 @@ def main() -> None:
     parser.add_argument("--dataset_name", required=True, help="Human-readable dataset name")
     parser.add_argument("--dataset_key", required=True, help="Short key for output paths, e.g. german_credit")
     parser.add_argument("--out_root", default="artifacts/llm_benchmark")
-    parser.add_argument("--model", default=GEMINI_MODEL)
+    parser.add_argument("--model", default=DEFAULT_MODEL)
     args = parser.parse_args()
 
     configs: dict[str, str] = {}

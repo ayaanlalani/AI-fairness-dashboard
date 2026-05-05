@@ -1,5 +1,7 @@
 {
   "pilot_dataset": "german_credit",
+  "primary_llm_provider": "openai",
+  "benchmark_role": "qualitative remediation-ready audit over Python-computed fairness metrics",
   "budget_cad": 50.0,
   "cad_to_usd": 0.74,
   "budget_reserve_cad": 10.0,
