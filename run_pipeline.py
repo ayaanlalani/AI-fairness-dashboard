@@ -153,6 +153,42 @@ DATASETS: dict[str, dict] = {
             ),
         },
     },
+    "lending_club": {
+        "dir": "lending_club_dataset",
+        "artifact_dir": "lending_club",
+        "steps": {
+            "clean": f"{PYTHON} data/clean_lending_club.py --input_path data/loan.csv --out_dir processed",
+            "train": f"{PYTHON} scripts/train_models.py --data_dir processed --out_dir metrics --models_dir models",
+            "fairness": (
+                f"{PYTHON} scripts/compute_fairness.py"
+                " --data_dir processed --predictions_dir metrics"
+                " --out_dir metrics/fairness --seed 42"
+            ),
+            "qualitative": (
+                f"{PYTHON} scripts/prepare_qualitative_inputs.py"
+                " --data_dir processed --metrics_dir metrics && "
+                f"{PYTHON} ../scripts/qualitative_analysis.py"
+                " --predictions metrics/classification_predictions_enriched.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics_normalized.csv"
+                " --target actual --pred_col predicted --favorable_label 0"
+                " --protected_attrs gender,income_level,loan_amount_level"
+                " --out_dir metrics/fairness"
+                " --dataset_name 'Lending Club P2P Loans'"
+            ),
+            "benchmark": (
+                f"{PYTHON} ../scripts/llm_benchmark.py"
+                " --predictions metrics/classification_predictions_enriched.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics_normalized.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 0"
+                " --protected_attrs 'gender:male,income_level:medium,loan_amount_level:medium'"
+                " --dataset_name 'Lending Club P2P Loans'"
+                " --dataset_key lending_club"
+                " --out_root ../artifacts/llm_benchmark"
+                " --model gpt-4o"
+            ),
+        },
+    },
     "healthcare_insurance": {
         "dir": "Healthcare-insurance-dataset",
         "steps": {

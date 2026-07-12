@@ -87,6 +87,8 @@ REQUIRED_ALGORITHMS = [
     "equalized odds",
 ]
 
+GUARDRAILS_PATH = Path(__file__).resolve().parent.parent / "configs" / "research_guardrails.json"
+
 AIF360_CONTEXT = (
     "Reference fairness toolkit context:\n"
     "- AIF360: Reweighing, DisparateImpactRemover, PrejudiceRemover, "
@@ -416,10 +418,37 @@ def call_openai(
     return result, usage_stats, raw_text
 
 
+def _provider_for_model(model: str) -> str:
+    return "openai" if model.startswith(("gpt", "o1", "o3")) else "gemini"
+
+
+def enforce_llm_gate(model: str) -> None:
+    """Refuse live LLM calls unless configs/research_guardrails.json approves the provider.
+
+    Gate policy: docs/RESEARCH_STAGING_PROMPT.md §0. Missing or unparseable
+    guardrail files fail closed.
+    """
+    provider = _provider_for_model(model)
+    status = "blocked"
+    if GUARDRAILS_PATH.exists():
+        try:
+            gates = json.loads(GUARDRAILS_PATH.read_text(encoding="utf-8"))
+            status = gates.get("llm_providers", {}).get(provider, "blocked")
+        except (json.JSONDecodeError, OSError):
+            status = "blocked"
+    if status != "approved":
+        raise RuntimeError(
+            f"Guardrail gate: provider '{provider}' is '{status}' in {GUARDRAILS_PATH}. "
+            "Live LLM calls require the user to flip it to 'approved'. "
+            "Use --dry-run to build prompt packs without any API call."
+        )
+
+
 def call_model(
     prompt: str, model: str
 ) -> tuple[dict, dict, str]:
     """Route to the correct LLM backend based on model name."""
+    enforce_llm_gate(model)
     if model.startswith("gpt") or model.startswith("o1") or model.startswith("o3"):
         api_key = os.environ.get("OPENAI_API_KEY", "")
         if not api_key:
@@ -487,6 +516,71 @@ def detect_hallucinations(result: dict, known_titles: list[str]) -> list[str]:
 #  Per-attribute benchmark runner
 # ═══════════════════════════════════════════════════════════════════════
 
+def _mock_llm_response(
+    attr: str,
+    attr_baseline: dict,
+    research_evidence: list[dict],
+    context_payload: dict,
+) -> tuple[dict, dict, str]:
+    """Deterministic stand-in for an LLM response (dry-run mode).
+
+    Restates the deterministic baseline so the scoring harness, refusal
+    detector, and hallucination detector all execute on realistic input
+    without any network call.
+    """
+    rows = attr_baseline.get("attributes", [])
+    base = rows[0] if rows else {}
+    di = None
+    for a in context_payload.get("attributes", []):
+        if a["attribute"] == attr:
+            di = a.get("metrics", {}).get("disparate_impact")
+            break
+    causes = base.get("root_cause_labels") or ["representation_bias"]
+    cause_text = ", ".join(label.replace("_", " ") for label in causes)
+    titles = [p.get("title", "") for p in research_evidence[:2] if p.get("title")]
+    # Baseline severity strings can carry qualifiers ("MODERATE (borderline)");
+    # the LLM is instructed to emit a bare label, so the mock does too.
+    severity = next(
+        (label for label in VALID_SEVERITIES if label in str(base.get("severity", "")).upper()),
+        "MODERATE",
+    )
+    result = {
+        "attribute": attr,
+        "severity": severity,
+        "what_is_wrong": (
+            f"[DRY RUN] The pre-computed context reports disparate impact = {di} for "
+            f"'{attr}', alongside the demographic parity, equal opportunity, and "
+            "average odds differences supplied by the deterministic pipeline."
+        ),
+        "why_is_wrong": (
+            f"[DRY RUN] The deterministic root-cause analysis attributes this disparity "
+            f"to {cause_text}; this mock restates that finding so the cause-alignment "
+            "scorer runs end-to-end without an LLM call."
+        ),
+        "how_to_fix": (
+            "[DRY RUN] Apply Reweighing preprocessing, then validate with a "
+            "ThresholdOptimizer postprocessing pass, targeting disparate impact "
+            ">= 0.8 on the held-out test split."
+        ),
+        # Only cite titles actually present in the research context; inventing
+        # one here would (correctly) trip the hallucination detector.
+        "supporting_research": titles,
+    }
+    usage = {
+        "model": "dry_run",
+        "attempts": 0,
+        "wall_clock_s": 0.0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "input_cost_usd": 0.0,
+        "output_cost_usd": 0.0,
+        "total_cost_usd": 0.0,
+        "dry_run": True,
+    }
+    return result, usage, json.dumps(result)
+
+
 def _make_single_attr_baseline(baseline_payload: dict, attr: str) -> dict:
     """Extract a single-attribute baseline payload for scoring."""
     for row in baseline_payload.get("attributes", []):
@@ -504,13 +598,15 @@ def run_attribute_benchmark(
     dataset_key: str,
     out_root: Path,
     model: str = DEFAULT_MODEL,
+    dry_run: bool = False,
 ) -> list[dict]:
     """Run all 4 cycles for a single protected attribute. Returns list of result dicts."""
     known_titles = [p.get("title", "") for p in research_evidence]
     research_ctx = format_evidence_for_prompt(research_evidence)
     attr_baseline = _make_single_attr_baseline(baseline_payload, attr)
 
-    attr_dir = out_root / model.replace("/", "-") / dataset_key
+    model_dir = "dry_run" if dry_run else model.replace("/", "-")
+    attr_dir = out_root / model_dir / dataset_key
     attr_dir.mkdir(parents=True, exist_ok=True)
 
     results: list[dict] = []
@@ -527,13 +623,18 @@ def run_attribute_benchmark(
             previous_output=prev_output,
         )
 
-        if cycle_idx > 1:
-            time.sleep(7)  # stay under 10 RPM (1 req / 6s with margin)
-        try:
-            llm_result, usage, raw_text = call_model(prompt, model)
-        except Exception as exc:
-            log.error(f"  Cycle {cycle_idx} failed: {exc}")
-            llm_result, usage, raw_text = {}, {}, str(exc)
+        if dry_run:
+            llm_result, usage, raw_text = _mock_llm_response(
+                attr, attr_baseline, research_evidence, context_payload
+            )
+        else:
+            if cycle_idx > 1:
+                time.sleep(7)  # stay under 10 RPM (1 req / 6s with margin)
+            try:
+                llm_result, usage, raw_text = call_model(prompt, model)
+            except Exception as exc:
+                log.error(f"  Cycle {cycle_idx} failed: {exc}")
+                llm_result, usage, raw_text = {}, {}, str(exc)
 
         refusal = detect_refusal(llm_result if llm_result else None, raw_text)
         hallucinations = detect_hallucinations(llm_result or {}, known_titles)
@@ -554,7 +655,10 @@ def run_attribute_benchmark(
             "refusal_detected": refusal,
             "hallucination_flags": hallucinations,
             "usage": usage,
+            "dry_run": dry_run,
         }
+        if dry_run:
+            record["prompt"] = prompt  # frozen prompt pack for post-approval replay
 
         out_path = attr_dir / f"{attr}_cycle{cycle_idx}.json"
         out_path.write_text(json.dumps(record, indent=2), encoding="utf-8")
@@ -588,6 +692,7 @@ def run_benchmark(
     dataset_key: str,
     out_root: str | Path = "artifacts/llm_benchmark",
     model: str = DEFAULT_MODEL,
+    dry_run: bool = False,
 ) -> Path:
     """Run the 4-cycle benchmark for every protected attribute in the dataset."""
     t0_total = time.time()
@@ -621,11 +726,12 @@ def run_benchmark(
             dataset_key=dataset_key,
             out_root=out_root,
             model=model,
+            dry_run=dry_run,
         )
         all_results.extend(attr_results)
 
     # Write dataset summary
-    summary_dir = out_root / model.replace("/", "-") / dataset_key
+    summary_dir = out_root / ("dry_run" if dry_run else model.replace("/", "-")) / dataset_key
     summary_dir.mkdir(parents=True, exist_ok=True)
     summary = _build_summary(all_results, dataset_name, dataset_key, model, time.time() - t0_total)
     summary_path = summary_dir / "_summary.json"
@@ -699,7 +805,16 @@ def main() -> None:
     parser.add_argument("--dataset_key", required=True, help="Short key for output paths, e.g. german_credit")
     parser.add_argument("--out_root", default="artifacts/llm_benchmark")
     parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Build prompt packs and score a deterministic mock response; "
+             "no API client is constructed and no key is read.",
+    )
     args = parser.parse_args()
+
+    if not args.dry_run:
+        # Fail fast (before any Semantic Scholar traffic) if the provider is gated.
+        enforce_llm_gate(args.model)
 
     configs: dict[str, str] = {}
     for pair in args.protected_attrs.split(","):
@@ -721,6 +836,7 @@ def main() -> None:
         dataset_key=args.dataset_key,
         out_root=args.out_root,
         model=args.model,
+        dry_run=args.dry_run,
     )
 
 
