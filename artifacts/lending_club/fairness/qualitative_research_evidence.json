@@ -1,37 +1,5 @@
 {
-  "gender": [
-    {
-      "paper_id": "bf11c75b72d2e8e6a65fa653fedde256277f5397",
-      "title": "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
-      "year": 2025,
-      "venue": "",
-      "citation_count": 3,
-      "url": "https://www.semanticscholar.org/paper/bf11c75b72d2e8e6a65fa653fedde256277f5397",
-      "abstract": "At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic fairness and bias mitigation are among the most important but challenging issues at hand. The goal of this book is to provide a holistic view across various disciplines of the ethical base, detection methods, and technical measures for trustworthy AI systems. Starting from a solid foundation of statistical bias, transparency systems and fairness-aware ML models, this book methodically looks at state-of-the-art methodologies, where we highlight their shortcomings and introduce a unified model framework for detecting bias and transparent algorithms. Moving beyond technical diagnoses, it examines key sociotechnical and policy tools that are required to implement AI responsibly, providing guidance to researchers, engineers, policy makers, and organizational leaders. Literature review has been driven following the experimental case, the fairness trade-offs, intersectional bias, explainability and regulatory compliance are discussed in depth by the authors. This work underscores that fairness in automated decision-making systems depends not only on algorithmic accuracy, but also institutional will and stakeholder engagement. The chapters in this book function as both an academic primer and a resourceful handbook, transitioning readers through an ever-growing ethical AI terrain. Whether you are a data scientist building and deploying an algorithm that encourages ethical speech, or a regulator working to create and refine guidelines around such algorithms, this book provides you with both the tools and the understanding you need for ethical technology development and deployment.",
-      "authors": [
-        "Jayesh Rane",
-        "Reshma Amol Chaudhari",
-        "N. Rane"
-      ],
-      "query": "algorithmic fairness bias detection mitigation machine learning",
-      "meets_citation_threshold": false
-    },
-    {
-      "paper_id": "c41f9c5c5fff18dd742908efdf7c2683f4b70ddd",
-      "title": "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
-      "year": 2025,
-      "venue": "INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT",
-      "citation_count": 0,
-      "url": "https://www.semanticscholar.org/paper/c41f9c5c5fff18dd742908efdf7c2683f4b70ddd",
-      "abstract": "As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by introducing the Bias Detection Dashboard\u2014a Python-based tool built with Pandas, Seaborn, Matplotlib, Fairlearn, and Streamlit. The dashboard helps users identify data imbalances, compute fairness metrics like disparate impact, and detect sensitive attributes before model training. A case study in HR recruitment shows how it flagged gender bias and guided corrective steps. The research also introduces the Ethical AI Triangle\u2014bias, fairness, and privacy\u2014as key pillars that must be balanced. It calls for ethical practices across the AI lifecycle, diversity in teams, and transparent systems to build responsible, trustworthy AI.\n\nKeywords- Artificial Intelligence, algorithmic bias, data privacy, Bias Detection Dashboard, fairness metrics, gender bias, Ethical AI Triangle, responsible AI.",
-      "authors": [
-        "S. Sucharita",
-        "P. Shaw"
-      ],
-      "query": "algorithmic fairness bias detection mitigation machine learning",
-      "meets_citation_threshold": false
-    }
-  ],
+  "gender": [],
   "income_level": [],
   "loan_amount_level": []
 }

@@ -11,12 +11,19 @@ using the trained classifier's predictions on the binary loan_default label.
   - Average Odds Difference (AOD)
 - Optional cross-check with Fairlearn (group-wise selection rate, TPR, FPR)
 
+All metrics are oriented on the *favorable* outcome (default: predicted
+non-default, loan_default = 0) and follow the AIF360 conventions:
+DI = unprivileged rate / privileged rate; differences are
+unprivileged - privileged. This matches the shared audit spec used by
+scripts/qualitative_analysis.py (invoked with --favorable_label 0).
+
 Example run:
 
 python scripts/compute_fairness.py \
   --data_dir processed \
   --predictions_dir metrics \
   --out_dir metrics/fairness \
+  --favorable_label 0 \
   --seed 42
 """
 from __future__ import annotations
@@ -148,50 +155,56 @@ def _majority_group(values: pd.Series) -> str:
     return str(counts.idxmax())
 
 
-def _manual_group_rates(y_true: pd.Series, y_pred: pd.Series, group: pd.Series, privileged_value: str) -> Tuple[float, float, float, float]:
-    """Compute DI, DPD, EOD, AOD manually."""
+def _manual_group_rates(
+    y_true: pd.Series,
+    y_pred: pd.Series,
+    group: pd.Series,
+    privileged_value: str,
+    favorable_label: int,
+) -> Tuple[float, float, float, float]:
+    """Compute DI, DPD, EOD, AOD oriented on the favorable label (AIF360 conventions)."""
     mask_priv = group == privileged_value
     mask_unpriv = group != privileged_value
 
     def rate_sel(mask: pd.Series) -> float:
         if mask.sum() == 0:
             return np.nan
-        return float((y_pred[mask] == 1).mean())
+        return float((y_pred[mask] == favorable_label).mean())
 
     def rate_tpr(mask: pd.Series) -> float:
-        denom = (y_true[mask] == 1).sum()
+        denom = (y_true[mask] == favorable_label).sum()
         if denom == 0:
             return np.nan
-        return float(((y_true[mask] == 1) & (y_pred[mask] == 1)).sum() / denom)
+        return float(((y_true[mask] == favorable_label) & (y_pred[mask] == favorable_label)).sum() / denom)
 
     def rate_fpr(mask: pd.Series) -> float:
-        denom = (y_true[mask] == 0).sum()
+        denom = (y_true[mask] != favorable_label).sum()
         if denom == 0:
             return np.nan
-        return float(((y_true[mask] == 0) & (y_pred[mask] == 1)).sum() / denom)
+        return float(((y_true[mask] != favorable_label) & (y_pred[mask] == favorable_label)).sum() / denom)
 
     sel_priv = rate_sel(mask_priv)
     sel_unpriv = rate_sel(mask_unpriv)
-    
-    # Disparate Impact
-    di = np.nan
-    if sel_unpriv and not np.isnan(sel_unpriv) and sel_unpriv > 0:
-        di = float(sel_priv / sel_unpriv)
-    
-    # Demographic Parity Difference
-    dpd = float(sel_priv - sel_unpriv) if not (np.isnan(sel_priv) or np.isnan(sel_unpriv)) else np.nan
 
-    # Equal Opportunity Difference
+    # Disparate Impact: unprivileged favorable rate / privileged favorable rate
+    di = np.nan
+    if not (np.isnan(sel_priv) or np.isnan(sel_unpriv)) and sel_priv > 0:
+        di = float(sel_unpriv / sel_priv)
+
+    # Demographic Parity Difference: unprivileged - privileged
+    dpd = float(sel_unpriv - sel_priv) if not (np.isnan(sel_priv) or np.isnan(sel_unpriv)) else np.nan
+
+    # Equal Opportunity Difference: unprivileged - privileged
     tpr_priv = rate_tpr(mask_priv)
     tpr_unpriv = rate_tpr(mask_unpriv)
-    eod = float(tpr_priv - tpr_unpriv) if not (np.isnan(tpr_priv) or np.isnan(tpr_unpriv)) else np.nan
+    eod = float(tpr_unpriv - tpr_priv) if not (np.isnan(tpr_priv) or np.isnan(tpr_unpriv)) else np.nan
 
-    # Average Odds Difference
+    # Average Odds Difference: mean of FPR and TPR gaps (unprivileged - privileged)
     fpr_priv = rate_fpr(mask_priv)
     fpr_unpriv = rate_fpr(mask_unpriv)
     aod = np.nan
     if not any(np.isnan([fpr_priv, fpr_unpriv, tpr_priv, tpr_unpriv])):
-        aod = float(((fpr_priv - fpr_unpriv) + (tpr_priv - tpr_unpriv)) / 2.0)
+        aod = float(((fpr_unpriv - fpr_priv) + (tpr_unpriv - tpr_priv)) / 2.0)
 
     return di, dpd, eod, aod
 
@@ -207,6 +220,7 @@ def main() -> None:
     parser.add_argument("--out_dir", type=str, default="metrics/fairness", help="Directory to write fairness outputs")
     parser.add_argument("--protected_attrs", type=str, default="gender,income_level,loan_amount_level", help="Comma-separated protected attribute names")
     parser.add_argument("--threshold", type=float, default=0.8, help="DI bias flag threshold")
+    parser.add_argument("--favorable_label", type=int, default=0, help="Favorable outcome label (0 = predicted non-default)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
 
     args = parser.parse_args()
@@ -215,14 +229,7 @@ def main() -> None:
     logger.info("Fairness analysis script started successfully")
     logger.info(f"AIF360 available: {AIF360_AVAILABLE}")
     logger.info(f"Fairlearn available: {FAIRLEARN_AVAILABLE}")
-
-
-    args = parser.parse_args()
-    logger = get_logger()
-
-    logger.info("Fairness analysis script started successfully")
-    logger.info(f"AIF360 available: {AIF360_AVAILABLE}")
-    logger.info(f"Fairlearn available: {FAIRLEARN_AVAILABLE}")
+    logger.info(f"Favorable label: {args.favorable_label}")
 
     # Parse protected attributes
     protected_attrs = parse_attr_list(args.protected_attrs)
@@ -255,10 +262,11 @@ def main() -> None:
         
         # Compute metrics manually
         di, dpd, eod, aod = _manual_group_rates(
-            df['loan_default'], 
-            df['y_pred'], 
-            df[attr], 
-            privileged_group
+            df['loan_default'],
+            df['y_pred'],
+            df[attr],
+            privileged_group,
+            args.favorable_label,
         )
         
         # Store results
@@ -312,6 +320,7 @@ def main() -> None:
         f"**Total Records**: {len(df):,}",
         f"**Default Rate**: {df['loan_default'].mean():.1%}",
         f"**Prediction Default Rate**: {df['y_pred'].mean():.1%}",
+        f"**Favorable Label**: {args.favorable_label} (metrics oriented on predicted {'non-default' if args.favorable_label == 0 else 'default'})",
         "",
         "## Fairness Metrics Summary",
         "",
@@ -323,10 +332,10 @@ def main() -> None:
             "",
             f"- **Privileged Group**: {results['privileged_group']}",
             f"- **Groups**: {', '.join(results['groups'])}",
-            f"- **Disparate Impact**: {results['disparate_impact']:.3f}" if results['disparate_impact'] else "- **Disparate Impact**: N/A",
-            f"- **Demographic Parity Difference**: {results['demographic_parity_difference']:.3f}" if results['demographic_parity_difference'] else "- **Demographic Parity Difference**: N/A",
-            f"- **Equal Opportunity Difference**: {results['equal_opportunity_difference']:.3f}" if results['equal_opportunity_difference'] else "- **Equal Opportunity Difference**: N/A",
-            f"- **Average Odds Difference**: {results['average_odds_difference']:.3f}" if results['average_odds_difference'] else "- **Average Odds Difference**: N/A",
+            f"- **Disparate Impact**: {results['disparate_impact']:.3f}" if results['disparate_impact'] is not None else "- **Disparate Impact**: N/A",
+            f"- **Demographic Parity Difference**: {results['demographic_parity_difference']:.3f}" if results['demographic_parity_difference'] is not None else "- **Demographic Parity Difference**: N/A",
+            f"- **Equal Opportunity Difference**: {results['equal_opportunity_difference']:.3f}" if results['equal_opportunity_difference'] is not None else "- **Equal Opportunity Difference**: N/A",
+            f"- **Average Odds Difference**: {results['average_odds_difference']:.3f}" if results['average_odds_difference'] is not None else "- **Average Odds Difference**: N/A",
             f"- **Bias Status**: {'⚠️ BIAS DETECTED' if results['bias_detected'] else '✅ WITHIN THRESHOLD'}",
             "",
         ])
@@ -335,7 +344,7 @@ def main() -> None:
         "## Interpretation",
         "",
         "- **Disparate Impact < 0.8**: Potential bias (80% rule)",
-        "- **Values closer to 1.0 or 0.0**: Better fairness",
+        "- **Disparate Impact closer to 1.0**: Better fairness",
         "- **Large absolute differences**: Concerning for equity",
         "",
         "## Recommendations",

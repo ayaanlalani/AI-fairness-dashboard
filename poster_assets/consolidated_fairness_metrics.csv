@@ -5,6 +5,6 @@ german_credit,foreign_worker,0,0.9402,-0.0498,-0.0889,0.2013,0.3084,False,,,,,,,
 hmda,race,White,0.8956,-0.0776,0.0025,0.0117,0.4838,False,,,,,,,
 hmda,sex,Male,0.9291,-0.0518,-0.0076,-0.0084,0.4838,False,,,,,,,
 hmda,age_group,mid,1.0138,0.0097,0.0008,-0.015,0.4838,False,,,,,,,
-lending_club,,,,,,,,,gender,0.0,-0.0069444444444444,-0.0714285714285714,-0.0357142857142857,male,True
-lending_club,,,,,,,,,income_level,,0.0071942446043165,0.064516129032258,0.032258064516129,medium,False
-lending_club,,,,,,,,,loan_amount_level,,0.00625,0.054054054054054,0.027027027027027,medium,False
+lending_club,,,,,,,,,gender,0.9930555555555556,-0.0069444444444444,0.0,-0.0357142857142857,male,False
+lending_club,,,,,,,,,income_level,1.0072463768115942,0.0071942446043165,0.0,0.032258064516129,medium,False
+lending_club,,,,,,,,,loan_amount_level,1.0062893081761006,0.0062499999999999,0.0,0.027027027027027,medium,False

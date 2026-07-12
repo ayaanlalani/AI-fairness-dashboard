@@ -17,7 +17,7 @@
 This deterministic baseline pairs quantitative disparity metrics with interpretable causal diagnostics and concrete mitigation options so the output is directly usable for remediation planning and LLM benchmark scoring.
 
 ---
-## gender  (DI = 0.0000, severity: CRITICAL)
+## gender  (DI = 0.9931, severity: LOW (fair))
 
 ### Per-group breakdown
 
@@ -28,32 +28,19 @@ This deterministic baseline pairs quantitative disparity metrics with interpreta
 
 ### What is wrong
 
-The model's favorable-outcome rate varies across gender groups. The highest rate is for **male** (100.0%) and the lowest is for **female** (99.3%), a gap of 0.7%.
-
-- Demographic Parity Difference = -0.0069: the unprivileged group is selected less often.
-- Equal Opportunity Difference = -0.0714: among truly deserving candidates, the model misses more unprivileged individuals.
-- Average Odds Difference = -0.0357: error rates differ systematically across groups.
+No significant disparity detected (DI = 0.9931). The model treats gender groups approximately equally.
 
 ### Why it is wrong
 
 **Root causes identified:**
-1. Unequal opportunity: the model is under-predicting favorable outcomes for the unprivileged group (EOD = -0.0714). Deserving members of the unprivileged group are disproportionately missed or incorrectly classified.
+1. No significant disparate impact detected. The model treats groups approximately equally on the measured metrics.
 
 ### How to fix it
 
-1. In-processing -- Prejudice Remover (aif360.algorithms.inprocessing.PrejudiceRemover): add a fairness regularization term during model training that penalizes dependence on the protected attribute.
-
-### Research-backed evidence
-
-1. **Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications** (2025), Jayesh Rane, Reshma Amol Chaudhari, N. Rane. *Unknown venue*. Citations: 3.
-   At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
-   https://www.semanticscholar.org/paper/bf11c75b72d2e8e6a65fa653fedde256277f5397
-2. **Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models** (2025), S. Sucharita, P. Shaw. *INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT*. Citations: 0.
-   As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
-   https://www.semanticscholar.org/paper/c41f9c5c5fff18dd742908efdf7c2683f4b70ddd
+1. Continue monitoring: fairness can drift as data distributions change. Re-run this analysis periodically and after any model retraining.
 
 ---
-## income_level  (DI = --, severity: UNKNOWN)
+## income_level  (DI = 1.0072, severity: LOW (fair))
 
 ### Per-group breakdown
 
@@ -65,7 +52,7 @@ The model's favorable-outcome rate varies across gender groups. The highest rate
 
 ### What is wrong
 
-Disparate Impact could not be computed for this attribute.
+No significant disparity detected (DI = 1.0072). The model treats income_level groups approximately equally.
 
 ### Why it is wrong
 
@@ -81,15 +68,13 @@ Disparate Impact could not be computed for this attribute.
 
 **Root causes identified:**
 1. Proxy discrimination: features that correlate with the protected attribute allow the model to indirectly discriminate even without direct access to the attribute. Proxy features detected: annual_inc (r=0.916), loan_amnt (r=0.458), installment (r=0.437), revol_bal (r=0.309).
-2. Unequal opportunity: the model is over-predicting favorable outcomes for the unprivileged group (EOD = +0.0645). Deserving members of the unprivileged group are disproportionately missed or incorrectly classified.
 
 ### How to fix it
 
 1. Pre-processing -- Disparate Impact Remover (aif360.algorithms.preprocessing.DisparateImpactRemover): transform feature distributions to reduce correlation with the protected attribute while preserving rank-ordering.
-2. In-processing -- Prejudice Remover (aif360.algorithms.inprocessing.PrejudiceRemover): add a fairness regularization term during model training that penalizes dependence on the protected attribute.
 
 ---
-## loan_amount_level  (DI = --, severity: UNKNOWN)
+## loan_amount_level  (DI = 1.0063, severity: LOW (fair))
 
 ### Per-group breakdown
 
@@ -101,7 +86,7 @@ Disparate Impact could not be computed for this attribute.
 
 ### What is wrong
 
-Disparate Impact could not be computed for this attribute.
+No significant disparity detected (DI = 1.0063). The model treats loan_amount_level groups approximately equally.
 
 ### Why it is wrong
 
@@ -120,18 +105,16 @@ Disparate Impact could not be computed for this attribute.
 
 **Root causes identified:**
 1. Proxy discrimination: features that correlate with the protected attribute allow the model to indirectly discriminate even without direct access to the attribute. Proxy features detected: loan_amnt (r=0.922), installment (r=0.876), annual_inc (r=0.424), term_60_months (r=0.4), revol_bal (r=0.321).
-2. Unequal opportunity: the model is over-predicting favorable outcomes for the unprivileged group (EOD = +0.0541). Deserving members of the unprivileged group are disproportionately missed or incorrectly classified.
 
 ### How to fix it
 
 1. Pre-processing -- Disparate Impact Remover (aif360.algorithms.preprocessing.DisparateImpactRemover): transform feature distributions to reduce correlation with the protected attribute while preserving rank-ordering.
-2. In-processing -- Prejudice Remover (aif360.algorithms.inprocessing.PrejudiceRemover): add a fairness regularization term during model training that penalizes dependence on the protected attribute.
 
 ---
 ## Summary
 
 | Attribute | DI | Severity | Top root cause |
 |---|---:|---|---|
-| gender | 0.0000 | CRITICAL | Unequal opportunity: the model is under-predicting favorable outcomes for the un... |
-| income_level | -- | UNKNOWN | Proxy discrimination: features that correlate with the protected attribute allow... |
-| loan_amount_level | -- | UNKNOWN | Proxy discrimination: features that correlate with the protected attribute allow... |
+| gender | 0.9931 | LOW (fair) | No significant disparate impact detected. The model treats groups approximately ... |
+| income_level | 1.0072 | LOW (fair) | Proxy discrimination: features that correlate with the protected attribute allow... |
+| loan_amount_level | 1.0063 | LOW (fair) | Proxy discrimination: features that correlate with the protected attribute allow... |
