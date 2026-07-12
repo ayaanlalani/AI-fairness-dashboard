@@ -1,0 +1,7 @@
+race,n,selection_rate,small_subgroup,disparate_impact_vs_best
+Asian,173,0.7861271676300579,False,1.0
+White,1252,0.7428115015974441,False,0.9448999248261605
+Black,748,0.6443850267379679,False,0.8196956590122679
+Pacific Islander,5,0.6,True,0.763235294117647
+American Indian,10,0.4,True,0.5088235294117647
+Multiracial,8,0.375,True,0.4770220588235294

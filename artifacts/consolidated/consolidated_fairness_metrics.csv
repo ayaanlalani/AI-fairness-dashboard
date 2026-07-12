@@ -1,7 +1,10 @@
-Dataset,Attribute,PrivilegedValue,DisparateImpact,DemographicParityDiff,EqualOpportunityDiff,AverageOddsDiff,TheilIndex,BiasFlag
-german_credit,Sex,male,0.8595,-0.1152,-0.0512,0.1256,0.3084,False
-german_credit,AgeGroup,40_plus,0.8212,-0.1586,-0.0513,0.1649,0.3084,False
-german_credit,foreign_worker,0,0.9402,-0.0498,-0.0889,-0.2013,0.3084,False
-hmda,race,White,0.8956,-0.0776,0.0025,-0.0117,0.4838,False
-hmda,sex,Male,0.9291,-0.0518,-0.0076,0.0084,0.4838,False
-hmda,age_group,mid,1.0138,0.0097,0.0008,0.015,0.4838,False
+Dataset,Attribute,PrivilegedValue,DisparateImpact,DemographicParityDiff,EqualOpportunityDiff,AverageOddsDiff,TheilIndex,BiasFlag,protected_attribute,disparate_impact,demographic_parity_difference,equal_opportunity_difference,average_odds_difference,privileged_group,bias_detected
+german_credit,Sex,male,0.8595,-0.1152,-0.0512,-0.1256,0.3084,False,,,,,,,
+german_credit,AgeGroup,40_plus,0.8212,-0.1586,-0.0513,-0.1649,0.3084,False,,,,,,,
+german_credit,foreign_worker,0,0.9402,-0.0498,-0.0889,0.2013,0.3084,False,,,,,,,
+hmda,race,White,0.8956,-0.0776,0.0025,0.0117,0.4838,False,,,,,,,
+hmda,sex,Male,0.9291,-0.0518,-0.0076,-0.0084,0.4838,False,,,,,,,
+hmda,age_group,mid,1.0138,0.0097,0.0008,-0.015,0.4838,False,,,,,,,
+lending_club,,,,,,,,,gender,0.0,-0.0069444444444444,-0.0714285714285714,-0.0357142857142857,male,True
+lending_club,,,,,,,,,income_level,,0.0071942446043165,0.064516129032258,0.032258064516129,medium,False
+lending_club,,,,,,,,,loan_amount_level,,0.00625,0.054054054054054,0.027027027027027,medium,False

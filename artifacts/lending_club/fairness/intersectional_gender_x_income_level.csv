@@ -1,0 +1,7 @@
+gender,income_level,n,selection_rate,small_subgroup,disparate_impact_vs_best
+female,high,69,1.0,False,1.0
+female,low,87,1.0,False,1.0
+male,high,70,1.0,False,1.0
+male,low,96,1.0,False,1.0
+male,medium,146,1.0,False,1.0
+female,medium,132,0.9848484848484849,False,0.9848484848484849

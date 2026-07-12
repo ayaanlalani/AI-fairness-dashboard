@@ -1,0 +1,4 @@
+Attribute,PrivilegedValue,DisparateImpact,DemographicParityDiff,EqualOpportunityDiff,AverageOddsDiff,TheilIndex,BiasFlag
+gender,male,0.0,-0.0069444444444444,-0.0714285714285714,-0.0357142857142857,,True
+income_level,medium,,0.0071942446043165,0.064516129032258,0.032258064516129,,False
+loan_amount_level,medium,,0.00625,0.054054054054054,0.027027027027027,,False

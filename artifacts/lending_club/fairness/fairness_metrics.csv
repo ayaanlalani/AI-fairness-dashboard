@@ -1,0 +1,4 @@
+protected_attribute,disparate_impact,demographic_parity_difference,equal_opportunity_difference,average_odds_difference,privileged_group,bias_detected
+gender,0.0,-0.006944444444444444,-0.07142857142857142,-0.03571428571428571,male,True
+income_level,,0.007194244604316547,0.06451612903225806,0.03225806451612903,medium,False
+loan_amount_level,,0.00625,0.05405405405405406,0.02702702702702703,medium,False

@@ -1,0 +1,10 @@
+income_level,loan_amount_level,n,selection_rate,small_subgroup,disparate_impact_vs_best
+high,large,53,1.0,False,1.0
+high,medium,71,1.0,False,1.0
+high,small,15,1.0,False,1.0
+low,large,9,1.0,True,1.0
+low,medium,82,1.0,False,1.0
+low,small,92,1.0,False,1.0
+medium,large,37,1.0,False,1.0
+medium,small,74,1.0,False,1.0
+medium,medium,167,0.9880239520958084,False,0.9880239520958084

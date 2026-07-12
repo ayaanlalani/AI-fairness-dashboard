@@ -1,0 +1,3 @@
+sex,n,selection_rate,small_subgroup,disparate_impact_vs_best
+Male,1276,0.7311912225705329,False,1.0
+Female,920,0.6793478260869565,False,0.9290973484318934

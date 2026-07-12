@@ -1,0 +1,4 @@
+loan_amount_level,n,selection_rate,small_subgroup,disparate_impact_vs_best
+large,99,1.0,False,1.0
+small,181,1.0,False,1.0
+medium,320,0.99375,False,0.99375

@@ -1,0 +1,5 @@
+AgeGroup_original,Sex_original,n,selection_rate,small_subgroup,disparate_impact_vs_best
+40_plus,female,15,1.0,False,1.0
+40_plus,male,56,0.8571428571428571,False,0.8571428571428571
+under_40,male,83,0.7951807228915663,False,0.7951807228915663
+under_40,female,46,0.6086956521739131,False,0.6086956521739131

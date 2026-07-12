@@ -1,4 +1,4 @@
 Attribute,PrivilegedValue,DisparateImpact,DemographicParityDiff,EqualOpportunityDiff,AverageOddsDiff,TheilIndex,BiasFlag
-Sex,male,0.8595,-0.1152,-0.0512,0.1256,0.3084,False
-AgeGroup,40_plus,0.8212,-0.1586,-0.0513,0.1649,0.3084,False
-foreign_worker,0,0.9402,-0.0498,-0.0889,-0.2013,0.3084,False
+Sex,male,0.8595,-0.1152,-0.0512,-0.1256,0.3084,False
+AgeGroup,40_plus,0.8212,-0.1586,-0.0513,-0.1649,0.3084,False
+foreign_worker,0,0.9402,-0.0498,-0.0889,0.2013,0.3084,False

@@ -1,0 +1,40 @@
+{
+  "gender": {
+    "disparate_impact": 0.0,
+    "demographic_parity_difference": -0.006944444444444444,
+    "equal_opportunity_difference": -0.07142857142857142,
+    "average_odds_difference": -0.03571428571428571,
+    "privileged_group": "male",
+    "groups": [
+      "female",
+      "male"
+    ],
+    "bias_detected": true
+  },
+  "income_level": {
+    "disparate_impact": null,
+    "demographic_parity_difference": 0.007194244604316547,
+    "equal_opportunity_difference": 0.06451612903225806,
+    "average_odds_difference": 0.03225806451612903,
+    "privileged_group": "medium",
+    "groups": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "bias_detected": false
+  },
+  "loan_amount_level": {
+    "disparate_impact": null,
+    "demographic_parity_difference": 0.00625,
+    "equal_opportunity_difference": 0.05405405405405406,
+    "average_odds_difference": 0.02702702702702703,
+    "privileged_group": "medium",
+    "groups": [
+      "medium",
+      "small",
+      "large"
+    ],
+    "bias_detected": false
+  }
+}

@@ -1,0 +1,4 @@
+income_level,n,selection_rate,small_subgroup,disparate_impact_vs_best
+high,139,1.0,False,1.0
+low,183,1.0,False,1.0
+medium,278,0.9928057553956835,False,0.9928057553956835

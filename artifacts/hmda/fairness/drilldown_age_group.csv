@@ -1,0 +1,4 @@
+age_group,n,selection_rate,small_subgroup,disparate_impact_vs_best
+young,464,0.7780172413793104,False,1.0
+mid,1121,0.7047279214986619,False,0.9057998769401083
+senior,611,0.6661211129296236,False,0.8561778293610675
