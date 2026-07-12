@@ -1,0 +1,25 @@
+{
+  "name": "research_guardrails_v1",
+  "description": "Machine-readable stage gates for the staged lending fairness research (docs/RESEARCH_STAGING_PROMPT.md). Flip a provider to 'approved' ONLY with explicit user consent recorded in the session.",
+  "llm_providers": {
+    "openai": "blocked",
+    "gemini": "blocked"
+  },
+  "dry_run_allowed": true,
+  "semantic_scholar": {
+    "allowed": true,
+    "api_key_required": false,
+    "min_request_interval_s": 2.0
+  },
+  "max_cost_usd_per_run": 37.0,
+  "git": {
+    "push_allowed": false,
+    "remote_operations_allowed": false,
+    "local_commits_allowed": true,
+    "allowed_branch_prefix": "feat/"
+  },
+  "artifact_policy": {
+    "delete_legacy_artifacts": false,
+    "llm_may_recompute_metrics": false
+  }
+}
