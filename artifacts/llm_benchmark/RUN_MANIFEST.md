@@ -40,10 +40,17 @@ planning number. Either way the run is far below the cap.
 - `german_credit`, `hmda`: packs embed the retained Semantic Scholar harvest
   (3 papers/attribute) via `--research_json artifacts/<ds>/fairness/qualitative_research_evidence.json`.
 - `lending_club`: evidence list is empty — the keyless Semantic Scholar API
-  returned HTTP 429 during Stage 1 and Stage 2 pack generation. Re-harvest
-  off-peak and regenerate the lending_club packs before (or alongside) the
-  Stage 3 run; the run commands below already pass `--research_json` so the
-  refreshed JSON is picked up.
+  returned HTTP 429 during Stage 1, Stage 2 pack generation, and repeated
+  retries spaced over ~70 minutes on 2026-07-17. This appears to be the
+  keyless tier's steady state, not a transient. The reliable refresh path is
+  `SEMANTIC_SCHOLAR_API_KEY` (a free key; the only permitted network
+  dependency, not gated by the LLM guardrail): with it set, rerun
+  `python3.11 run_pipeline.py --datasets lending_club --steps qualitative`
+  then regenerate the lending_club packs with the dry-run command. A later
+  successful harvest is now retained across subsequent 429s
+  (`scripts/qualitative_analysis.py` keeps non-empty evidence on disk), and
+  the run commands below already pass `--research_json` so the refreshed
+  JSON is picked up.
 
 ## Exact post-approval commands
 
