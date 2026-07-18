@@ -14,13 +14,16 @@ Gemini outputs are retained only as secondary legacy comparison artifacts where 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 make smoke
+make test
 make fairness
 ```
 
-The smoke test is local and does not call external APIs. The fairness run regenerates deterministic metrics for the two main lending datasets.
+The smoke test and unit tests are local and do not call external APIs. The fairness run regenerates deterministic metrics for the main lending datasets.
+
+> **Note:** if the repository lives in an iCloud-synced location (e.g. `Desktop/`), repo-local virtualenvs can hang on native-library loads during file eviction. The Makefile therefore prefers a system `python3.11` when one is available; installing dependencies against Homebrew `python3.11` is the most reliable local setup.
 
 To run the OpenAI benchmark, set an API key first:
 
@@ -38,17 +41,21 @@ export SEMANTIC_SCHOLAR_API_KEY="..."
 ## Repository Layout
 
 - `run_pipeline.py`: central orchestrator for cleaning, training, deterministic fairness analysis, qualitative analysis, OpenAI benchmarking, and visualization.
-- `german_credit_dataset/`: German Credit preprocessing, model training, and fairness scripts.
-- `hmda_dataset/`: HMDA Georgia preprocessing, model training, and fairness scripts.
+- `german_credit_dataset/`: German Credit preprocessing, model training, and fairness scripts (UC1, consumer credit scoring).
+- `hmda_dataset/`: HMDA Georgia preprocessing, model training, and fairness scripts (UC2, mortgage underwriting).
+- `lending_club_dataset/`: Lending Club preprocessing, model training, and fairness scripts (UC3, P2P default risk; favorable outcome = predicted non-default, `favorable_label 0`).
 - `scripts/openai_fairness_analysis.py`: primary OpenAI qualitative benchmark over deterministic metric context.
 - `scripts/llm_benchmark.py`: multi-cycle LLM benchmark runner; OpenAI is the artifact default, while Gemini can be selected explicitly for legacy comparison.
-- `configs/`: OpenAI pilot/smoke configs, report quality rubric, and guardrails.
+- `configs/`: OpenAI pilot/smoke configs, report quality rubric, and guardrails — including `configs/research_guardrails.json`, the machine-readable stage gates (LLM providers stay `"blocked"` until explicitly user-approved).
 - `docs/data_cards/`: data cards for German Credit and HMDA Georgia.
-- `artifacts/german_credit/fairness/` and `artifacts/hmda/fairness/`: current deterministic and LLM audit outputs.
-- `artifacts/consolidated/`: cross-dataset summaries and OpenAI comparison reports.
+- `docs/RESEARCH_STAGING_PROMPT.md`: the staged research program (Stage 0 scaffolding → Stage 5 paper artifacts) spanning the three lending use cases.
+- `artifacts/german_credit/fairness/`, `artifacts/hmda/fairness/`, `artifacts/lending_club/fairness/`: current deterministic and LLM audit outputs.
+- `artifacts/llm_benchmark/`: frozen dry-run prompt packs (`dry_run/`) and the Track Q run manifest (`RUN_MANIFEST.md`).
+- `artifacts/consolidated/`: cross-dataset summaries, the lending-lifecycle baseline, and OpenAI comparison reports.
+- `tests/`: pytest suite covering fairness-metric orientation/sign conventions and the LLM benchmark scoring, refusal, and hallucination detectors (`make test`).
 - `report/report.tex`: paper/report source.
 
-Older course-project folders for diabetes, healthcare insurance, and Lending Club remain in the repository for provenance, but they are not the main NeurIPS artifact scope.
+Older course-project folders for diabetes and healthcare insurance remain in the repository for provenance, but they are not the main NeurIPS artifact scope. Lending Club has been promoted into scope as UC3 of the staged lending-lifecycle research program.
 
 ## Setup
 

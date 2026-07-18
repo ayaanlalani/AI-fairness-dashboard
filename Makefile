@@ -1,6 +1,8 @@
-.PHONY: smoke fairness benchmark paper
+.PHONY: smoke test fairness benchmark paper
 
-PYTHON ?= $(shell if test -x .venv/bin/python; then echo .venv/bin/python; else command -v python3; fi)
+# Prefer a system python3.11: repo-local venvs can hang under iCloud Drive
+# eviction (see artifacts/consolidated/stage1_findings.md, environment note).
+PYTHON ?= $(shell command -v python3.11 || { test -x .venv/bin/python && echo .venv/bin/python; } || command -v python3)
 
 smoke:
 	$(PYTHON) -m py_compile run_pipeline.py scripts/openai_fairness_analysis.py scripts/llm_benchmark.py scripts/qualitative_analysis.py scripts/llm_benchmark_common.py
@@ -10,8 +12,11 @@ smoke:
 	test -d artifacts/german_credit/fairness
 	test -d artifacts/hmda/fairness
 
+test:
+	$(PYTHON) -m pytest tests/ -q
+
 fairness:
-	$(PYTHON) run_pipeline.py --datasets german_credit hmda --steps fairness qualitative visualize
+	$(PYTHON) run_pipeline.py --datasets german_credit hmda lending_club --steps fairness qualitative visualize
 
 benchmark:
 	$(PYTHON) run_pipeline.py --datasets german_credit hmda --steps llm_benchmark visualize
