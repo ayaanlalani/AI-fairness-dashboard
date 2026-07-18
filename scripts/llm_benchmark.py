@@ -485,22 +485,54 @@ def detect_refusal(result: dict | None, raw_text: str = "") -> bool:
     return False
 
 
-def detect_hallucinations(result: dict, known_titles: list[str]) -> list[str]:
-    """
-    Flag citations not traceable to our Semantic Scholar context.
+# Numeric values the LLM may legitimately quote without them appearing in the
+# metric context: canonical fairness thresholds and trivial anchors.
+_ALLOWED_METRIC_ANCHORS = {0.0, 0.05, 0.1, 0.2, 0.25, 0.5, 0.8, 0.9, 1.0, 1.25}
+_METRIC_VALUE_RE = re.compile(r"-?\d+\.\d+")
+_METRIC_TOLERANCE = 5e-4  # covers rounding to 3+ decimal places
 
-    Heuristic: a citation is suspicious if no 3-gram from it appears in
-    any known paper title (case-insensitive). Short single-word entries are
-    also flagged.
+
+def known_metric_values(context_payload: dict) -> set[float]:
+    """Collect every numeric value in the metric context (rounded for matching)."""
+    values: set[float] = set()
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict):
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+        elif isinstance(node, (int, float)) and not isinstance(node, bool):
+            values.add(float(node))
+
+    walk(context_payload)
+    return values
+
+
+def detect_hallucinations(
+    result: dict,
+    known_titles: list[str],
+    context_values: set[float] | None = None,
+) -> list[str]:
+    """
+    Flag content not traceable to the provided context (guardrail 5:
+    LLMs interpret metrics, they never assert new ones).
+
+    Two heuristics:
+    - Citations: suspicious if no 3-gram appears in any known paper title
+      (case-insensitive); short single-word entries are also flagged.
+    - Metric values: any decimal number in the narrative fields that is not
+      within tolerance of a value present in the metric context (and is not a
+      canonical threshold such as 0.8) is flagged as a fabricated metric.
     """
     if not result:
         return []
-    cited = result.get("supporting_research", [])
-    if not cited:
-        return []
 
-    known_blob = " ".join(t.lower() for t in known_titles)
     flags: list[str] = []
+
+    cited = result.get("supporting_research", [])
+    known_blob = " ".join(t.lower() for t in known_titles)
     for citation in cited:
         words = citation.lower().split()
         if len(words) < 3:
@@ -509,6 +541,15 @@ def detect_hallucinations(result: dict, known_titles: list[str]) -> list[str]:
         trigrams = [" ".join(words[i : i + 3]) for i in range(len(words) - 2)]
         if not any(tg in known_blob for tg in trigrams):
             flags.append(citation)
+
+    if context_values is not None:
+        allowed = context_values | _ALLOWED_METRIC_ANCHORS
+        for field in ("what_is_wrong", "why_is_wrong", "how_to_fix"):
+            for match in _METRIC_VALUE_RE.findall(str(result.get(field, ""))):
+                quoted = float(match)
+                if not any(abs(quoted - v) <= _METRIC_TOLERANCE for v in allowed):
+                    flags.append(f"metric value {match} in '{field}' not present in provided context")
+
     return flags
 
 
@@ -637,7 +678,9 @@ def run_attribute_benchmark(
                 llm_result, usage, raw_text = {}, {}, str(exc)
 
         refusal = detect_refusal(llm_result if llm_result else None, raw_text)
-        hallucinations = detect_hallucinations(llm_result or {}, known_titles)
+        hallucinations = detect_hallucinations(
+            llm_result or {}, known_titles, known_metric_values(context_payload)
+        )
 
         # Wrap result for score_llm_output (expects {"qualitative": [...]})
         wrapped = {"qualitative": [llm_result]} if llm_result else {"qualitative": []}
@@ -693,6 +736,7 @@ def run_benchmark(
     out_root: str | Path = "artifacts/llm_benchmark",
     model: str = DEFAULT_MODEL,
     dry_run: bool = False,
+    preloaded_research: list[dict] | None = None,
 ) -> Path:
     """Run the 4-cycle benchmark for every protected attribute in the dataset."""
     t0_total = time.time()
@@ -713,6 +757,7 @@ def run_benchmark(
         pred_col=pred_col,
         favorable_label=favorable_label,
         dataset_name=dataset_name,
+        preloaded_research=preloaded_research,
     )
 
     all_results: list[dict] = []
@@ -810,6 +855,12 @@ def main() -> None:
         help="Build prompt packs and score a deterministic mock response; "
              "no API client is constructed and no key is read.",
     )
+    parser.add_argument(
+        "--research_json", default=None,
+        help="Path to a retained qualitative_research_evidence.json "
+             "({attr: [paper, ...]}) to embed instead of a live Semantic "
+             "Scholar harvest (useful when the keyless API is rate-limited).",
+    )
     args = parser.parse_args()
 
     if not args.dry_run:
@@ -824,6 +875,19 @@ def main() -> None:
         attr, priv = pair.split(":", 1)
         configs[attr.strip()] = priv.strip()
 
+    preloaded_research = None
+    if args.research_json:
+        raw = json.loads(Path(args.research_json).read_text(encoding="utf-8"))
+        papers = raw if isinstance(raw, list) else [p for plist in raw.values() for p in plist]
+        seen: set[str] = set()
+        preloaded_research = []
+        for paper in papers:
+            key = paper.get("paper_id") or paper.get("title", "").lower()
+            if key and key not in seen:
+                seen.add(key)
+                preloaded_research.append(paper)
+        log.info(f"Preloaded {len(preloaded_research)} papers from {args.research_json}")
+
     run_benchmark(
         predictions_path=args.predictions,
         fairness_csv_path=args.fairness_csv,
@@ -837,6 +901,7 @@ def main() -> None:
         out_root=args.out_root,
         model=args.model,
         dry_run=args.dry_run,
+        preloaded_research=preloaded_research,
     )
 
 

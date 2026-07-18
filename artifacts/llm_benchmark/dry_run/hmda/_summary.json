@@ -1,6 +1,6 @@
 {
-  "dataset": "german_credit",
-  "dataset_name": "German Credit",
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
   "model": "gpt-4o",
   "total_results": 12,
   "total_cost_usd": 0.0,
@@ -8,21 +8,21 @@
   "refusal_count": 0,
   "hallucination_count": 0,
   "cycle_avg_score": {
-    "1": 100.0,
-    "2": 100.0,
-    "3": 100.0,
-    "4": 100.0
+    "1": 98.33,
+    "2": 98.33,
+    "3": 98.33,
+    "4": 98.33
   },
   "attributes": [
-    "AgeGroup_original",
-    "Sex_original",
-    "foreign_worker_original"
+    "age_group",
+    "race",
+    "sex"
   ],
   "cycles": [
     {
       "cycle": 1,
       "prompt_format": "zero_shot",
-      "attribute": "Sex_original",
+      "attribute": "race",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -30,7 +30,7 @@
     {
       "cycle": 2,
       "prompt_format": "chain_of_thought",
-      "attribute": "Sex_original",
+      "attribute": "race",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -38,7 +38,7 @@
     {
       "cycle": 3,
       "prompt_format": "self_critique",
-      "attribute": "Sex_original",
+      "attribute": "race",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -46,7 +46,7 @@
     {
       "cycle": 4,
       "prompt_format": "constrained",
-      "attribute": "Sex_original",
+      "attribute": "race",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -54,39 +54,39 @@
     {
       "cycle": 1,
       "prompt_format": "zero_shot",
-      "attribute": "AgeGroup_original",
-      "score": 100.0,
+      "attribute": "sex",
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
     {
       "cycle": 2,
       "prompt_format": "chain_of_thought",
-      "attribute": "AgeGroup_original",
-      "score": 100.0,
+      "attribute": "sex",
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
     {
       "cycle": 3,
       "prompt_format": "self_critique",
-      "attribute": "AgeGroup_original",
-      "score": 100.0,
+      "attribute": "sex",
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
     {
       "cycle": 4,
       "prompt_format": "constrained",
-      "attribute": "AgeGroup_original",
-      "score": 100.0,
+      "attribute": "sex",
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
     {
       "cycle": 1,
       "prompt_format": "zero_shot",
-      "attribute": "foreign_worker_original",
+      "attribute": "age_group",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -94,7 +94,7 @@
     {
       "cycle": 2,
       "prompt_format": "chain_of_thought",
-      "attribute": "foreign_worker_original",
+      "attribute": "age_group",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -102,7 +102,7 @@
     {
       "cycle": 3,
       "prompt_format": "self_critique",
-      "attribute": "foreign_worker_original",
+      "attribute": "age_group",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
@@ -110,7 +110,7 @@
     {
       "cycle": 4,
       "prompt_format": "constrained",
-      "attribute": "foreign_worker_original",
+      "attribute": "age_group",
       "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0

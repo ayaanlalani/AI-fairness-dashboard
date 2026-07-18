@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "age_group",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "[DRY RUN] The pre-computed context reports disparate impact = 1.0138 for 'age_group', alongside the demographic parity, equal opportunity, and average odds differences supplied by the deterministic pipeline.",
+    "why_is_wrong": "[DRY RUN] The deterministic root-cause analysis attributes this disparity to historical label bias; this mock restates that finding so the cause-alignment scorer runs end-to-end without an LLM call.",
+    "how_to_fix": "[DRY RUN] Apply Reweighing preprocessing, then validate with a ThresholdOptimizer postprocessing pass, targeting disparate impact >= 0.8 on the held-out test split.",
+    "supporting_research": [
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications"
+    ]
+  },
+  "score": {
+    "total_score": 100.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 15.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 100.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=15.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "dry_run",
+    "attempts": 0,
+    "wall_clock_s": 0.0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "input_cost_usd": 0.0,
+    "output_cost_usd": 0.0,
+    "total_cost_usd": 0.0,
+    "dry_run": true
+  },
+  "dry_run": true,
+  "prompt": "    You are an AI fairness auditor reviewing your own prior analysis of \"age_group\"\n    in the \"HMDA Mortgage Lending (Georgia)\" dataset.\n\n    ## Your previous output\n    ```json\n    {\n  \"attribute\": \"age_group\",\n  \"severity\": \"LOW\",\n  \"what_is_wrong\": \"[DRY RUN] The pre-computed context reports disparate impact = 1.0138 for 'age_group', alongside the demographic parity, equal opportunity, and average odds differences supplied by the deterministic pipeline.\",\n  \"why_is_wrong\": \"[DRY RUN] The deterministic root-cause analysis attributes this disparity to historical label bias; this mock restates that finding so the cause-alignment scorer runs end-to-end without an LLM call.\",\n  \"how_to_fix\": \"[DRY RUN] Apply Reweighing preprocessing, then validate with a ThresholdOptimizer postprocessing pass, targeting disparate impact >= 0.8 on the held-out test split.\",\n  \"supporting_research\": [\n    \"Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models\",\n    \"Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications\"\n  ]\n}\n    ```\n\n    Self-critique checklist \u2014 assess each point, then improve:\n    1. Severity: is it consistent with the DI threshold rules in the context?\n    2. Cause: is \"why_is_wrong\" specific (cites a mechanism) or generic (says \"bias\")?\n    3. Fix: does \"how_to_fix\" name a specific algorithm from AIF360 or Fairlearn?\n    4. Citations: are the research entries real and directly relevant?\n\n    Reference fairness toolkit context:\n- AIF360: Reweighing, DisparateImpactRemover, PrejudiceRemover, EqOddsPostprocessing, CalibratedEqOddsPostprocessing.\n- Fairlearn: ExponentiatedGradient, GridSearch, ThresholdOptimizer.\nReason from the provided metric values; do not invent new data.\n\n    ## Research evidence (Semantic Scholar)\n    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0\n    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...\n[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0\n    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...\n[3] Algorithmic Lending Bias: Evaluating the Fairness of Historical Redlining in Loan Approvals (2024) | K. Sarwal, Sheikh Rabiul Islam | BigData Congress [Services Society] | citations=1\n    Summary: This paper investigates the persistent influence of historical redlining on modern AI algorithms used in real estate and loan approvals. Utilizing Home Mortgage Disclosure Act (HMDA) data, we uncover demographic biase...\n[4] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0\n    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...\n[5] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0\n    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...\n[6] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0\n    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...\n\n    ## Fairness context (pre-computed)\n    ```json\n    {\n  \"dataset_name\": \"HMDA Mortgage Lending (Georgia)\",\n  \"favorable_label\": 1,\n  \"reference_audit_spec\": {\n    \"name\": \"Reference Audit Specification\",\n    \"core_metrics\": [\n      \"Disparate Impact\",\n      \"Demographic Parity Difference\",\n      \"Equal Opportunity Difference\",\n      \"Average Odds Difference\",\n      \"Theil Index\"\n    ],\n    \"required_response_elements\": [\n      \"per-group breakdown\",\n      \"severity classification\",\n      \"root-cause analysis\",\n      \"mitigation recommendations\",\n      \"research-backed justification\"\n    ],\n    \"why_this_spec\": \"A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions.\"\n  },\n  \"attributes\": [\n    {\n      \"attribute\": \"age_group\",\n      \"privileged_value\": \"mid\",\n      \"metrics\": {\n        \"disparate_impact\": 1.0138,\n        \"demographic_parity_diff\": 0.0097,\n        \"equal_opportunity_diff\": 0.0008,\n        \"average_odds_diff\": -0.015,\n        \"theil_index\": 0.4838\n      },\n      \"group_breakdown\": [\n        {\n          \"group\": \"mid\",\n          \"n\": 1121,\n          \"pct_of_total\": 51.0,\n          \"base_rate\": 0.7083,\n          \"selection_rate\": 0.7047,\n          \"tpr\": 0.971,\n          \"fpr\": 0.0581\n        },\n        {\n          \"group\": \"senior\",\n          \"n\": 611,\n          \"pct_of_total\": 27.8,\n          \"base_rate\": 0.6792,\n          \"selection_rate\": 0.6661,\n          \"tpr\": 0.9735,\n          \"fpr\": 0.0153\n        },\n        {\n          \"group\": \"young\",\n          \"n\": 464,\n          \"pct_of_total\": 21.1,\n          \"base_rate\": 0.7909,\n          \"selection_rate\": 0.778,\n          \"tpr\": 0.97,\n          \"fpr\": 0.0515\n        }\n      ],\n      \"imbalance_findings\": [],\n      \"severity_thresholds\": {\n        \"critical_if_di_below\": 0.72,\n        \"high_if_di_below\": 0.8,\n        \"moderate_if_di_below\": 0.95\n      }\n    }\n  ]\n}\n    ```\n\n    Return ONLY valid JSON with this exact structure \u2014 no markdown, no prose outside:\n{\n  \"attribute\": \"age_group\",\n  \"severity\": \"<CRITICAL|HIGH|MODERATE|LOW>\",\n  \"what_is_wrong\": \"<paragraph>\",\n  \"why_is_wrong\": \"<paragraph>\",\n  \"how_to_fix\": \"<paragraph>\",\n  \"supporting_research\": [\"<citation>\", \"...\"]\n}\n"
+}

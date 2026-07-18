@@ -1,0 +1,43 @@
+{
+  "dataset": "lending_club",
+  "dataset_name": "Lending Club P2P Loans",
+  "attribute": "loan_amount_level",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "loan_amount_level",
+    "severity": "LOW",
+    "what_is_wrong": "[DRY RUN] The pre-computed context reports disparate impact = 1.0062893081761006 for 'loan_amount_level', alongside the demographic parity, equal opportunity, and average odds differences supplied by the deterministic pipeline.",
+    "why_is_wrong": "[DRY RUN] The deterministic root-cause analysis attributes this disparity to proxy discrimination; this mock restates that finding so the cause-alignment scorer runs end-to-end without an LLM call.",
+    "how_to_fix": "[DRY RUN] Apply Reweighing preprocessing, then validate with a ThresholdOptimizer postprocessing pass, targeting disparate impact >= 0.8 on the held-out test split.",
+    "supporting_research": []
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 15.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=35.0, Severity agreement=20.0, Cause alignment=15.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "dry_run",
+    "attempts": 0,
+    "wall_clock_s": 0.0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "input_cost_usd": 0.0,
+    "output_cost_usd": 0.0,
+    "total_cost_usd": 0.0,
+    "dry_run": true
+  },
+  "dry_run": true,
+  "prompt": "    You are an AI fairness auditor operating under strict output constraints.\n\n    ## Hard constraints (violations invalidate the response)\n    1. \"what_is_wrong\" MUST quote the exact numerical DI value from the context.\n    2. \"how_to_fix\" MUST name exactly one algorithm from: Reweighing, DisparateImpactRemover, ExponentiatedGradient, ThresholdOptimizer.\n    3. \"severity\" MUST be exactly one of: CRITICAL, HIGH, MODERATE, LOW \u2014 no other text.\n    4. \"supporting_research\" MUST contain at least 2 entries.\n    5. Do NOT speculate beyond what the provided metric values support.\n\n    ## Attribute: \"loan_amount_level\"  |  Dataset: \"Lending Club P2P Loans\"\n\n    Reference fairness toolkit context:\n- AIF360: Reweighing, DisparateImpactRemover, PrejudiceRemover, EqOddsPostprocessing, CalibratedEqOddsPostprocessing.\n- Fairlearn: ExponentiatedGradient, GridSearch, ThresholdOptimizer.\nReason from the provided metric values; do not invent new data.\n\n    ## Research evidence (Semantic Scholar)\n    No external research evidence was retrieved.\n\n    ## Fairness context (pre-computed)\n    ```json\n    {\n  \"dataset_name\": \"Lending Club P2P Loans\",\n  \"favorable_label\": 0,\n  \"reference_audit_spec\": {\n    \"name\": \"Reference Audit Specification\",\n    \"core_metrics\": [\n      \"Disparate Impact\",\n      \"Demographic Parity Difference\",\n      \"Equal Opportunity Difference\",\n      \"Average Odds Difference\",\n      \"Theil Index\"\n    ],\n    \"required_response_elements\": [\n      \"per-group breakdown\",\n      \"severity classification\",\n      \"root-cause analysis\",\n      \"mitigation recommendations\",\n      \"research-backed justification\"\n    ],\n    \"why_this_spec\": \"A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions.\"\n  },\n  \"attributes\": [\n    {\n      \"attribute\": \"loan_amount_level\",\n      \"privileged_value\": \"medium\",\n      \"metrics\": {\n        \"disparate_impact\": 1.0062893081761006,\n        \"demographic_parity_diff\": 0.0062499999999999,\n        \"equal_opportunity_diff\": 0.0,\n        \"average_odds_diff\": 0.027027027027027,\n        \"theil_index\": null\n      },\n      \"group_breakdown\": [\n        {\n          \"group\": \"medium\",\n          \"n\": 320,\n          \"pct_of_total\": 53.3,\n          \"base_rate\": 0.8844,\n          \"selection_rate\": 0.9938,\n          \"tpr\": 1.0,\n          \"fpr\": 0.9459\n        },\n        {\n          \"group\": \"small\",\n          \"n\": 181,\n          \"pct_of_total\": 30.2,\n          \"base_rate\": 0.8729,\n          \"selection_rate\": 1.0,\n          \"tpr\": 1.0,\n          \"fpr\": 1.0\n        },\n        {\n          \"group\": \"large\",\n          \"n\": 99,\n          \"pct_of_total\": 16.5,\n          \"base_rate\": 0.8788,\n          \"selection_rate\": 1.0,\n          \"tpr\": 1.0,\n          \"fpr\": 1.0\n        }\n      ],\n      \"imbalance_findings\": [\n        \"Moderate size imbalance: medium (320) is 3.2x larger than large (99).\"\n      ],\n      \"severity_thresholds\": {\n        \"critical_if_di_below\": 0.72,\n        \"high_if_di_below\": 0.8,\n        \"moderate_if_di_below\": 0.95\n      }\n    }\n  ]\n}\n    ```\n\n    Return ONLY valid JSON with this exact structure \u2014 no markdown, no prose outside:\n{\n  \"attribute\": \"loan_amount_level\",\n  \"severity\": \"<CRITICAL|HIGH|MODERATE|LOW>\",\n  \"what_is_wrong\": \"<paragraph>\",\n  \"why_is_wrong\": \"<paragraph>\",\n  \"how_to_fix\": \"<paragraph>\",\n  \"supporting_research\": [\"<citation>\", \"...\"]\n}\n"
+}

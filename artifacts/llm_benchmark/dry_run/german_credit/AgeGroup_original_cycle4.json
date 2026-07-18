@@ -1,0 +1,46 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "AgeGroup_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "AgeGroup_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "[DRY RUN] The pre-computed context reports disparate impact = 0.8212 for 'AgeGroup_original', alongside the demographic parity, equal opportunity, and average odds differences supplied by the deterministic pipeline.",
+    "why_is_wrong": "[DRY RUN] The deterministic root-cause analysis attributes this disparity to historical label bias, proxy discrimination, unequal odds, unequal opportunity; this mock restates that finding so the cause-alignment scorer runs end-to-end without an LLM call.",
+    "how_to_fix": "[DRY RUN] Apply Reweighing preprocessing, then validate with a ThresholdOptimizer postprocessing pass, targeting disparate impact >= 0.8 on the held-out test split.",
+    "supporting_research": [
+      "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment",
+      "Bias Mitigation in Federated Healthcare Cloud Models"
+    ]
+  },
+  "score": {
+    "total_score": 100.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 15.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 100.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=15.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "dry_run",
+    "attempts": 0,
+    "wall_clock_s": 0.0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "input_cost_usd": 0.0,
+    "output_cost_usd": 0.0,
+    "total_cost_usd": 0.0,
+    "dry_run": true
+  },
+  "dry_run": true,
+  "prompt": "    You are an AI fairness auditor operating under strict output constraints.\n\n    ## Hard constraints (violations invalidate the response)\n    1. \"what_is_wrong\" MUST quote the exact numerical DI value from the context.\n    2. \"how_to_fix\" MUST name exactly one algorithm from: Reweighing, DisparateImpactRemover, ExponentiatedGradient, ThresholdOptimizer.\n    3. \"severity\" MUST be exactly one of: CRITICAL, HIGH, MODERATE, LOW \u2014 no other text.\n    4. \"supporting_research\" MUST contain at least 2 entries.\n    5. Do NOT speculate beyond what the provided metric values support.\n\n    ## Attribute: \"AgeGroup_original\"  |  Dataset: \"German Credit\"\n\n    Reference fairness toolkit context:\n- AIF360: Reweighing, DisparateImpactRemover, PrejudiceRemover, EqOddsPostprocessing, CalibratedEqOddsPostprocessing.\n- Fairlearn: ExponentiatedGradient, GridSearch, ThresholdOptimizer.\nReason from the provided metric values; do not invent new data.\n\n    ## Research evidence (Semantic Scholar)\n    [1] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0\n    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...\n[2] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0\n    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...\n[3] Evaluating Bias Mitigation Techniques in Credit and Marketing Models: Balancing Fairness and Performance (2025) | Sai Prashanth Pathi | Journal of Advances in Developmental Research | citations=0\n    Summary: Algorithmic decision making in financial services often amplifies existing societal biases due to imbalanced data and historical discrimination. Ensuring fairness in machine learning models, particularly within credit...\n[4] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0\n    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...\n[5] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0\n    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...\n[6] FAIRNESS AND BIAS MITIGATION IN AI-BASED CREDIT SCORING USING ALTERNATIVE DATA: A FRAMEWORK FOR ETHICAL FINANCIAL INCLUSION (2025) | Derrick Atuobi Oware, Samuel Amfo Junior | EPRA international journal of multidisciplinary research | citations=0\n    Summary: There are a lot of opportunities to speed up financial inclusion through the use of artificial intelligence (AI) and alternative data in credit scoring, especially for underprivileged groups that have been shut out of...\n[7] Persistent Proxy Discrimination in HIV Testing Prediction Models: A National Fairness Audit of 386,775 US Adults (2026) | H. Farquhar | medRxiv | citations=0\n    Summary: \n\n    ## Fairness context (pre-computed)\n    ```json\n    {\n  \"dataset_name\": \"German Credit\",\n  \"favorable_label\": 1,\n  \"reference_audit_spec\": {\n    \"name\": \"Reference Audit Specification\",\n    \"core_metrics\": [\n      \"Disparate Impact\",\n      \"Demographic Parity Difference\",\n      \"Equal Opportunity Difference\",\n      \"Average Odds Difference\",\n      \"Theil Index\"\n    ],\n    \"required_response_elements\": [\n      \"per-group breakdown\",\n      \"severity classification\",\n      \"root-cause analysis\",\n      \"mitigation recommendations\",\n      \"research-backed justification\"\n    ],\n    \"why_this_spec\": \"A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions.\"\n  },\n  \"attributes\": [\n    {\n      \"attribute\": \"AgeGroup_original\",\n      \"privileged_value\": \"40_plus\",\n      \"metrics\": {\n        \"disparate_impact\": 0.8212,\n        \"demographic_parity_diff\": -0.1586,\n        \"equal_opportunity_diff\": -0.0513,\n        \"average_odds_diff\": -0.1649,\n        \"theil_index\": 0.3084\n      },\n      \"group_breakdown\": [\n        {\n          \"group\": \"under_40\",\n          \"n\": 129,\n          \"pct_of_total\": 64.5,\n          \"base_rate\": 0.6589,\n          \"selection_rate\": 0.7287,\n          \"tpr\": 0.8941,\n          \"fpr\": 0.4091\n        },\n        {\n          \"group\": \"40_plus\",\n          \"n\": 71,\n          \"pct_of_total\": 35.5,\n          \"base_rate\": 0.7746,\n          \"selection_rate\": 0.8873,\n          \"tpr\": 0.9455,\n          \"fpr\": 0.6875\n        }\n      ],\n      \"imbalance_findings\": [],\n      \"severity_thresholds\": {\n        \"critical_if_di_below\": 0.72,\n        \"high_if_di_below\": 0.8,\n        \"moderate_if_di_below\": 0.95\n      }\n    }\n  ]\n}\n    ```\n\n    Return ONLY valid JSON with this exact structure \u2014 no markdown, no prose outside:\n{\n  \"attribute\": \"AgeGroup_original\",\n  \"severity\": \"<CRITICAL|HIGH|MODERATE|LOW>\",\n  \"what_is_wrong\": \"<paragraph>\",\n  \"why_is_wrong\": \"<paragraph>\",\n  \"how_to_fix\": \"<paragraph>\",\n  \"supporting_research\": [\"<citation>\", \"...\"]\n}\n"
+}
