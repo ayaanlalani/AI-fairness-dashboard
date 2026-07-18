@@ -88,7 +88,9 @@ def _manual_metrics(y_true, y_pred, group, priv_value) -> dict:
     di = (su / sp) if (sp and not np.isnan(sp) and sp > 0) else np.nan
     dpd = float(su - sp) if not (np.isnan(sp) or np.isnan(su)) else np.nan
     eod = float(tu - tp) if not (np.isnan(tp) or np.isnan(tu)) else np.nan
-    aod = float(((fp - fu) + (tp - tu)) / 2.0) if not any(np.isnan([fp, fu, tp, tu])) else np.nan
+    # Pinned to AIF360 orientation (unprivileged - privileged), matching
+    # DI/DPD/EOD above and ClassificationMetric.average_odds_difference().
+    aod = float(((fu - fp) + (tu - tp)) / 2.0) if not any(np.isnan([fp, fu, tp, tu])) else np.nan
 
     return {"DisparateImpact": di, "DemographicParityDiff": dpd, "EqualOpportunityDiff": eod, "AverageOddsDiff": aod}
 

@@ -662,6 +662,22 @@ def run_qualitative_analysis(
             max_papers=3,
         )
 
+    # A transient Semantic Scholar failure (e.g. keyless-tier 429) must not
+    # clobber a previously successful harvest on disk with empty lists.
+    evidence_path = out_dir / "qualitative_research_evidence.json"
+    if evidence_path.exists():
+        try:
+            retained = json.loads(evidence_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            retained = {}
+        for attr, papers in research_evidence_by_attr.items():
+            if not papers and retained.get(attr):
+                research_evidence_by_attr[attr] = retained[attr]
+                log.warning(
+                    f"Semantic Scholar returned no papers for '{attr}'; "
+                    f"keeping {len(retained[attr])} retained papers from the prior harvest."
+                )
+
     report = generate_qualitative_report(
         predictions_df=predictions_df,
         fairness_df=fairness_df,
