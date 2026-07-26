@@ -139,16 +139,26 @@ Commit.
 
 Rewrite report/report.tex into a NeurIPS-format first draft (use the NeurIPS
 D&B track style; keep the existing report.tex as report_course.tex for
-provenance). Structure it like the exemplar paper the user shared — if the
-exemplar file/path is not present in the repo, ask the user for it before
-drafting. Requirements: use-case-first Results; Track Q tables and Track H
+provenance). The user-designated exemplar for framing, voice, and
+human-centered argument structure is:
+
+  Lee et al., "Human-Centered Approaches to Fair and Responsible AI",
+  CHI EA 2020, DOI 10.1145/3334480.3375158
+  (https://dl.acm.org/doi/abs/10.1145/3334480.3375158)
+
+Match its framing style — every fairness claim grounded in the human
+decision context — while using the NeurIPS D&B format for structure and
+length. Source 2–3 additional related-work citations from that paper's
+citation graph (Google Scholar cluster 7844550987917920838; resolvable via
+the Semantic Scholar API citations endpoint for the DOI, using the key in
+.env). Requirements: use-case-first Results; Track Q tables and Track H
 contrast; Limitations (subgroup n, LLM nondeterminism, API versioning, metric
 grounding, no causal/legal claims); CHI-EA framing pass in Intro/Discussion
 pairing every statistical finding with its decision-context interpretation;
-cite Lee et al. 2020 plus 2–3 works from its citation graph and the harvested
+cite Lee et al. 2020 plus the citation-graph picks and the harvested
 Semantic Scholar papers (real citations only — verify every bibkey against
-the evidence JSONs). `make paper` must build (or document the missing LaTeX
-dependency). Commit.
+the evidence JSONs or the fetched citation records). `make paper` must build
+(or document the missing LaTeX dependency). Commit.
 
 ### Stage H — explanatory Jupyter notebook
 
