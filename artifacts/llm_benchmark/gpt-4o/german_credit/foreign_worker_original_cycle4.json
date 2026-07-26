@@ -1,0 +1,44 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "foreign_worker_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "foreign_worker_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact value is 0.9402, which indicates a moderate disparity in the selection rates between the privileged and unprivileged groups.",
+    "why_is_wrong": "The computed Disparate Impact of 0.9402 is below the threshold of 0.95, indicating moderate inequity between foreign workers versus non-foreign workers. While this suggests some disparity, it is not below the more severe thresholds of 0.8 or 0.72. Additionally, the severe size imbalance between the privilege group '1' having 194 records and '0' with 6 records challenges the reliability of the metric with very low sample size for group '0'.",
+    "how_to_fix": "Applying the DisparateImpactRemover algorithm could adjust and improve the distribution of feature values to align with fairness requirements.",
+    "supporting_research": [
+      "[3] Evaluating Bias Mitigation Techniques in Credit and Marketing Models: Balancing Fairness and Performance (2025) | Sai Prashanth Pathi",
+      "[6] FAIRNESS AND BIAS MITIGATION IN AI-BASED CREDIT SCORING USING ALTERNATIVE DATA: A FRAMEWORK FOR ETHICAL FINANCIAL INCLUSION (2025) | Derrick Atuobi Oware, Samuel Amfo Junior"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.62,
+    "input_tokens": 1478,
+    "output_tokens": 292,
+    "total_tokens": 1770,
+    "input_cost_usd": 0.003695,
+    "output_cost_usd": 0.00292,
+    "total_cost_usd": 0.006615
+  },
+  "dry_run": false
+}

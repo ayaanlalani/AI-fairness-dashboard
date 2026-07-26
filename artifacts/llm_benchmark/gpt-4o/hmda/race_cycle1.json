@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "race",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "LOW",
+    "what_is_wrong": "The HMDA Mortgage Lending dataset for Georgia displays demographic parity and disparate impact metrics that indicate slight imbalances among racial groups. Particularly, the disparate impact is 0.8956, which falls in the moderate-to-low severity range according to the specified thresholds. The selection rate for certain minority groups like Asians and Blacks closely mirrors their respective base rates, indicating a relatively balanced treatment in terms of favorable outcomes like loan approvals.",
+    "why_is_wrong": "Despite the generally low severity, the disproportionate representation of White applicants compared to other racial groups, particularly those with smaller sample sizes, leads to potential inaccuracies and wide confidence intervals for these smaller groups. In addition, the higher base rates for Asians and the lower ones for Multiracial groups suggest an alignment that might coincide with systemic biases reflected in historical data. This could signify that underlying societal biases are influencing the data patterns.",
+    "how_to_fix": "To address these imbalances, consider employing methods like the DisparateImpactRemover from AIF360 to adjust the dataset features towards demographic parity, or Fairlearn's ExponentiatedGradient to achieve more equitable decision boundaries. It would be beneficial to increase the representation of underrepresented racial groups in the dataset, potentially through strategic oversampling or data augmentation, to ensure that the minority groups' metrics are reliable and reflect fair outcomes.",
+    "supporting_research": [
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025)",
+      "Algorithmic Lending Bias: Evaluating the Fairness of Historical Redlining in Loan Approvals (2024)"
+    ]
+  },
+  "score": {
+    "total_score": 65.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 65.0/100. Completeness=40.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 3.69,
+    "input_tokens": 1707,
+    "output_tokens": 343,
+    "total_tokens": 2050,
+    "input_cost_usd": 0.004267,
+    "output_cost_usd": 0.00343,
+    "total_cost_usd": 0.007697
+  },
+  "dry_run": false
+}

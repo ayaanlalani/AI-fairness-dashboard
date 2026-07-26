@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "age_group",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The metrics for the 'age_group' attribute demonstrate minor disparities across groups, with all disparity measures indicating slight differences that do not trigger any severity thresholds. The disparate impact is slightly above 1, indicating a negligible advantage for the 'mid' age group compared to others.",
+    "why_is_wrong": "These minor disparities, although present, are not substantial enough to cause immediate concern under the given thresholds. The disparate impact is very close to 1, and other metrics like demographic parity difference, equal opportunity difference, and average odds difference show only minor deviations. Such small differences suggest that the model treats age groups relatively fairly without significant bias.",
+    "how_to_fix": "Given the low severity of the disparities, immediate action may not be necessary. However, continuously monitor fairness metrics to ensure they remain equitable across age groups. Using fairness mitigation methods such as Reweighing or ThresholdOptimizer can be considered if disparities increase, ensuring persistent vigilance against potential shifts in fairness.",
+    "supporting_research": [
+      "Algorithmic Lending Bias: Evaluating the Fairness of Historical Redlining in Loan Approvals (2024)",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025)",
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025)"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 3.11,
+    "input_tokens": 1373,
+    "output_tokens": 290,
+    "total_tokens": 1663,
+    "input_cost_usd": 0.003433,
+    "output_cost_usd": 0.0029,
+    "total_cost_usd": 0.006332
+  },
+  "dry_run": false
+}

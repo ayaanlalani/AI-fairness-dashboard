@@ -1,0 +1,124 @@
+{
+  "dataset": "lending_club",
+  "dataset_name": "Lending Club P2P Loans",
+  "model": "gpt-4o",
+  "total_results": 12,
+  "total_cost_usd": 0.0683,
+  "elapsed_s": 92.4,
+  "refusal_count": 3,
+  "hallucination_count": 5,
+  "cycle_avg_score": {
+    "1": 83.33,
+    "2": 83.33,
+    "3": 88.33,
+    "4": 83.0
+  },
+  "attributes": [
+    "gender",
+    "income_level",
+    "loan_amount_level"
+  ],
+  "cycles": [
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "gender",
+      "score": 80.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "gender",
+      "score": 95.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "gender",
+      "score": 95.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "gender",
+      "score": 87.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "income_level",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 2
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "income_level",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "income_level",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "income_level",
+      "score": 77.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "loan_amount_level",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "loan_amount_level",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "loan_amount_level",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "loan_amount_level",
+      "score": 85.0,
+      "refusal_detected": true,
+      "hallucination_count": 1
+    }
+  ],
+  "cost_cap_usd": 15.0,
+  "cumulative_spend_usd": 0.227376,
+  "aborted_on_cost_cap": false,
+  "attributes_completed": 3,
+  "attributes_requested": 3
+}

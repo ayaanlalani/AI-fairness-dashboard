@@ -1,0 +1,44 @@
+{
+  "dataset": "lending_club",
+  "dataset_name": "Lending Club P2P Loans",
+  "attribute": "gender",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "gender",
+    "severity": "LOW",
+    "what_is_wrong": "The Disparate Impact (DI) value is 0.9930555555555556.",
+    "why_is_wrong": "The Disparate Impact value is very close to 1, indicating minimal disparity between the genders with respect to selection rates in the Lending Club P2P Loans dataset.",
+    "how_to_fix": "Reweighing",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders"
+    ]
+  },
+  "score": {
+    "total_score": 87.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 87.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.69,
+    "input_tokens": 1205,
+    "output_tokens": 158,
+    "total_tokens": 1363,
+    "input_cost_usd": 0.003012,
+    "output_cost_usd": 0.00158,
+    "total_cost_usd": 0.004592
+  },
+  "dry_run": false
+}

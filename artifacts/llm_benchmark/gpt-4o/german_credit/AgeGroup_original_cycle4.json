@@ -1,0 +1,44 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "AgeGroup_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "AgeGroup_original",
+    "severity": "HIGH",
+    "what_is_wrong": "The Disparate Impact (DI) value is 0.8212.",
+    "why_is_wrong": "The Disparate Impact (DI) metric measures the ratio of the selection rate for the underprivileged group ('under_40') to that of the privileged group ('40_plus'). A DI of less than 0.8 indicates a high disparity, suggesting that the 'under_40' group is less likely to receive favorable outcomes when compared to the '40_plus' group.",
+    "how_to_fix": "Apply the DisparateImpactRemover algorithm to adjust the data distribution and reduce bias.",
+    "supporting_research": [
+      "Evaluating Bias Mitigation Techniques in Credit and Marketing Models: Balancing Fairness and Performance (2025)",
+      "Bias Mitigation in Federated Healthcare Cloud Models (2025)"
+    ]
+  },
+  "score": {
+    "total_score": 57.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 57.0/100. Completeness=32.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.67,
+    "input_tokens": 1430,
+    "output_tokens": 196,
+    "total_tokens": 1626,
+    "input_cost_usd": 0.003575,
+    "output_cost_usd": 0.00196,
+    "total_cost_usd": 0.005535
+  },
+  "dry_run": false
+}

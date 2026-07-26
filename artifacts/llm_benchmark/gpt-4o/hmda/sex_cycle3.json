@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "sex",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "sex",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact (DI) for the 'sex' attribute is 0.9291, which is below the threshold for moderate severity disparity since it is less than 0.95 but not critically low.",
+    "why_is_wrong": "The lower selection rate for female applicants compared to male applicants suggests a systemic bias in the mortgage lending data for Georgia, potentially leading to disproportionate outcomes for females.",
+    "how_to_fix": "The Reweighing algorithm from the AIF360 fairness toolkit could be applied. This technique adjusts the importance of samples in the training data to achieve better fairness between male and female applicants without altering the model's structure.",
+    "supporting_research": [
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw",
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane",
+      "Algorithmic Lending Bias: Evaluating the Fairness of Historical Redlining in Loan Approvals (2024) | K. Sarwal, Sheikh Rabiul Islam"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.59,
+    "input_tokens": 1675,
+    "output_tokens": 280,
+    "total_tokens": 1955,
+    "input_cost_usd": 0.004188,
+    "output_cost_usd": 0.0028,
+    "total_cost_usd": 0.006987
+  },
+  "dry_run": false
+}

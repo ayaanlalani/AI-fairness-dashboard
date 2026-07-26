@@ -1,0 +1,44 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "Sex_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "Sex_original",
+    "severity": "HIGH",
+    "what_is_wrong": "The Disparate Impact (DI) is 0.8595.",
+    "why_is_wrong": "The DI value of 0.8595 indicates that the selection rates between the privileged group (male) and the unprivileged group (female) are not sufficiently equitable, showing a bias against females. According to the severity thresholds, a DI below 0.8 is considered high severity.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Evaluating Bias Mitigation Techniques in Credit and Marketing Models: Balancing Fairness and Performance (2025) | Sai Prashanth Pathi",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw"
+    ]
+  },
+  "score": {
+    "total_score": 57.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 57.0/100. Completeness=32.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.43,
+    "input_tokens": 1420,
+    "output_tokens": 196,
+    "total_tokens": 1616,
+    "input_cost_usd": 0.00355,
+    "output_cost_usd": 0.00196,
+    "total_cost_usd": 0.00551
+  },
+  "dry_run": false
+}

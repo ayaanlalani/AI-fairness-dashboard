@@ -1,0 +1,44 @@
+{
+  "dataset": "lending_club",
+  "dataset_name": "Lending Club P2P Loans",
+  "attribute": "income_level",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "income_level",
+    "severity": "LOW",
+    "what_is_wrong": "The Disparate Impact (DI) value is 1.0072463768115942, which is close to parity.",
+    "why_is_wrong": "The Disparate Impact value indicates that the selection procedures used in this dataset result in nearly equivalent outcomes for different income levels, suggesting low bias with respect to 'income_level'. However, even marginal deviations from perfect parity can sometimes cause concern, though they are within acceptable limits here.",
+    "how_to_fix": "Reweighing",
+    "supporting_research": [
+      "Trust and Credit: The Role of Appearance in Peer-to-peer Lending (2012) | J. Duarte, Stephan Siegel, Lance A. Young",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller"
+    ]
+  },
+  "score": {
+    "total_score": 77.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 77.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.4,
+    "input_tokens": 1278,
+    "output_tokens": 196,
+    "total_tokens": 1474,
+    "input_cost_usd": 0.003195,
+    "output_cost_usd": 0.00196,
+    "total_cost_usd": 0.005155
+  },
+  "dry_run": false
+}

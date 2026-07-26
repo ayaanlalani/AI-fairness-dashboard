@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "race",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact (DI) is 0.8956.",
+    "why_is_wrong": "The DI value indicates that there is a moderate disparity in the selection rates between White and non-White applicants within the dataset, reflecting potential bias in loan approvals based on race.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw",
+      "Algorithmic Lending Bias: Evaluating the Fairness of Historical Redlining in Loan Approvals (2024) | K. Sarwal, Sheikh Rabiul Islam"
+    ]
+  },
+  "score": {
+    "total_score": 77.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 77.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.95,
+    "input_tokens": 1819,
+    "output_tokens": 177,
+    "total_tokens": 1996,
+    "input_cost_usd": 0.004548,
+    "output_cost_usd": 0.00177,
+    "total_cost_usd": 0.006318
+  },
+  "dry_run": false
+}

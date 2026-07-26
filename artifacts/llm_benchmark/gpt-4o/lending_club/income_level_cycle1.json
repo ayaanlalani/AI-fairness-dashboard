@@ -1,0 +1,47 @@
+{
+  "dataset": "lending_club",
+  "dataset_name": "Lending Club P2P Loans",
+  "attribute": "income_level",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "income_level",
+    "severity": "LOW",
+    "what_is_wrong": "The fair lending audit for the income_level attribute shows minimal disparity across key fairness metrics. The disparate impact is close to 1, at 1.007, indicating near-proportional loan approvals among different income groups. However, the average odds difference is slightly elevated at 0.032, suggesting some imbalance in false positive and true positive rates across groups.",
+    "why_is_wrong": "Although metric values suggest low disparity, there is a trace of imbalance in opportunity allocation as evidenced by the average odds difference. This could signify subtle biases in the model\u2019s decision-making process when approving loans for different income levels, potentially due to data imbalances or unrecognized socio-economic factors.",
+    "how_to_fix": "To address these concerns, consider using fairness preprocessing and postprocessing techniques. Implement calibration methods such as CalibratedEqOddsPostprocessing to align true positive and false positive rates more closely across groups. Revisiting feature selection and data preprocess techniques like DisparateImpactRemover and Reweighing could also help mitigate any latent imbalance.",
+    "supporting_research": [
+      "5",
+      "6"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "5",
+    "6"
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.52,
+    "input_tokens": 1166,
+    "output_tokens": 251,
+    "total_tokens": 1417,
+    "input_cost_usd": 0.002915,
+    "output_cost_usd": 0.00251,
+    "total_cost_usd": 0.005425
+  },
+  "dry_run": false
+}

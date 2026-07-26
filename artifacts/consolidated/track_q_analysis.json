@@ -1,0 +1,281 @@
+{
+  "model": "gpt-4o",
+  "n_records": 36,
+  "stability": [
+    {
+      "dataset": "german_credit",
+      "attribute": "AgeGroup_original",
+      "baseline_severity": "MODERATE",
+      "cycle_severities": [
+        "HIGH",
+        "HIGH",
+        "HIGH",
+        "HIGH"
+      ],
+      "distinct_severities": [
+        "HIGH"
+      ],
+      "stable_across_cycles": true,
+      "agreement_count": 0,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "Sex_original",
+      "baseline_severity": "MODERATE",
+      "cycle_severities": [
+        "HIGH",
+        "HIGH",
+        "MODERATE",
+        "HIGH"
+      ],
+      "distinct_severities": [
+        "MODERATE",
+        "HIGH"
+      ],
+      "stable_across_cycles": false,
+      "agreement_count": 1,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "foreign_worker_original",
+      "baseline_severity": "MODERATE",
+      "cycle_severities": [
+        "LOW",
+        "MODERATE",
+        "MODERATE",
+        "MODERATE"
+      ],
+      "distinct_severities": [
+        "LOW",
+        "MODERATE"
+      ],
+      "stable_across_cycles": false,
+      "agreement_count": 3,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "age_group",
+      "baseline_severity": "LOW",
+      "cycle_severities": [
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW"
+      ],
+      "distinct_severities": [
+        "LOW"
+      ],
+      "stable_across_cycles": true,
+      "agreement_count": 4,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "race",
+      "baseline_severity": "MODERATE",
+      "cycle_severities": [
+        "LOW",
+        "MODERATE",
+        "MODERATE",
+        "MODERATE"
+      ],
+      "distinct_severities": [
+        "LOW",
+        "MODERATE"
+      ],
+      "stable_across_cycles": false,
+      "agreement_count": 3,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "sex",
+      "baseline_severity": "MODERATE",
+      "cycle_severities": [
+        "MODERATE",
+        "MODERATE",
+        "MODERATE",
+        "MODERATE"
+      ],
+      "distinct_severities": [
+        "MODERATE"
+      ],
+      "stable_across_cycles": true,
+      "agreement_count": 4,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "lending_club",
+      "attribute": "gender",
+      "baseline_severity": "LOW",
+      "cycle_severities": [
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW"
+      ],
+      "distinct_severities": [
+        "LOW"
+      ],
+      "stable_across_cycles": true,
+      "agreement_count": 4,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "lending_club",
+      "attribute": "income_level",
+      "baseline_severity": "LOW",
+      "cycle_severities": [
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW"
+      ],
+      "distinct_severities": [
+        "LOW"
+      ],
+      "stable_across_cycles": true,
+      "agreement_count": 4,
+      "cycles_scored": 4
+    },
+    {
+      "dataset": "lending_club",
+      "attribute": "loan_amount_level",
+      "baseline_severity": "LOW",
+      "cycle_severities": [
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW"
+      ],
+      "distinct_severities": [
+        "LOW"
+      ],
+      "stable_across_cycles": true,
+      "agreement_count": 4,
+      "cycles_scored": 4
+    }
+  ],
+  "agreement": {
+    "overall_rate": 0.75,
+    "agreed": 27,
+    "scored": 36,
+    "by_dataset": {
+      "german_credit": {
+        "agreed": 4,
+        "scored": 12,
+        "rate": 0.3333
+      },
+      "hmda": {
+        "agreed": 11,
+        "scored": 12,
+        "rate": 0.9167
+      },
+      "lending_club": {
+        "agreed": 12,
+        "scored": 12,
+        "rate": 1.0
+      }
+    },
+    "direction": {
+      "over_escalates": 7,
+      "under_escalates": 2,
+      "matches": 27
+    }
+  },
+  "by_strategy": [
+    {
+      "cycle": 1,
+      "strategy": "zero_shot",
+      "n": 9,
+      "mean_score": 76.67,
+      "min_score": 65.0,
+      "max_score": 95.0,
+      "refusal_count": 0,
+      "refusal_rate": 0.0,
+      "genuine_refusal_count": 0,
+      "genuine_refusal_rate": 0.0,
+      "brevity_only_refusal_count": 0,
+      "hallucinated_records": 3,
+      "hallucination_flag_count": 5,
+      "hallucination_rate": 0.3333,
+      "severity_agreement_rate": 0.5556
+    },
+    {
+      "cycle": 2,
+      "strategy": "chain_of_thought",
+      "n": 9,
+      "mean_score": 80.0,
+      "min_score": 65.0,
+      "max_score": 95.0,
+      "refusal_count": 0,
+      "refusal_rate": 0.0,
+      "genuine_refusal_count": 0,
+      "genuine_refusal_rate": 0.0,
+      "brevity_only_refusal_count": 0,
+      "hallucinated_records": 1,
+      "hallucination_flag_count": 1,
+      "hallucination_rate": 0.1111,
+      "severity_agreement_rate": 0.7778
+    },
+    {
+      "cycle": 3,
+      "strategy": "self_critique",
+      "n": 9,
+      "mean_score": 83.89,
+      "min_score": 65.0,
+      "max_score": 95.0,
+      "refusal_count": 0,
+      "refusal_rate": 0.0,
+      "genuine_refusal_count": 0,
+      "genuine_refusal_rate": 0.0,
+      "brevity_only_refusal_count": 0,
+      "hallucinated_records": 1,
+      "hallucination_flag_count": 1,
+      "hallucination_rate": 0.1111,
+      "severity_agreement_rate": 0.8889
+    },
+    {
+      "cycle": 4,
+      "strategy": "constrained",
+      "n": 9,
+      "mean_score": 76.56,
+      "min_score": 57.0,
+      "max_score": 87.0,
+      "refusal_count": 6,
+      "refusal_rate": 0.6667,
+      "genuine_refusal_count": 0,
+      "genuine_refusal_rate": 0.0,
+      "brevity_only_refusal_count": 6,
+      "hallucinated_records": 1,
+      "hallucination_flag_count": 1,
+      "hallucination_rate": 0.1111,
+      "severity_agreement_rate": 0.7778
+    }
+  ],
+  "cost": {
+    "total_usd": 0.227376,
+    "input_tokens": 52294,
+    "output_tokens": 9664,
+    "total_tokens": 61958,
+    "wall_clock_s": 94.8,
+    "usd_per_call": 0.006316
+  },
+  "legacy_contrast": {
+    "n_records": 24,
+    "mean_score": 69.08333333333333,
+    "refusals": 3,
+    "hallucination_flags": 16,
+    "current_n": 24,
+    "current_mean": 76.66666666666667,
+    "current_refusals": 3,
+    "current_hallucination_flags": 2,
+    "shared_datasets": [
+      "german_credit",
+      "hmda"
+    ]
+  }
+}

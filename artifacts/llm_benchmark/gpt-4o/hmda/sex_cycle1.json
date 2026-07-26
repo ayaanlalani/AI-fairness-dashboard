@@ -1,0 +1,47 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "sex",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "sex",
+    "severity": "MODERATE",
+    "what_is_wrong": "The fairness metrics suggest a moderate disparity in lending approvals between males and females. The disparate impact ratio is 0.9291, which is slightly below the threshold for moderate severity. The demographic parity difference and average odds difference are also non-zero, indicating some inequity in the distribution of favorable outcomes between the sexes.",
+    "why_is_wrong": "These disparities could be symptomatic of underlying biases in the mortgage lending process that disadvantage females compared to males. The lower selection rate for females, along with the slight discrepancies in true positive and false positive rates, suggest unequal treatment or historic biases affecting lending decisions.",
+    "how_to_fix": "To address these disparities, applying mitigation strategies such as Reweighing or DisparateImpactRemover may help to adjust the dataset or model to reduce the bias. Additionally, measures such as post-processing techniques like EqOddsPostprocessing could be employed to align lending decision rates more closely between men and women.",
+    "supporting_research": [
+      "Sarwal, K., Islam, S.R. (2024)",
+      "Sucharita, S., Shaw, K. (2025)"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "Sarwal, K., Islam, S.R. (2024)",
+    "Sucharita, S., Shaw, K. (2025)"
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.73,
+    "input_tokens": 1300,
+    "output_tokens": 251,
+    "total_tokens": 1551,
+    "input_cost_usd": 0.00325,
+    "output_cost_usd": 0.00251,
+    "total_cost_usd": 0.00576
+  },
+  "dry_run": false
+}
