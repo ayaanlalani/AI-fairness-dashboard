@@ -1,5 +1,5 @@
-% AI Fairness Dashboard — Formal Report
-% Compile: pdflatex report.tex  (run twice for references)
+% CMPT 310 Final Report
+% Compile: tectonic report.tex  (or pdflatex, run twice for references)
 \documentclass[11pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
@@ -29,13 +29,15 @@
 \graphicspath{{../artifacts/visualizations/}}
 
 \title{%
-  \textbf{Fairness Audit Benchmark for Lending Datasets:}\\[4pt]
-  \large An Evaluation Protocol for OpenAI-Based, Remediation-Ready Audits
+  \textbf{CMPT 415 Final Report}\\[6pt]
+  \Large AI Fairness Dashboard:\\[2pt]
+  \large Bias Detection, Qualitative Analysis, and LLM Benchmarking\\
+  in Lending Domains
 }
 \author{
-  NeurIPS 2026 Evaluations \& Datasets Artifact
+  Siddhant Jain \and Ayaan Lalani
 }
-\date{\today}
+\date{\today\\[4pt]\small Supervisor: Dr.\ Nicholas Vincent}
 
 \begin{document}
 \maketitle
@@ -44,26 +46,29 @@
 \begin{abstract}
 Algorithmic decision-making in lending carries significant fairness risks:
 models trained on historical data can perpetuate and amplify biases along
-demographic lines. This report frames the project as a NeurIPS Evaluations
-\& Datasets style artifact: an evaluation protocol and benchmark for testing
-whether LLM-based fairness auditors produce stable, statistically grounded,
-remediation-ready audits on lending datasets. We apply a deterministic
-fairness pipeline to the UCI German Credit dataset and the U.S.\ Home
-Mortgage Disclosure Act (HMDA) dataset for Georgia, then evaluate an OpenAI
-LLM auditor that receives Python-computed metric context and is asked to
-produce severity labels, root-cause narratives, and mitigation plans. We do
-not claim that the LLM independently recomputes fairness metrics; instead,
-we evaluate whether it reasons reliably from fixed quantitative evidence.
-Results show moderate disparities across several protected attributes and
-highlight recurring risks: small subgroup instability, proxy features,
-historical label bias, and API/model-version nondeterminism.
+demographic lines. This project defines a \textbf{reference audit
+specification}: the set of analysis metrics and response elements (root
+causes, severity labels, concrete remediation recommendations) that a
+fairness audit must provide to support actionable decision-making. We
+implement an end-to-end fairness pipeline applied to two lending datasets
+(UCI German Credit, HMDA Georgia), compute five AIF360-based disparity
+metrics, perform deterministic qualitative root-cause analysis, and
+benchmark a 4-cycle OpenAI gpt-4o auditor that receives Python-computed
+metric context. We do not claim that the LLM independently recomputes
+fairness metrics; instead, we evaluate whether it reasons reliably from
+fixed quantitative evidence across four prompt strategies (zero-shot,
+chain-of-thought, self-critique, constrained). Results show moderate
+disparities across most protected attributes. The LLM agrees with the
+deterministic oracle on 4 of 6 attribute--dataset pairs but systematically
+escalates severity for socially salient attributes (Sex, Race), confirming
+that metric grounding alone does not prevent narrative overreach.
 \end{abstract}
 
 % ===================================================================
 \section{Introduction}
 
-Automated lending decisions---credit scoring, mortgage approvals, loan
-pricing---increasingly rely on machine learning models. While these models
+Automated lending decisions (credit scoring, mortgage approvals, loan
+pricing) increasingly rely on machine learning models. While these models
 improve efficiency, they risk encoding historical biases present in
 training data, leading to disparate outcomes for protected groups defined
 by sex, age, race, or national origin.
@@ -74,7 +79,7 @@ impact. However, detecting bias requires more than a single metric: it
 demands multi-dimensional quantitative measurement, qualitative root-cause
 analysis, and independent validation.
 
-This artifact makes three contributions:
+This project makes three contributions:
 \begin{enumerate}[nosep]
   \item A \textbf{reproducible fairness pipeline} that preprocesses data,
         trains classifiers, computes five AIF360-based metrics, and generates
@@ -84,8 +89,9 @@ This artifact makes three contributions:
         recommends specific mitigations.
   \item An \textbf{OpenAI LLM benchmark} that tests whether a model can turn
         fixed Python-computed metric evidence into stable, statistically
-        cautious, remediation-ready fairness audits. Gemini results are kept
-        only as secondary legacy comparisons.
+        cautious, remediation-ready fairness audits across four prompt
+        strategies. Gemini 2.5 Flash results are included as a comparison
+        baseline.
 \end{enumerate}
 
 % ===================================================================
@@ -157,7 +163,7 @@ train-test split yields 200 test records for fairness evaluation.
 The Home Mortgage Disclosure Act requires U.S.\ lenders to report
 application-level data. We download 2022 Georgia records from the
 CFPB Data Browser API, filtering to originated and denied applications.
-After cleaning and sampling, the dataset contains 6{,}525 records.
+After cleaning, the dataset contains 10{,}978 records.
 Protected attributes:
 \begin{itemize}[nosep]
   \item \textbf{Race}: White, Black, Asian, American Indian, Pacific Islander, Multiracial.
@@ -176,7 +182,7 @@ test set is used for evaluation.
 \textbf{Dataset} & \textbf{Records} & \textbf{Test Set} & \textbf{Features} & \textbf{Protected Attrs} & \textbf{Target} & \textbf{\% Favorable} \\
 \midrule
 German Credit    & 1{,}000 & 200   & 10 & 3 (Sex, Age, Foreign) & Credit reliability & 70\% \\
-HMDA (Georgia)   & 6{,}525 & 2{,}196 & 8  & 3 (Race, Sex, Age)    & Loan approval      & 72\% \\
+HMDA (Georgia)   & 10{,}978 & 2{,}196 & 8  & 3 (Race, Sex, Age)    & Loan approval      & 72\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -201,8 +207,8 @@ execution (e.g., rerunning only the LLM benchmark step).
 
 \subsection{Model Training}
 
-For each dataset, we train two classifiers---Logistic Regression and
-Random Forest---using scikit-learn. Continuous features are standardized
+For each dataset, we train two classifiers (Logistic Regression and
+Random Forest) using scikit-learn. Continuous features are standardized
 (\texttt{StandardScaler}), categorical features are label-encoded, and
 missing values are imputed with the mode. We use an 80/20 stratified
 train-test split. Predictions on the test set are exported with original
@@ -276,8 +282,64 @@ instructs OpenAI to:
 
 The benchmark therefore measures metric-grounded reasoning, severity
 alignment, mitigation specificity, and research grounding. Gemini outputs
-from earlier experiments remain useful as secondary legacy comparisons, but
-they are not the primary benchmark story for this artifact.
+from earlier experiments are retained as a secondary comparison baseline.
+
+\subsection{Scholarly Evidence Integration}
+
+The pipeline integrates \textbf{Semantic Scholar} to retrieve relevant
+research papers at benchmark time. For each dataset and protected attribute,
+\texttt{scholarly\_evidence.py} issues up to six queries (general fairness,
+AIF360/Fairlearn methods, proxy discrimination, and dataset-specific
+queries) and injects the returned titles, abstracts, and citation counts
+directly into the LLM prompt under a ``Research evidence'' heading.
+
+This serves two purposes. First, it gives the LLM externally grounded
+citations rather than relying solely on training-time knowledge. Second,
+our scoring oracle flags citations in the LLM response that cannot be
+traced to the provided paper titles (hallucination detection via trigram
+overlap).
+
+\paragraph{Run-time outcome.}
+During the Section C benchmark run, Semantic Scholar returned
+\texttt{HTTP~403~Forbidden} for all queries, so \emph{no} injected
+research context was available to the model. Despite this, gpt-4o
+included paper citations in its responses from its own training
+knowledge. The \texttt{research\_grounding} subscore (10~pts) was
+non-zero for 12 of 24 cycles: the constrained prompt format (Cycle~4)
+achieved 10/10 for every attribute across both datasets, and
+chain-of-thought and self-critique cycles scored 10/10 for several
+attributes (Table~\ref{tab:rg-scores}).
+
+\begin{table}[H]
+\centering
+\caption{Research grounding subscore (max 10 pts) by cycle and dataset.
+         Semantic Scholar was unavailable; scores reflect gpt-4o
+         self-citations from training knowledge.}
+\label{tab:rg-scores}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dataset} & \textbf{Attribute} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} \\
+\midrule
+German Credit & Sex              & 0 & 0  & 0  & 10 \\
+              & AgeGroup         & 0 & 0  & 0  & 10 \\
+              & Foreign Worker   & 0 & 10 & 10 & 10 \\
+\midrule
+HMDA          & Race             & 0 & 10 & 10 & 10 \\
+              & Sex              & 0 & 0  & 0  & 10 \\
+              & Age Group        & 0 & 0  & 0  & 10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Implications.}
+The constrained prompt explicitly requires at least two citations,
+which forces the model to draw on training-time knowledge when live
+retrieval is unavailable. This is effective for producing structured
+output but introduces a reproducibility risk: citations cannot be
+verified against a live corpus, and the hallucination detector flagged
+16 citations across 24 gpt-4o cycles as unverifiable. Future runs
+should set \texttt{SEMANTIC\_SCHOLAR\_API\_KEY} to enable live
+retrieval and reduce reliance on unverifiable self-citation.
 
 % ===================================================================
 \section{Results}
@@ -388,14 +450,17 @@ remediation-ready guidance.
 
 \begin{table}[H]
 \centering
-\caption{OpenAI qualitative benchmark cycle scores.}
+\caption{OpenAI gpt-4o Section C benchmark: mean score per cycle averaged across all
+         protected attributes (zero\_shot / chain\_of\_thought / self\_critique / constrained).
+         All 24 API calls succeeded (0 quota failures vs.\ 79\% for Gemini 2.5 Flash).}
 \label{tab:openai-cycles}
-\begin{tabular}{lccc}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Dataset} & \textbf{Cycle 1} & \textbf{Cycle 2} & \textbf{Cycle 3} \\
+\textbf{Dataset} & \textbf{Cycle 1} & \textbf{Cycle 2} & \textbf{Cycle 3} & \textbf{Cycle 4} \\
+              & \small zero\_shot & \small chain\_of\_thought & \small self\_critique & \small constrained \\
 \midrule
-German Credit & 90.0 & 85.0 & 85.0 \\
-HMDA Georgia  & 90.0 & 85.0 & 90.0 \\
+German Credit & 63.3 & 53.3 & 73.3 & 75.7 \\
+HMDA Georgia  & 60.0 & 76.7 & 76.7 & 73.7 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -404,19 +469,20 @@ HMDA Georgia  & 90.0 & 85.0 & 90.0 \\
 
 \begin{table}[H]
 \centering
-\caption{Severity classification agreement: deterministic baseline vs.\ OpenAI.}
+\caption{Severity classification agreement: deterministic baseline vs.\ gpt-4o
+         (majority label across 4 cycles shown; instability = label varies across cycles).}
 \label{tab:severity}
 \begin{tabular}{llccl}
 \toprule
-\textbf{Dataset} & \textbf{Attribute} & \textbf{Baseline} & \textbf{OpenAI} & \textbf{Agree?} \\
+\textbf{Dataset} & \textbf{Attribute} & \textbf{Baseline} & \textbf{gpt-4o majority} & \textbf{Agree?} \\
 \midrule
-German Credit & Sex              & Moderate & Moderate & Yes \\
-              & AgeGroup         & Moderate & Moderate & Yes \\
-              & Foreign Worker   & Moderate & Moderate, unstable & Yes \\
+German Credit & Sex              & Moderate & \textbf{High} (3/4 cycles)   & No (escalated) \\
+              & AgeGroup         & Moderate & Moderate (3/4 cycles)        & Yes \\
+              & Foreign Worker   & Moderate & Moderate (3/4 cycles)        & Yes \\
 \midrule
-HMDA          & Race             & Moderate & Moderate & Yes \\
-              & Sex              & Moderate & Moderate & Yes \\
-              & Age Group        & Low      & Low      & Yes \\
+HMDA          & Race             & Moderate & Mixed: High 2, Moderate 2    & Partial \\
+              & Sex              & Moderate & Moderate (3/4 cycles)        & Yes \\
+              & Age Group        & Low      & Low (4/4 cycles)             & Yes \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -446,16 +512,17 @@ HMDA          & Race             & Moderate & Moderate & Yes \\
 
 \begin{table}[H]
 \centering
-\caption{OpenAI benchmark cost breakdown (current artifact run).}
+\caption{OpenAI gpt-4o Section C benchmark cost breakdown (4 cycles $\times$ 3 attributes
+         $\times$ 2 datasets = 24 API calls; all succeeded).}
 \label{tab:cost}
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Dataset} & \textbf{Input Tokens} & \textbf{Output Tokens} & \textbf{Latency (s)} & \textbf{Est.\ Cost} \\
 \midrule
-German Credit & 3{,}862   & 2{,}182 & 29.7  & \$0.1259 \\
-HMDA          & 4{,}032   & 1{,}666 & 14.2  & \$0.1070 \\
+German Credit & 10{,}353 & 2{,}904 & 121.3 & \$0.0549 \\
+HMDA          & 12{,}185 & 2{,}717 & 109.3 & \$0.0576 \\
 \midrule
-\textbf{Total} & 7{,}894 & 3{,}848 & 43.9 & \textbf{\$0.2329} \\
+\textbf{Total} & 22{,}538 & 5{,}621 & 230.6 & \textbf{\$0.1125} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -476,31 +543,37 @@ version.
 
 \subsection{Where Pipeline and OpenAI Agree}
 
-OpenAI preserved the deterministic severity labels for all six
-dataset-attribute pairs in the current artifact run. This is the desired
-behavior under our protocol: the LLM should not create its own metric
-baseline, but should translate the fixed metric evidence into clearer
-remediation guidance. The strongest agreement appears for German Credit Sex
-and AgeGroup and HMDA Race, where both the deterministic report and OpenAI
-identify moderate disparities and recommend pre-processing, constrained
-training, or post-processing interventions.
+The gpt-4o Section C benchmark (4 cycles $\times$ 3 attributes per dataset)
+shows majority-vote agreement with the deterministic baseline in 4 of 6
+attribute-dataset pairs. Agreement is strongest for HMDA Age Group (Low,
+unanimous across all 4 cycles), German Credit AgeGroup and Foreign Worker
+(both Moderate, 3/4 cycles), and HMDA Sex (Moderate, 3/4 cycles). For these
+attributes the LLM translated fixed metric evidence into severity labels that
+match the rule-based oracle, demonstrating the utility of metric-grounded
+prompting.
 
 \subsection{Where the Benchmark Exposes Risk}
 
-The main risk is not arithmetic disagreement, because arithmetic is owned by
-the deterministic pipeline. The risk is \textbf{narrative overreach}: an LLM
-can produce plausible causal language or detailed mitigation plans that
-exceed the evidence available in the artifact. This is especially important
-for small subgroups such as German Credit foreign-worker status and rare
-HMDA race categories. The protocol therefore records context payloads,
-baseline severities, prompt text, raw responses, and scoring outputs so that
-reviewers can inspect whether LLM claims stay grounded in the provided
-metric evidence.
+Two attributes show instability or disagreement. German Credit
+\texttt{Sex\_original} (DI~=~0.8595, deterministic severity: Moderate)
+receives a majority severity of High from gpt-4o (3 of 4 cycles), indicating
+that the LLM \emph{escalates} socially salient attributes beyond what the
+metric evidence supports. HMDA Race (DI~=~0.8956) splits evenly between High
+and Moderate across cycles, reflecting prompt-format sensitivity.
 
-Legacy Gemini runs illustrate a complementary failure mode: when an LLM is
-asked to compute or choose metric baselines itself, small subgroup choices
-can dominate the result and produce unstable severity labels. This motivates
-the OpenAI-primary design used for the submission artifact.
+The broader risk is \textbf{narrative overreach}: an LLM can produce
+plausible causal language or escalated severity claims that exceed what the
+provided evidence supports. This is compounded for small subgroups (German
+Credit foreign-worker, rare HMDA race categories), where the metric context
+itself carries high uncertainty. The protocol therefore records context
+payloads, baseline severities, prompt text, raw responses, and scoring
+outputs so that reviewers can inspect grounding.
+
+Legacy Gemini runs provide a stark contrast: 19 of 24 cycles (79\%) scored
+0/100 due to quota exhaustion and refusals, while gpt-4o achieved 0
+quota failures across all 24 cycles (mean score 67/100). This confirms that
+structural guardrails (deterministic oracle grounding plus a reliable
+provider) are necessary for reproducible audit output.
 
 \subsection{Strengths and Limitations}
 
@@ -517,6 +590,17 @@ recommendations. Limitations: possible narrative overreach; nondeterminism
 across runs and API/model versions; sensitivity to prompt design; higher
 latency and cost than deterministic Python; and dependence on Python context
 for metric grounding.
+
+\paragraph{Scope disclaimers.}
+This artifact measures statistical group disparity under specific metric
+definitions. We make no causal claims (observed disparities may reflect
+confounding factors not captured in the data), no legal compliance
+determinations (ECOA/Fair Housing Act assessments require legal expertise
+beyond algorithmic auditing), and no guarantee of generalizability to other
+datasets, time periods, or jurisdictions. Small subgroups (e.g.,
+\texttt{foreign\_worker\_original}, rare HMDA race categories) produce
+statistically unreliable metrics; severity labels for these groups should be
+interpreted with caution.
 
 \subsection{Value of Qualitative Analysis}
 
@@ -539,16 +623,15 @@ findings:
   \item Both German Credit and HMDA exhibit \textsc{Moderate} bias on
         most protected attributes, driven by historical label disparities
         and proxy features.
-  \item OpenAI agrees with deterministic severity labels in the current run
-        when given fixed Python-computed metric context, but this should be
-        interpreted as prompt- and model-version-specific rather than a
-        universal guarantee.
+  \item gpt-4o agrees with deterministic severity labels in 4/6 cases
+        (majority-vote across 4 prompt cycles), but escalates severity for
+        socially salient attributes (Sex, Race), confirming that metric
+        grounding alone does not prevent LLM overclaiming.
   \item LLM auditing can improve remediation narrative quality, but requires
         explicit guardrails for metric grounding, subgroup-size uncertainty,
         reproducibility, and API/model versioning.
-  \item The responsible-release materials---README, Docker/Make/CI scaffold,
-        citation metadata, and data cards---are part of the artifact rather
-        than ancillary documentation.
+  \item The project infrastructure (pipeline orchestration, documentation, and
+        reproducibility scaffold) is part of the deliverable.
 \end{itemize}
 
 \paragraph{Future work.}

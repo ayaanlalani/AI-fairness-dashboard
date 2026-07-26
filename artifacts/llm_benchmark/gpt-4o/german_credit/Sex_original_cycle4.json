@@ -1,0 +1,46 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "Sex_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "Sex_original",
+    "severity": "HIGH",
+    "what_is_wrong": "The Disparate Impact value is 0.8595, which is below the threshold of 0.95 indicating potential bias.",
+    "why_is_wrong": "An 0.8595 value for Disparate Impact means that female applicants are selected at a lower rate compared to male applicants when the selection rate should be more balanced to ensure fairness. This deviation can lead to disadvantageous outcomes for the unprivileged group.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Feldman, M., Friedler, S. A., Moeller, J., Scheidegger, C., & Venkatasubramanian, S. (2015). Certifying and removing disparate impact.",
+      "Zafar, M. B., Valera, I., Gomez-Rodriguez, M., & Gummadi, K. P. (2017). Fairness beyond disparate treatment & disparate impact: Learning classification without disparate mistreatment."
+    ]
+  },
+  "score": {
+    "total_score": 65.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 65.0/100. Completeness=40.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [
+    "Feldman, M., Friedler, S. A., Moeller, J., Scheidegger, C., & Venkatasubramanian, S. (2015). Certifying and removing disparate impact.",
+    "Zafar, M. B., Valera, I., Gomez-Rodriguez, M., & Gummadi, K. P. (2017). Fairness beyond disparate treatment & disparate impact: Learning classification without disparate mistreatment."
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.83,
+    "input_tokens": 825,
+    "output_tokens": 225,
+    "total_tokens": 1050,
+    "input_cost_usd": 0.002063,
+    "output_cost_usd": 0.00225,
+    "total_cost_usd": 0.004313
+  }
+}

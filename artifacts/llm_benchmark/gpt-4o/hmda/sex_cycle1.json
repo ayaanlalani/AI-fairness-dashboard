@@ -1,0 +1,40 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "sex",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "sex",
+    "severity": "LOW",
+    "what_is_wrong": "The analysis indicates a low level of bias against females in mortgage lending decisions when compared to males. The calculated Disparate Impact is 0.9291, which is within acceptable bounds and indicates that females have access to favorable decisions at a rate not substantially less than males. The Demographic Parity Difference of -0.0518 suggests a slight disparity in the selection rates between males and females, favoring males. However, other metrics like Equal Opportunity Difference (-0.0076) and Average Odds Difference (0.0084) show that the performance differences between groups are minimal.",
+    "why_is_wrong": "The slight discrepancies as evidenced by Demographic Parity Difference and Disparate Impact suggest underlying biases in the selection process that may still need attention. While the impact is not severe, these metrics indicate that males might be favored slightly more in mortgage lending approvals. Although the metric values are above critical severity thresholds, these biases can perpetuate historical inequalities, deter fair competition, and result in less favorable conditions for females.",
+    "how_to_fix": "To mitigate these disparities, employing fairness interventions such as DisparateImpactRemover or CalibratedEqOddsPostprocessing can help ensure that the model's predictions are less biased towards males. Further investigation into the decision-making process in mortgage lending, using tools like the ExponentiatedGradient from Fairlearn to constrain disparities directly, could bring about better balance in outcomes across genders. Educating decision-makers and providing transparency in processes can also improve fairness perceptions.",
+    "supporting_research": []
+  },
+  "score": {
+    "total_score": 60.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 60.0/100. Completeness=35.0, Severity agreement=0.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 6.26,
+    "input_tokens": 722,
+    "output_tokens": 333,
+    "total_tokens": 1055,
+    "input_cost_usd": 0.001805,
+    "output_cost_usd": 0.00333,
+    "total_cost_usd": 0.005135
+  }
+}

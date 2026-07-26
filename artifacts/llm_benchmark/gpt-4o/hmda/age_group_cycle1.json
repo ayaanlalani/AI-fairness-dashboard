@@ -1,0 +1,40 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "age_group",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The analysis of the 'age_group' attribute indicates minimal disparities among the different age categories in the HMDA Mortgage Lending dataset for Georgia. The metrics show that the disparate impact is slightly above 1, indicating fairness in treatment among age groups. The demographic parity difference and equal opportunity difference are near zero, suggesting no significant discrimination in terms of selection and true positive rates among age groups.",
+    "why_is_wrong": "Although the metrics show low disparity and no critical issues with fairness for the 'age_group' attribute, there is always potential for underlying biases not captured here. Current statistics like the Theil Index suggest some level of distributional inequality. Furthermore, minor differences in base rates and selection rates could grow over time, potentially leading to more significant discrepancies if left unmonitored.",
+    "how_to_fix": "To maintain fairness and monitor potential disparities over time, regular audits should be implemented using fairness-enhancing interventions such as reweighing or threshold optimization tools. It's essential to ensure that these metrics are consistently monitored and that any emerging trends are addressed promptly. Engaging with stakeholders to explain these metrics and incorporating their feedback can help develop more comprehensive fairness strategies.",
+    "supporting_research": []
+  },
+  "score": {
+    "total_score": 70.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 70.0/100. Completeness=35.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 6.57,
+    "input_tokens": 795,
+    "output_tokens": 265,
+    "total_tokens": 1060,
+    "input_cost_usd": 0.001988,
+    "output_cost_usd": 0.00265,
+    "total_cost_usd": 0.004638
+  }
+}

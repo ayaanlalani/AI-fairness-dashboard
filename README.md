@@ -50,15 +50,37 @@ export SEMANTIC_SCHOLAR_API_KEY="..."
 
 Older course-project folders for diabetes, healthcare insurance, and Lending Club remain in the repository for provenance, but they are not the main NeurIPS artifact scope.
 
+## Reviewer Checklist
+
+| Step | Command | Est. time | Needs API key? |
+|------|---------|-----------|----------------|
+| 1. Install deps | `pip install -r requirements.txt` | ~1 min | No |
+| 2. Smoke test | `make smoke` | <5 sec | No |
+| 3. Fairness pipeline | `make fairness` | 3–5 min | No (Semantic Scholar optional) |
+| 4. OpenAI benchmark | `make benchmark` | ~10 min | Yes (`OPENAI_API_KEY`) |
+| 5. Paper build | `make paper` | ~30 sec | No (requires LaTeX) |
+
+Expected outputs after `make fairness`:
+- `artifacts/german_credit/fairness/fairness_metrics.csv`
+- `artifacts/hmda/fairness/fairness_metrics.csv`
+- Qualitative reports and visualizations under each dataset's `metrics/fairness/` directory
+
+Expected outputs after `make benchmark`:
+- `artifacts/llm_benchmark/gpt-4o/german_credit/_summary.json`
+- `artifacts/llm_benchmark/gpt-4o/hmda/_summary.json`
+- Per-attribute per-cycle JSON files with scores, refusal flags, and hallucination flags
+
 ## Setup
 
-Python 3.10+ is recommended.
+**Python 3.11 is required.** The `.venv` included in this repository uses Python 3.14 which has an incompatible pandas C extension. Use a fresh environment with Python 3.11:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+python3.11 -m venv .venv311
+source .venv311/bin/activate
 pip install -r requirements.txt
 ```
+
+The `Makefile` auto-detects `python3.11` when available (takes precedence over `.venv/bin/python`).
 
 The same dependencies are declared in `pyproject.toml` for `uv` users:
 
@@ -173,6 +195,33 @@ The repository license covers this code, documentation, and artifact scaffolding
 - Fairness metrics are computed by deterministic Python code, with AIF360 used when available and manual fallback logic otherwise.
 - OpenAI model outputs may vary across API/model versions even with fixed prompts. The benchmark therefore records prompts, context payloads, raw responses, model names, token usage, and cost estimates.
 - Small subgroup results, especially German Credit `foreign_worker` and rare HMDA race categories, should be treated as statistically fragile.
+
+## Troubleshooting
+
+**`make smoke` fails with import errors**
+- Ensure you are using Python 3.11: `python3.11 --version`
+- Re-install dependencies: `python3.11 -m pip install -r requirements.txt`
+
+**`make fairness` hangs or is very slow (2–5 min)**
+- This is expected: the qualitative step queries Semantic Scholar for research evidence.
+- The circuit breaker trips after 2 consecutive timeouts (8 s each), so worst-case is ~16 s of network wait then normal completion.
+- Set `SEMANTIC_SCHOLAR_API_KEY` to increase the API rate limit.
+- If the hang persists beyond 10 minutes, kill the process and check network connectivity to `api.semanticscholar.org`.
+
+**`aif360` import warns about missing TensorFlow or inFairness**
+- These warnings are non-fatal. The benchmark uses only the base AIF360 metrics (no AdversarialDebiasing or SenSR).
+
+**`make benchmark` fails with `OPENAI_API_KEY not set`**
+- Export the key before running: `export OPENAI_API_KEY="sk-..."`
+- The benchmark does NOT silently fall back to Gemini; it exits with a clear error if the key is absent.
+
+**`make paper` fails with `pdflatex: command not found`**
+- Install a LaTeX distribution: `brew install --cask mactex` (macOS) or `apt install texlive-full` (Linux).
+- As a workaround, read `report/report.tex` directly or view pre-rendered figures in `artifacts/visualizations/`.
+
+**Python version compatibility**
+- The `.venv` in this repo uses Python 3.14 (from course setup) with a broken pandas C extension.
+- Always use a separate `python3.11` environment for all pipeline steps.
 
 ## Citation
 

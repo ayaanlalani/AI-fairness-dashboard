@@ -1,0 +1,40 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "race",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "HIGH",
+    "what_is_wrong": "The dataset shows a high level of demographic disparity among different racial groups in mortgage lending outcomes. Notably, the disparate impact metric for the Black group is 0.8956, which is below the moderate severity threshold of 0.95, indicating a significant disparity compared to the privileged group, White.",
+    "why_is_wrong": "The demographic disparity arises from systemic biases that might be embedded in the historical data and could perpetuate discrimination against non-privileged groups. For instance, base rates across groups differ substantially, such as the high favorable outcome for Asians compared to the low for Multiracials, suggesting a reflection of societal biases. The significant size imbalance between groups further complicates the reliability of the fairness metrics.",
+    "how_to_fix": "To mitigate these disparities, techniques from fairness toolkits can be employed such as Reweighing and DisparateImpactRemover to balance outcomes, and ExponentiatedGradient or GridSearch for finding optimal fairness-accuracy trade-offs. Additionally, efforts should focus on collecting more data from underrepresented groups to improve metric reliability and promote equity.",
+    "supporting_research": []
+  },
+  "score": {
+    "total_score": 50.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 50.0/100. Completeness=35.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 4.39,
+    "input_tokens": 1129,
+    "output_tokens": 252,
+    "total_tokens": 1381,
+    "input_cost_usd": 0.002822,
+    "output_cost_usd": 0.00252,
+    "total_cost_usd": 0.005343
+  }
+}

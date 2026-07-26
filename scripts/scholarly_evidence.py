@@ -27,6 +27,8 @@ REQUEST_INTERVAL_S = 2.0
 MAX_RETRIES = 2
 _RATE_LIMIT_BACKOFF_S = 15  # base wait on 429; doubles each retry
 _CIRCUIT_OPEN = False  # once tripped, skip all Semantic Scholar calls this run
+_CONSECUTIVE_ERRORS = 0  # trip circuit after 2 consecutive non-429 failures
+_CIRCUIT_ERROR_THRESHOLD = 2
 MIN_CITATION_COUNT = 5
 _LAST_REQUEST_TS = 0.0
 
@@ -46,11 +48,23 @@ def _trip_circuit() -> None:
     log.warning("Semantic Scholar circuit breaker OPEN — skipping all remaining queries this run.")
 
 
+def _record_error() -> None:
+    global _CONSECUTIVE_ERRORS
+    _CONSECUTIVE_ERRORS += 1
+    if _CONSECUTIVE_ERRORS >= _CIRCUIT_ERROR_THRESHOLD:
+        _trip_circuit()
+
+
+def _record_success() -> None:
+    global _CONSECUTIVE_ERRORS
+    _CONSECUTIVE_ERRORS = 0
+
+
 def search_semantic_scholar(
     query: str,
     limit: int = 3,
     fields: str = DEFAULT_FIELDS,
-    timeout_s: int = 20,
+    timeout_s: int = 8,
 ) -> list[dict[str, Any]]:
     """Return simplified Semantic Scholar search results for a query."""
     if _CIRCUIT_OPEN:
@@ -86,11 +100,14 @@ def search_semantic_scholar(
                 _trip_circuit()
             else:
                 log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
+                _record_error()
             return []
         except Exception as exc:
             log.warning(f"Semantic Scholar query failed for '{query}': {exc}")
+            _record_error()
             return []
 
+    _record_success()
     papers: list[dict[str, Any]] = []
     for item in payload.get("data", []):
         papers.append({

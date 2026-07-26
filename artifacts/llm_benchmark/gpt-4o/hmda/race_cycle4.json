@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "race",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "HIGH",
+    "what_is_wrong": "The Disparate Impact (DI) value is 0.8956.",
+    "why_is_wrong": "The DI value indicates that individuals from the non-privileged groups are less likely to receive favorable outcomes compared to the privileged group (White), indicating a significant inequality in the model predictions across different racial groups.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Research on Disparate Impact (DI) mitigation methods.",
+      "Applications of DisparateImpactRemover in fairness interventions."
+    ]
+  },
+  "score": {
+    "total_score": 57.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 57.0/100. Completeness=32.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [
+    "Research on Disparate Impact (DI) mitigation methods.",
+    "Applications of DisparateImpactRemover in fairness interventions."
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.59,
+    "input_tokens": 1241,
+    "output_tokens": 130,
+    "total_tokens": 1371,
+    "input_cost_usd": 0.003102,
+    "output_cost_usd": 0.0013,
+    "total_cost_usd": 0.004403
+  }
+}
