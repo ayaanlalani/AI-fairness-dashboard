@@ -1,0 +1,119 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "model": "gpt-4o",
+  "total_results": 12,
+  "total_cost_usd": 0.0576,
+  "elapsed_s": 109.3,
+  "refusal_count": 2,
+  "hallucination_count": 5,
+  "cycle_avg_score": {
+    "1": 60.0,
+    "2": 76.67,
+    "3": 76.67,
+    "4": 73.67
+  },
+  "attributes": [
+    "age_group",
+    "race",
+    "sex"
+  ],
+  "cycles": [
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "race",
+      "score": 50.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "race",
+      "score": 80.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "race",
+      "score": 80.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "race",
+      "score": 57.0,
+      "refusal_detected": true,
+      "hallucination_count": 2
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "sex",
+      "score": 60.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "sex",
+      "score": 80.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "sex",
+      "score": 80.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "sex",
+      "score": 87.0,
+      "refusal_detected": false,
+      "hallucination_count": 2
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "age_group",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "age_group",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "age_group",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "age_group",
+      "score": 77.0,
+      "refusal_detected": true,
+      "hallucination_count": 2
+    }
+  ]
+}

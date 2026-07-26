@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "sex",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "sex",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact (DI) value is 0.9291.",
+    "why_is_wrong": "The Disparate Impact value of 0.9291 indicates a moderate level of disparity in treatment between males and females in the dataset. This value is below the threshold of 0.95, which suggests an imbalance that might affect fairness perceptions.",
+    "how_to_fix": "DisparateImpactRemover can be applied to the data to adjust feature distributions for reducing disparity and aligning them closer to desired fairness thresholds.",
+    "supporting_research": [
+      "Verma, S., and Rubin, J. (2018). Fairness Definitions Explained. 2018 IEEE/ACM International Workshop on Software Fairness (FairWare).",
+      "Feldman, M., Friedler, S. A., Moeller, J., Scheidegger, C., and Venkatasubramanian, S. (2015). Certifying and removing disparate impact. In Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining."
+    ]
+  },
+  "score": {
+    "total_score": 87.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 87.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "Verma, S., and Rubin, J. (2018). Fairness Definitions Explained. 2018 IEEE/ACM International Workshop on Software Fairness (FairWare).",
+    "Feldman, M., Friedler, S. A., Moeller, J., Scheidegger, C., and Venkatasubramanian, S. (2015). Certifying and removing disparate impact. In Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining."
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.22,
+    "input_tokens": 834,
+    "output_tokens": 241,
+    "total_tokens": 1075,
+    "input_cost_usd": 0.002085,
+    "output_cost_usd": 0.00241,
+    "total_cost_usd": 0.004495
+  }
+}

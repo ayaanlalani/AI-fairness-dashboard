@@ -38,7 +38,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from llm_benchmark_common import build_context_and_baseline, score_llm_output
+from llm_benchmark_common import (
+    build_context_and_baseline,
+    enforce_llm_gate,
+    score_llm_output,
+)
 from scholarly_evidence import gather_research_context, format_evidence_for_prompt
 
 logging.basicConfig(
@@ -627,6 +631,9 @@ def run_llm_benchmark(
 ) -> Path:
     """Run the full LLM benchmark and write reports. Returns comparison path."""
     benchmark_t0 = time.time()
+    # Guardrail gate before the key read. Gemini is permanently "blocked", so
+    # this legacy path now fails closed instead of silently spending.
+    enforce_llm_gate(GEMINI_MODEL)
     api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         raise RuntimeError(

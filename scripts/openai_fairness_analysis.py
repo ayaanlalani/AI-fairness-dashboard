@@ -27,7 +27,11 @@ from typing import Any
 
 import pandas as pd
 
-from llm_benchmark_common import build_context_and_baseline, score_llm_output
+from llm_benchmark_common import (
+    build_context_and_baseline,
+    enforce_llm_gate,
+    score_llm_output,
+)
 from scholarly_evidence import format_evidence_for_prompt
 
 logging.basicConfig(
@@ -574,6 +578,9 @@ def run_llm_benchmark(
     cycles: int = 3,
 ) -> Path:
     benchmark_t0 = time.time()
+    # Guardrail gate must run BEFORE the key is read (staging prompt §0.1).
+    # This path was previously ungated even though it is the Track H entry point.
+    enforce_llm_gate(model)
     api_key = os.environ.get("OPENAI_API_KEY", "")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY not set. Export it or add to a .env file.")

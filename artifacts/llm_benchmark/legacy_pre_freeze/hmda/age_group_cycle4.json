@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "age_group",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The Disparate Impact (DI) value is 1.0138.",
+    "why_is_wrong": "The disparate impact is close to 1, indicating minimal disparity. The equality measures suggest fairly balanced treatment across age groups, with the demographic parity difference and other metrics close to zero. Hence, the severity is low.",
+    "how_to_fix": "Reweighing",
+    "supporting_research": [
+      "Feldman et al. 2015: \"Certifying and removing disparate impact.\"",
+      "Kamiran et al. 2012: \"Data preprocessing techniques for classification without discrimination.\""
+    ]
+  },
+  "score": {
+    "total_score": 77.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 77.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [
+    "Feldman et al. 2015: \"Certifying and removing disparate impact.\"",
+    "Kamiran et al. 2012: \"Data preprocessing techniques for classification without discrimination.\""
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.57,
+    "input_tokens": 907,
+    "output_tokens": 148,
+    "total_tokens": 1055,
+    "input_cost_usd": 0.002267,
+    "output_cost_usd": 0.00148,
+    "total_cost_usd": 0.003747
+  }
+}

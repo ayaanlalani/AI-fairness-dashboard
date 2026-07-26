@@ -17,6 +17,30 @@ below until that gate is satisfied.
 | Frozen prompt packs | `artifacts/llm_benchmark/dry_run/<dataset>/<attr>_cycle<N>.json` (`prompt` field) |
 | Rate limiting | 7 s sleep between cycles (≤10 RPM) |
 | Retry policy | up to 5 attempts, exponential backoff base 20 s |
+| Cost cap | **$15.00**, enforced (see below) |
+
+### Cost cap enforcement (added Stage B)
+
+Stage B's pre-flight was specified as "confirm every benchmark command passes
+`--max_cost_usd` ≤ 15 or inherits the config cap". Neither was possible:
+`llm_benchmark.py` had **no cost flag and no cap logic at all** — it only summed
+spend post hoc — and `max_cost_usd_per_run` had **zero code readers** anywhere in
+the repo. The confirmation would have been vacuous, so the enforcement was built:
+
+- `--max_cost_usd` on `llm_benchmark.py`, defaulting to `max_cost_usd_per_run`
+  (now `15.0`). A live run with neither available is a hard argparse error.
+- Spend is checked **before** each call using a padded estimate, so the cap
+  trips ahead of an overrun rather than after it. `CostCapExceeded` stops the
+  remaining cycles and attributes, then still writes `_summary.json` with
+  `aborted_on_cost_cap`, `cumulative_spend_usd` and `attributes_completed`.
+- The cap is **cumulative across invocations**, persisted to
+  `artifacts/llm_benchmark/spend_ledger.json`. Stage 3 runs three separate
+  processes; a per-process counter would have allowed 3 × $15.
+- Prices live in one table (`llm_benchmark_common.MODEL_PRICES`) so the pre-call
+  estimate and the post-hoc accounting cannot drift. gpt-4o is $2.50/$10.00 per
+  1M tokens.
+
+Dry runs bill nothing, construct no ledger, and need no cap.
 
 ## Cost estimate
 

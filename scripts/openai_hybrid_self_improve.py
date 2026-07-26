@@ -24,7 +24,11 @@ from typing import Any
 
 import pandas as pd
 
-from llm_benchmark_common import build_context_and_baseline, score_llm_output
+from llm_benchmark_common import (
+    build_context_and_baseline,
+    enforce_llm_gate,
+    score_llm_output,
+)
 from openai_fairness_analysis import (
     OUTPUT_SCHEMA,
     build_prompt,
@@ -488,6 +492,13 @@ def run_hybrid_plan(config_path: Path, rubric_path: Path, guardrails_path: Path,
     if dataset_key not in DATASET_PRESETS:
         raise ValueError(f"Unknown pilot dataset '{dataset_key}'")
     dataset_cfg = DATASET_PRESETS[dataset_key]
+
+    # Guardrail gate before the key read. Both the generator and the judge model
+    # are checked, since either can be pointed at a different provider.
+    for _model_key in ("generator_model", "judge_model"):
+        _model = cfg.get(_model_key)
+        if _model:
+            enforce_llm_gate(_model)
 
     api_key = os.environ.get("OPENAI_API_KEY", "")
     if not api_key:

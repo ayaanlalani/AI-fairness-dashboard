@@ -1,0 +1,40 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "sex",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "sex",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact (DI) metric for sex in the HMDA Mortgage Lending dataset for Georgia is 0.9291, which falls below the threshold of 0.95, indicating a moderate disparity in the selection rates between males and females.",
+    "why_is_wrong": "The moderate disparity in DI suggests that females are experiencing a lower selection rate for favorable lending outcomes compared to males. This can often result from systemic biases entrenched in historical lending practices and credit accessibility, where males have traditionally been favored.",
+    "how_to_fix": "To mitigate the observed disparity, the DisparateImpactRemover from AIF360 could be employed as it specifically addresses and corrects for differences in selection rates by transforming the data to reduce bias while retaining dataset utility.",
+    "supporting_research": []
+  },
+  "score": {
+    "total_score": 80.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 80.0/100. Completeness=35.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.52,
+    "input_tokens": 1021,
+    "output_tokens": 186,
+    "total_tokens": 1207,
+    "input_cost_usd": 0.002553,
+    "output_cost_usd": 0.00186,
+    "total_cost_usd": 0.004412
+  }
+}

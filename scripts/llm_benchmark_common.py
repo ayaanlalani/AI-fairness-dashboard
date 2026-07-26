@@ -5,7 +5,11 @@ Shared helpers for qualitative-only LLM fairness benchmarking.
 """
 from __future__ import annotations
 
+import json
+import logging
+import time
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -19,6 +23,182 @@ from qualitative_analysis import (
     per_group_breakdown,
 )
 from scholarly_evidence import build_attribute_queries, gather_research_context
+
+log = logging.getLogger(__name__)
+
+# ═══════════════════════════════════════════════════════════════════════
+#  Guardrail gate + cost enforcement
+#
+#  Both live here rather than in llm_benchmark.py because every script that
+#  reads an LLM key already imports this module. Before this, the gate existed
+#  only in llm_benchmark.py while openai_fairness_analysis.py,
+#  openai_hybrid_self_improve.py and llm_fairness_analysis.py read
+#  OPENAI_API_KEY/GEMINI_API_KEY with no gate at all — so the standing
+#  verification claim in docs/RESEARCH_STAGING_PROMPT.md §4 ("no new file
+#  reads an LLM key outside the gated client-construction path") was not true.
+# ═══════════════════════════════════════════════════════════════════════
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+GUARDRAILS_PATH = REPO_ROOT / "configs" / "research_guardrails.json"
+SPEND_LEDGER_PATH = REPO_ROOT / "artifacts" / "llm_benchmark" / "spend_ledger.json"
+
+# Per-1M-token list prices, USD. Keep in one place so cost estimates and
+# post-hoc accounting cannot drift apart.
+MODEL_PRICES: dict[str, tuple[float, float]] = {
+    "gpt-4o": (2.50, 10.00),
+    "gpt-4o-mini": (0.15, 0.60),
+    "o3": (2.00, 8.00),
+    "gemini-2.5-flash": (0.10, 0.40),
+}
+_DEFAULT_PRICE = (2.50, 10.00)
+
+
+class CostCapExceeded(RuntimeError):
+    """Raised when a call would push cumulative spend past the configured cap."""
+
+
+def load_guardrails() -> dict[str, Any]:
+    """Read the guardrail config. Missing or unparseable files fail closed."""
+    if not GUARDRAILS_PATH.exists():
+        return {}
+    try:
+        return json.loads(GUARDRAILS_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def provider_for_model(model: str) -> str:
+    return "openai" if model.startswith(("gpt", "o1", "o3")) else "gemini"
+
+
+def enforce_llm_gate(model: str) -> None:
+    """Refuse live LLM calls unless the guardrail config approves the provider.
+
+    Gate policy: docs/RESEARCH_STAGING_PROMPT.md §0. Fails closed.
+    """
+    provider = provider_for_model(model)
+    status = load_guardrails().get("llm_providers", {}).get(provider, "blocked")
+    if status != "approved":
+        raise RuntimeError(
+            f"Guardrail gate: provider '{provider}' is '{status}' in {GUARDRAILS_PATH}. "
+            "Live LLM calls require the user to flip it to 'approved'. "
+            "Use --dry-run to build prompt packs without any API call."
+        )
+
+
+def guardrail_max_cost_usd(default: float | None = None) -> float | None:
+    """Return `max_cost_usd_per_run` from the guardrail config, if set."""
+    raw = load_guardrails().get("max_cost_usd_per_run", default)
+    try:
+        return None if raw is None else float(raw)
+    except (TypeError, ValueError):
+        return default
+
+
+def model_prices(model: str) -> tuple[float, float]:
+    return MODEL_PRICES.get(model, _DEFAULT_PRICE)
+
+
+def cost_for_tokens(model: str, input_tokens: int, output_tokens: int) -> float:
+    price_in, price_out = model_prices(model)
+    return (input_tokens / 1_000_000) * price_in + (output_tokens / 1_000_000) * price_out
+
+
+def estimate_call_cost_usd(
+    prompt: str, model: str, expected_output_tokens: int = 1200
+) -> float:
+    """Conservative pre-call cost estimate.
+
+    Input tokens are approximated at 4 chars/token, then padded 15% so the cap
+    trips *before* an overrun rather than after it.
+    """
+    approx_input = max(1, len(prompt) // 4)
+    est = cost_for_tokens(model, approx_input, expected_output_tokens)
+    return est * 1.15
+
+
+class SpendLedger:
+    """Cumulative spend tracker enforcing a hard USD cap.
+
+    The cap must hold across the whole program, not per process: Stage 3 runs
+    three separate `llm_benchmark.py` invocations, so a purely in-memory
+    counter would let 3 x cap through. Spend is therefore persisted to
+    `artifacts/llm_benchmark/spend_ledger.json` and re-read on construction.
+    """
+
+    def __init__(
+        self,
+        max_cost_usd: float | None,
+        path: Path | None = None,
+        run_label: str = "",
+    ) -> None:
+        self.max_cost_usd = max_cost_usd
+        self.path = path or SPEND_LEDGER_PATH
+        self.run_label = run_label
+        self.entries: list[dict[str, Any]] = []
+        self._prior_total = 0.0
+        if self.path.exists():
+            try:
+                data = json.loads(self.path.read_text(encoding="utf-8"))
+                self._prior_total = float(data.get("total_usd", 0.0) or 0.0)
+                self.entries = list(data.get("entries", []))
+            except (json.JSONDecodeError, OSError, TypeError, ValueError):
+                log.warning("Spend ledger at %s unreadable; starting a fresh one.", self.path)
+
+    @property
+    def spent_usd(self) -> float:
+        return round(self._prior_total, 6)
+
+    @property
+    def remaining_usd(self) -> float | None:
+        if self.max_cost_usd is None:
+            return None
+        return round(max(0.0, self.max_cost_usd - self.spent_usd), 6)
+
+    def assert_headroom(self, projected_usd: float, label: str = "") -> None:
+        """Abort *before* a call that would breach the cap."""
+        if self.max_cost_usd is None:
+            return
+        if self.spent_usd + projected_usd > self.max_cost_usd:
+            raise CostCapExceeded(
+                f"Cost cap reached: ${self.spent_usd:.4f} already spent, next call "
+                f"({label or 'unlabelled'}) projected at ${projected_usd:.4f}, cap is "
+                f"${self.max_cost_usd:.2f}. Aborting before the call. "
+                f"Raise --max_cost_usd or max_cost_usd_per_run to continue."
+            )
+
+    def record(self, usage: dict[str, Any], **meta: Any) -> None:
+        cost = float(usage.get("total_cost_usd", 0.0) or 0.0)
+        if cost <= 0:
+            return  # dry-run / failed call: nothing was billed
+        self._prior_total += cost
+        entry = {
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "run": self.run_label,
+            "cost_usd": round(cost, 6),
+            "input_tokens": usage.get("input_tokens", 0),
+            "output_tokens": usage.get("output_tokens", 0),
+            "model": usage.get("model", ""),
+        }
+        entry.update(meta)
+        self.entries.append(entry)
+        self.flush()
+
+    def flush(self) -> None:
+        if not self.entries:
+            return
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text(
+            json.dumps(
+                {
+                    "max_cost_usd": self.max_cost_usd,
+                    "total_usd": round(self._prior_total, 6),
+                    "entries": self.entries,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
 
 REFERENCE_AUDIT_SPEC = {
     "name": "Reference Audit Specification",

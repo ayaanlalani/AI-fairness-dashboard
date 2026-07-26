@@ -1,0 +1,253 @@
+{
+  "model": "gemini-2.5-flash",
+  "total_cycles": 24,
+  "refusal_count": 19,
+  "total_hallucination_flags": 2,
+  "mean_score_all_cycles": 19.79,
+  "zero_score_cycles": 14,
+  "cycles": [
+    {
+      "dataset": "german_credit",
+      "attribute": "AgeGroup_original",
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "AgeGroup_original",
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "AgeGroup_original",
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "AgeGroup_original",
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "Sex_original",
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "Sex_original",
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "Sex_original",
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "score": 70.0,
+      "refusal_detected": false,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "Sex_original",
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "score": 85.0,
+      "refusal_detected": true,
+      "hallucination_flags": [
+        "AIF360 toolkit documentation",
+        "Fairlearn toolkit documentation"
+      ],
+      "hallucination_count": 2
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "foreign_worker_original",
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "foreign_worker_original",
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "foreign_worker_original",
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "german_credit",
+      "attribute": "foreign_worker_original",
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "age_group",
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "age_group",
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "age_group",
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "age_group",
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "race",
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "race",
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "race",
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "race",
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "score": 0.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "sex",
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "score": 10.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "sex",
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "score": 10.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "sex",
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "score": 10.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    },
+    {
+      "dataset": "hmda",
+      "attribute": "sex",
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "score": 10.0,
+      "refusal_detected": true,
+      "hallucination_flags": [],
+      "hallucination_count": 0
+    }
+  ]
+}

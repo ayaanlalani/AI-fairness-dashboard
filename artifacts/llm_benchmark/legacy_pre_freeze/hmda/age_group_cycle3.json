@@ -1,0 +1,40 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "age_group",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The most notable disparity for the 'age_group' attribute in the HMDA Mortgage Lending dataset is in the 'average_odds_diff' metric with a value of 0.015. Despite the Disparate Impact metric of 1.0138 being within acceptable limits according to severity thresholds, minor disparities in demographic parity and equal opportunity differences suggest fairness concerns that are not substantial but warrant attention.",
+    "why_is_wrong": "Such minor disparities may arise due to longstanding structural biases in mortgage lending, where certain age groups may be historically favored or disadvantaged. This can be rooted in lending criteria and models that do not fully mitigate age-related biases, thereby allowing minimal but existing disparities to surface.",
+    "how_to_fix": "Applying the 'GridSearch' algorithm from Fairlearn can help mitigate these minor fairness concerns. This technique enables a thorough search across models to identify and re-weigh decision outcomes across different age groups, thereby improving model fairness without significantly impacting overall performance.",
+    "supporting_research": []
+  },
+  "score": {
+    "total_score": 70.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 0.0
+    },
+    "summary": "Total score: 70.0/100. Completeness=35.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=0.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 3.96,
+    "input_tokens": 1135,
+    "output_tokens": 225,
+    "total_tokens": 1360,
+    "input_cost_usd": 0.002837,
+    "output_cost_usd": 0.00225,
+    "total_cost_usd": 0.005088
+  }
+}

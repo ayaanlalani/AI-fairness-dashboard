@@ -45,7 +45,18 @@ from typing import Any
 
 import pandas as pd
 
-from llm_benchmark_common import build_context_and_baseline, score_llm_output
+from llm_benchmark_common import (
+    GUARDRAILS_PATH,
+    CostCapExceeded,
+    SpendLedger,
+    build_context_and_baseline,
+    enforce_llm_gate,
+    estimate_call_cost_usd,
+    guardrail_max_cost_usd,
+    model_prices,
+    provider_for_model as _provider_for_model,
+    score_llm_output,
+)
 from scholarly_evidence import format_evidence_for_prompt
 
 logging.basicConfig(
@@ -63,8 +74,10 @@ except ImportError:
 
 DEFAULT_MODEL = "gpt-4o"
 GEMINI_MODEL = "gemini-2.5-flash"
-PRICE_INPUT_PER_M = 0.10
-PRICE_OUTPUT_PER_M = 0.40
+# Prices live in llm_benchmark_common.MODEL_PRICES so the pre-call estimate and
+# the post-hoc accounting cannot drift apart. These aliases preserve the old
+# module-level names for the Gemini legacy path.
+PRICE_INPUT_PER_M, PRICE_OUTPUT_PER_M = model_prices(GEMINI_MODEL)
 MAX_RETRIES = 5
 RETRY_BACKOFF_BASE = 20
 
@@ -86,8 +99,6 @@ REQUIRED_ALGORITHMS = [
     "exponentiatedgradient", "gridsearch", "thresholdoptimizer",
     "equalized odds",
 ]
-
-GUARDRAILS_PATH = Path(__file__).resolve().parent.parent / "configs" / "research_guardrails.json"
 
 AIF360_CONTEXT = (
     "Reference fairness toolkit context:\n"
@@ -321,8 +332,9 @@ def call_gemini(
     usage = getattr(response, "usage_metadata", None)
     in_tok = getattr(usage, "prompt_token_count", 0) or 0
     out_tok = getattr(usage, "candidates_token_count", 0) or 0
-    in_cost = (in_tok / 1_000_000) * PRICE_INPUT_PER_M
-    out_cost = (out_tok / 1_000_000) * PRICE_OUTPUT_PER_M
+    price_in, price_out = model_prices(model)
+    in_cost = (in_tok / 1_000_000) * price_in
+    out_cost = (out_tok / 1_000_000) * price_out
 
     usage_stats = {
         "model": model,
@@ -349,8 +361,7 @@ def call_gemini(
     return result, usage_stats, raw_text
 
 
-OPENAI_PRICE_INPUT_PER_M = 2.50   # gpt-4o
-OPENAI_PRICE_OUTPUT_PER_M = 10.00
+OPENAI_PRICE_INPUT_PER_M, OPENAI_PRICE_OUTPUT_PER_M = model_prices(DEFAULT_MODEL)
 
 
 def call_openai(
@@ -391,8 +402,9 @@ def call_openai(
     usage = response.usage
     in_tok = usage.prompt_tokens if usage else 0
     out_tok = usage.completion_tokens if usage else 0
-    in_cost = (in_tok / 1_000_000) * OPENAI_PRICE_INPUT_PER_M
-    out_cost = (out_tok / 1_000_000) * OPENAI_PRICE_OUTPUT_PER_M
+    price_in, price_out = model_prices(model)
+    in_cost = (in_tok / 1_000_000) * price_in
+    out_cost = (out_tok / 1_000_000) * price_out
 
     usage_stats = {
         "model": model,
@@ -416,32 +428,6 @@ def call_openai(
         log.error(f"JSON parse error: {exc}. Raw (first 500): {raw_text[:500]}")
         raise
     return result, usage_stats, raw_text
-
-
-def _provider_for_model(model: str) -> str:
-    return "openai" if model.startswith(("gpt", "o1", "o3")) else "gemini"
-
-
-def enforce_llm_gate(model: str) -> None:
-    """Refuse live LLM calls unless configs/research_guardrails.json approves the provider.
-
-    Gate policy: docs/RESEARCH_STAGING_PROMPT.md §0. Missing or unparseable
-    guardrail files fail closed.
-    """
-    provider = _provider_for_model(model)
-    status = "blocked"
-    if GUARDRAILS_PATH.exists():
-        try:
-            gates = json.loads(GUARDRAILS_PATH.read_text(encoding="utf-8"))
-            status = gates.get("llm_providers", {}).get(provider, "blocked")
-        except (json.JSONDecodeError, OSError):
-            status = "blocked"
-    if status != "approved":
-        raise RuntimeError(
-            f"Guardrail gate: provider '{provider}' is '{status}' in {GUARDRAILS_PATH}. "
-            "Live LLM calls require the user to flip it to 'approved'. "
-            "Use --dry-run to build prompt packs without any API call."
-        )
 
 
 def call_model(
@@ -640,6 +626,7 @@ def run_attribute_benchmark(
     out_root: Path,
     model: str = DEFAULT_MODEL,
     dry_run: bool = False,
+    ledger: SpendLedger | None = None,
 ) -> list[dict]:
     """Run all 4 cycles for a single protected attribute. Returns list of result dicts."""
     known_titles = [p.get("title", "") for p in research_evidence]
@@ -669,13 +656,27 @@ def run_attribute_benchmark(
                 attr, attr_baseline, research_evidence, context_payload
             )
         else:
+            # Abort *before* a call that would breach the cap. A CostCapExceeded
+            # is deliberately not swallowed like a per-cycle API failure: the
+            # remaining cycles must not run either.
+            if ledger is not None:
+                ledger.assert_headroom(
+                    estimate_call_cost_usd(prompt, model),
+                    label=f"{dataset_key}/{attr} cycle {cycle_idx}",
+                )
             if cycle_idx > 1:
                 time.sleep(7)  # stay under 10 RPM (1 req / 6s with margin)
             try:
                 llm_result, usage, raw_text = call_model(prompt, model)
+            except CostCapExceeded:
+                raise
             except Exception as exc:
                 log.error(f"  Cycle {cycle_idx} failed: {exc}")
                 llm_result, usage, raw_text = {}, {}, str(exc)
+            if ledger is not None:
+                ledger.record(
+                    usage, dataset=dataset_key, attribute=attr, cycle=cycle_idx
+                )
 
         refusal = detect_refusal(llm_result if llm_result else None, raw_text)
         hallucinations = detect_hallucinations(
@@ -737,9 +738,22 @@ def run_benchmark(
     model: str = DEFAULT_MODEL,
     dry_run: bool = False,
     preloaded_research: list[dict] | None = None,
+    max_cost_usd: float | None = None,
 ) -> Path:
     """Run the 4-cycle benchmark for every protected attribute in the dataset."""
     t0_total = time.time()
+
+    # Dry runs bill nothing, so they need no ledger.
+    ledger: SpendLedger | None = None
+    if not dry_run:
+        ledger = SpendLedger(max_cost_usd=max_cost_usd, run_label=f"{dataset_key}/{model}")
+        if max_cost_usd is None:
+            log.warning("No cost cap configured — running without spend enforcement.")
+        else:
+            log.info(
+                f"Cost cap ${max_cost_usd:.2f} | already spent ${ledger.spent_usd:.4f} | "
+                f"remaining ${ledger.remaining_usd:.4f} (ledger: {ledger.path})"
+            )
 
     out_root = Path(out_root)
     predictions_df = pd.read_csv(predictions_path)
@@ -761,24 +775,41 @@ def run_benchmark(
     )
 
     all_results: list[dict] = []
+    cost_capped = False
     for attr in protected_configs:
-        attr_results = run_attribute_benchmark(
-            attr=attr,
-            context_payload=context_payload,
-            baseline_payload=baseline_payload,
-            research_evidence=research_evidence,
-            dataset_name=dataset_name,
-            dataset_key=dataset_key,
-            out_root=out_root,
-            model=model,
-            dry_run=dry_run,
-        )
+        try:
+            attr_results = run_attribute_benchmark(
+                attr=attr,
+                context_payload=context_payload,
+                baseline_payload=baseline_payload,
+                research_evidence=research_evidence,
+                dataset_name=dataset_name,
+                dataset_key=dataset_key,
+                out_root=out_root,
+                model=model,
+                dry_run=dry_run,
+                ledger=ledger,
+            )
+        except CostCapExceeded as exc:
+            # Stop cleanly and still write a summary, so partial results and the
+            # reason for stopping are both on disk.
+            log.error(str(exc))
+            cost_capped = True
+            break
         all_results.extend(attr_results)
 
     # Write dataset summary
     summary_dir = out_root / ("dry_run" if dry_run else model.replace("/", "-")) / dataset_key
     summary_dir.mkdir(parents=True, exist_ok=True)
     summary = _build_summary(all_results, dataset_name, dataset_key, model, time.time() - t0_total)
+    if ledger is not None:
+        summary["cost_cap_usd"] = ledger.max_cost_usd
+        summary["cumulative_spend_usd"] = ledger.spent_usd
+        summary["aborted_on_cost_cap"] = cost_capped
+        summary["attributes_completed"] = len(
+            {r["attribute"] for r in all_results}
+        )
+        summary["attributes_requested"] = len(protected_configs)
     summary_path = summary_dir / "_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     log.info(f"Summary → {summary_path}")
@@ -861,11 +892,28 @@ def main() -> None:
              "({attr: [paper, ...]}) to embed instead of a live Semantic "
              "Scholar harvest (useful when the keyless API is rate-limited).",
     )
+    parser.add_argument(
+        "--max_cost_usd", type=float, default=None,
+        help="Hard cap on cumulative USD spend. Defaults to "
+             "max_cost_usd_per_run in configs/research_guardrails.json. "
+             "Spend is tracked across invocations in "
+             "artifacts/llm_benchmark/spend_ledger.json, so the cap holds "
+             "across the whole run set rather than per process.",
+    )
     args = parser.parse_args()
+
+    max_cost_usd = args.max_cost_usd
+    if max_cost_usd is None:
+        max_cost_usd = guardrail_max_cost_usd()
 
     if not args.dry_run:
         # Fail fast (before any Semantic Scholar traffic) if the provider is gated.
         enforce_llm_gate(args.model)
+        if max_cost_usd is None:
+            parser.error(
+                "No cost cap available: pass --max_cost_usd or set "
+                "max_cost_usd_per_run in configs/research_guardrails.json."
+            )
 
     configs: dict[str, str] = {}
     for pair in args.protected_attrs.split(","):
@@ -902,6 +950,7 @@ def main() -> None:
         model=args.model,
         dry_run=args.dry_run,
         preloaded_research=preloaded_research,
+        max_cost_usd=max_cost_usd,
     )
 
 

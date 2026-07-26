@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA Mortgage Lending (Georgia)",
+  "attribute": "race",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact metric for the race attribute is 0.8956, which falls below the moderate threshold of 0.95. This indicates a disparity in mortgage approval rates primarily affecting non-White groups.",
+    "why_is_wrong": "The observed disparity is partially attributable to historical and systemic biases in mortgage lending practices. These biases have perpetuated lower approval rates for minority groups relative to White applicants. Additionally, the severe size imbalance among groups makes it difficult to accurately assess disparities for smaller groups such as Pacific Islander.",
+    "how_to_fix": "To address this moderate disparity, the DisparateImpactRemover algorithm from AIF360 can be employed. This algorithm adjusts the input features to mitigate the impact of differences in group base rates while retaining as much predictive power as possible.",
+    "supporting_research": [
+      "Bellamy, R. K. E., et al. (2019). AI Fairness 360: An extensible toolkit for detecting, understanding, and mitigating unwanted algorithmic bias. IBM Journal of Research and Development, 63(4/5), 4-1."
+    ]
+  },
+  "score": {
+    "total_score": 80.0,
+    "subscores": {
+      "completeness": 35.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 80.0/100. Completeness=35.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "Bellamy, R. K. E., et al. (2019). AI Fairness 360: An extensible toolkit for detecting, understanding, and mitigating unwanted algorithmic bias. IBM Journal of Research and Development, 63(4/5), 4-1."
+  ],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 3.17,
+    "input_tokens": 1222,
+    "output_tokens": 249,
+    "total_tokens": 1471,
+    "input_cost_usd": 0.003055,
+    "output_cost_usd": 0.00249,
+    "total_cost_usd": 0.005545
+  }
+}
