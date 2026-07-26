@@ -14,7 +14,7 @@
 
 **Required response elements:** per-group breakdown, severity classification, root-cause analysis, mitigation recommendations, research-backed justification
 
-This deterministic baseline pairs quantitative disparity metrics with interpretable causal diagnostics and concrete mitigation options so the output is directly usable for remediation planning and LLM benchmark scoring.
+This deterministic baseline pairs quantitative disparity metrics with interpretable root-cause diagnostics (rule-based inference from metrics and feature correlations, not causal identification) and concrete mitigation options so the output is directly usable for remediation planning and LLM benchmark scoring.
 
 ---
 ## race  (DI = 0.8956, severity: MODERATE (borderline))

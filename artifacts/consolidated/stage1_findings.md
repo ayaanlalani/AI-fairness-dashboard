@@ -98,3 +98,30 @@ Deterministic pipeline only — no LLM was used for any number or finding here.
    `.venv`/`venv` native libraries mmap-timing-out (errno=60) under iCloud
    Drive eviction (repo lives under `Desktop/`). Reviewers should use a local,
    non-synced interpreter — the Makefile already prefers `python3.11`.
+
+---
+
+## Appendix: Resolution log
+
+Appended after the fact. The findings above are the Stage 1 record and are
+left unedited; this log states what happened to each open item.
+
+| Item | Status | Resolved by |
+|---|---|---|
+| **Q3.1** — lending_club gender DI = 0.0 read as CRITICAL | **Resolved.** Metric-orientation artifact, not a disparity. Oriented on the favorable outcome (predicted non-default), gender DI is **0.9931** — near parity. Locked in by `tests/test_lending_club_fairness.py`, including a test that the old default-oriented computation would have read zero. | `39bd48b` |
+| **Cross-cutting #3** — Semantic Scholar 429, lending_club evidence empty | **Resolved.** The prescribed fix (obtain a `SEMANTIC_SCHOLAR_API_KEY`) does not work: the key returns HTTP 403 on every endpoint, and `qualitative_analysis.py` never loaded `.env` so it was never being sent. The keyless `/paper/DOI:` lookup endpoint does still serve requests while `/paper/search` is throttled, so evidence is now backfilled from curated real DOIs. lending_club went 0 → 3 papers/attribute; dry-run cycle average 83.33 → 98.33. | `fa1526b` |
+| **Cross-cutting #4** — AverageOddsDiff sign convention disagreement | **Resolved.** One convention pinned per dataset and asserted in `tests/test_sign_conventions.py` (one test class per dataset). | `9565085` |
+| **Q2.2** — HMDA income × loan-amount intersectional strata | **Still open.** Requires income and loan-amount strata joined into the HMDA predictions CSV, which Stage 1 deferred and no later stage needed. Carried forward as a stated gap, not silently dropped. |
+| **Q3.2 / Q3.3** — lending_club near-degenerate classifier | **Confirmed, not fixed.** The classifier predicts non-default for ~99.5% of the test set, so intersectional rates are all ≥ 0.9848. This is reported as *insufficient model discrimination to measure disparity* rather than as fairness. It is also why lending_club's 100% Track Q severity agreement is the easiest case rather than the best result. | `e08cc2f` |
+| **Cross-cutting #5** — `make fairness` hang under iCloud | **Resolved as environmental.** Did not reproduce under Homebrew `python3.11`; the Makefile already prefers it. |
+
+### Items discovered after Stage 1
+
+| Item | Detail | Commit |
+|---|---|---|
+| Cost cap was never enforced | `llm_benchmark.py` had no cost flag and no cap logic, and `max_cost_usd_per_run` had zero code readers. Now enforced cumulatively across invocations with a pre-call abort. | `9b64185` |
+| Three ungated LLM key reads | The guardrail gate existed only in `llm_benchmark.py`; `openai_fairness_analysis.py`, `openai_hybrid_self_improve.py` and `llm_fairness_analysis.py` read a key with no gate. All gated, with a test that greps for regressions. | `9b64185` |
+| Refusal detector conflates brevity with refusal | 6 of 9 `constrained`-prompt records were flagged as refusals; **zero were genuine**. The detector treats any narrative field under 40 characters as empty. Left unchanged (it is part of the frozen scoring harness) and reported as a harness finding. | `e08cc2f` |
+| Guardrail G4 penalises the correct answer | "Mitigation must name a canonical algorithm" fails exactly on the two data-scarcity attributes, where data acquisition and wider confidence intervals are the sound response and no post-processor applies. Reported rather than smoothed away. | `4658c02` |
+| Track H spend was untracked | Only Track Q recorded to the ledger, so any program total was an undercount. Track H now records too. Also unified two disagreeing price tables for o3. | `4658c02` |
+| "causal diagnostics" in the deterministic template | The report generator described its rule-based root-cause mapping as "causal diagnostics". Reworded — `map_root_causes()` infers from metric values and feature correlations and performs no causal identification. Caught by the Stage 5 overclaim grep. | this commit |
