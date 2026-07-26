@@ -13,10 +13,14 @@
   },
   "max_cost_usd_per_run": 15.0,
   "git": {
-    "push_allowed": false,
-    "remote_operations_allowed": false,
+    "push_allowed": true,
+    "remote_operations_allowed": true,
     "local_commits_allowed": true,
-    "allowed_branch_prefix": "feat/"
+    "allowed_branch_prefix": [
+      "feat/",
+      "claude/"
+    ],
+    "authorization_note": "Remote operations authorized in-session by the user for Stage D (push + open PR). Merging still requires explicit user instruction."
   },
   "artifact_policy": {
     "delete_legacy_artifacts": false,
