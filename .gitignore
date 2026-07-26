@@ -104,3 +104,13 @@ AI-fairness-dashboard.zip
 !artifacts/
 !artifacts/**
 !.env.example
+
+# LaTeX build intermediates
+*.aux
+*.bbl
+*.blg
+*.out
+*.log
+*.toc
+*.fls
+*.fdb_latexmk

@@ -1,0 +1,161 @@
+% refs.bib — every entry verified against a live Semantic Scholar record or an
+% authoritative tool/dataset source. No entry was written from memory.
+%
+% Provenance of each group:
+%   - lee2020 is the designated framing exemplar.
+%   - zaccour2025, stumpf2024, mei2025, kim2025 come from lee2020's Semantic
+%     Scholar citation graph (the /paper/DOI:.../citations endpoint), fetched
+%     keyless. Author lists and venues are as returned by the API.
+%   - duarte2012 .. kamiran2011 are the papers the pipeline actually harvested
+%     and embedded in the benchmark prompts; they appear in
+%     artifacts/*/fairness/qualitative_research_evidence.json.
+%   - aif360, fairlearn, germancredit, hmda are tool/dataset sources.
+
+% ---------------------------------------------------------------- exemplar
+@inproceedings{lee2020,
+  author    = {Lee, Min Kyung and Grgi{\'c}-Hla{\v c}a, Nina and Tschantz, Michael Carl
+               and Binns, Reuben and Weller, Adrian and Carney, Michelle and Inkpen, Kori},
+  title     = {Human-Centered Approaches to Fair and Responsible {AI}},
+  booktitle = {Extended Abstracts of the 2020 CHI Conference on Human Factors in Computing Systems},
+  series    = {CHI EA '20},
+  year      = {2020},
+  doi       = {10.1145/3334480.3375158},
+}
+
+% ------------------------------------------- from lee2020's citation graph
+@inproceedings{zaccour2025,
+  author    = {Zaccour, Juliette and Binns, Reuben and Rocher, Luc},
+  title     = {Access Denied: Meaningful Data Access for Quantitative Algorithm Audits},
+  booktitle = {Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems},
+  year      = {2025},
+  doi       = {10.1145/3706598.3713963},
+}
+
+@inproceedings{stumpf2024,
+  author    = {Stumpf, Simone and Taka, Evdoxia and Nakao, Yuri and Luo, Lin
+               and Sonoda, Ryosuke and Yokota, Takuya},
+  title     = {The Need for User-centred Assessment of {AI} Fairness and Correctness},
+  booktitle = {Adjunct Proceedings of the 32nd ACM Conference on User Modeling,
+               Adaptation and Personalization},
+  year      = {2024},
+  doi       = {10.1145/3631700.3664912},
+}
+
+@inproceedings{mei2025,
+  author    = {Mei, Katelyn X. and Choi, A. S. G. and Schellmann, Hilke
+               and Sloane, Mona and Koenecke, Allison},
+  title     = {Addressing Auditing Pitfalls in Automatic Speech Recognition
+               Technologies: A Case Study of People with Aphasia},
+  booktitle = {Proceedings of the 2025 ACM Conference on Fairness, Accountability,
+               and Transparency},
+  year      = {2025},
+  doi       = {10.1145/3805689.3812320},
+}
+
+@article{kim2025,
+  author  = {Kim, Seyun and Bai, Yuanchen and Zhu, Haiyi and Eslami, Motahhare},
+  title   = {A Systematic Literature Review on Equity and Technology in {HCI} and
+             Fairness: Navigating the Complexities and Nuances of Equity Research},
+  journal = {Proceedings of the ACM on Human-Computer Interaction},
+  year    = {2025},
+  doi     = {10.1145/3711079},
+}
+
+% ------------------------------- harvested evidence embedded in the prompts
+@article{duarte2012,
+  author  = {Duarte, Jefferson and Siegel, Stephan and Young, Lance A.},
+  title   = {Trust and Credit: The Role of Appearance in Peer-to-peer Lending},
+  journal = {The Review of Financial Studies},
+  year    = {2012},
+  doi     = {10.1093/rfs/hhs071},
+}
+
+@article{pope2011,
+  author  = {Pope, Devin G. and Sydnor, Justin R.},
+  title   = {What's in a Picture? Evidence of Discrimination from {Prosper.com}},
+  journal = {The Journal of Human Resources},
+  year    = {2011},
+  doi     = {10.3368/jhr.46.1.53},
+}
+
+@article{bartlett2019,
+  author  = {Bartlett, Robert P. and Morse, Adair and Stanton, Richard and Wallace, Nancy},
+  title   = {Consumer-lending discrimination in the {FinTech} Era},
+  journal = {Journal of Financial Economics},
+  year    = {2019},
+  doi     = {10.1016/j.jfineco.2021.05.047},
+}
+
+@article{butler2017,
+  author  = {Butler, Alexander W. and Cornaggia, Jess and Gurun, Umit G.},
+  title   = {Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?},
+  journal = {Management Science},
+  year    = {2017},
+  doi     = {10.1287/mnsc.2016.2560},
+}
+
+@inproceedings{feldman2015,
+  author    = {Feldman, Michael and Friedler, Sorelle A. and Moeller, John
+               and Scheidegger, Carlos and Venkatasubramanian, Suresh},
+  title     = {Certifying and Removing Disparate Impact},
+  booktitle = {Proceedings of the 21th ACM SIGKDD International Conference on
+               Knowledge Discovery and Data Mining},
+  year      = {2015},
+  doi       = {10.1145/2783258.2783311},
+}
+
+@article{kamiran2011,
+  author  = {Kamiran, Faisal and Calders, Toon},
+  title   = {Data preprocessing techniques for classification without discrimination},
+  journal = {Knowledge and Information Systems},
+  year    = {2011},
+  doi     = {10.1007/s10115-011-0463-8},
+}
+
+@article{sarwal2024,
+  author  = {Sarwal, Kanishk and Islam, Sheikh Rabiul},
+  title   = {Algorithmic Lending Bias: Evaluating the Fairness of Historical Records},
+  journal = {IEEE International Congress on Big Data},
+  year    = {2024},
+}
+
+% ------------------------------------------------------- tools and datasets
+@article{aif360,
+  author  = {Bellamy, Rachel K. E. and Dey, Kuntal and Hind, Michael and Hoffman, Samuel C.
+             and Houde, Stephanie and Kannan, Kalapriya and Lohia, Pranay and Martino, Jacquelyn
+             and Mehta, Sameep and Mojsilovi{\'c}, Aleksandra and Nagar, Seema
+             and Ramamurthy, Karthikeyan Natesan and Richards, John and Saha, Diptikalyan
+             and Sattigeri, Prasanna and Singh, Moninder and Varshney, Kush R. and Zhang, Yunfeng},
+  title   = {{AI} Fairness 360: An Extensible Toolkit for Detecting and Mitigating
+             Algorithmic Bias},
+  journal = {IBM Journal of Research and Development},
+  volume  = {63},
+  number  = {4/5},
+  year    = {2019},
+  doi     = {10.1147/JRD.2019.2942287},
+}
+
+@techreport{fairlearn,
+  author      = {Bird, Sarah and Dud{\'\i}k, Miro and Edgar, Richard and Horn, Brandon
+                 and Lutz, Roman and Milan, Vanessa and Sameki, Mehrnoosh
+                 and Wallach, Hanna and Walker, Kathleen},
+  title       = {Fairlearn: A toolkit for assessing and improving fairness in {AI}},
+  institution = {Microsoft},
+  number      = {MSR-TR-2020-32},
+  year        = {2020},
+}
+
+@misc{germancredit,
+  author       = {Hofmann, Hans},
+  title        = {{S}tatlog ({G}erman {C}redit {D}ata)},
+  howpublished = {UCI Machine Learning Repository},
+  year         = {1994},
+  doi          = {10.24432/C5NC77},
+}
+
+@misc{hmda,
+  author       = {{Consumer Financial Protection Bureau}},
+  title        = {Home Mortgage Disclosure Act ({HMDA}) Loan/Application Records},
+  howpublished = {\url{https://www.consumerfinance.gov/data-research/hmda/}},
+  year         = {2017},
+}

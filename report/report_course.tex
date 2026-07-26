@@ -1,0 +1,691 @@
+% CMPT 310 Final Report
+% Compile: tectonic report.tex  (or pdflatex, run twice for references)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black,
+}
+
+\graphicspath{{../artifacts/visualizations/}}
+
+\title{%
+  \textbf{CMPT 415 Final Report}\\[6pt]
+  \Large AI Fairness Dashboard:\\[2pt]
+  \large Bias Detection, Qualitative Analysis, and LLM Benchmarking\\
+  in Lending Domains
+}
+\author{
+  Siddhant Jain \and Ayaan Lalani
+}
+\date{\today\\[4pt]\small Supervisor: Dr.\ Nicholas Vincent}
+
+\begin{document}
+\maketitle
+
+% ===================================================================
+\begin{abstract}
+Algorithmic decision-making in lending carries significant fairness risks:
+models trained on historical data can perpetuate and amplify biases along
+demographic lines. This project defines a \textbf{reference audit
+specification}: the set of analysis metrics and response elements (root
+causes, severity labels, concrete remediation recommendations) that a
+fairness audit must provide to support actionable decision-making. We
+implement an end-to-end fairness pipeline applied to two lending datasets
+(UCI German Credit, HMDA Georgia), compute five AIF360-based disparity
+metrics, perform deterministic qualitative root-cause analysis, and
+benchmark a 4-cycle OpenAI gpt-4o auditor that receives Python-computed
+metric context. We do not claim that the LLM independently recomputes
+fairness metrics; instead, we evaluate whether it reasons reliably from
+fixed quantitative evidence across four prompt strategies (zero-shot,
+chain-of-thought, self-critique, constrained). Results show moderate
+disparities across most protected attributes. The LLM agrees with the
+deterministic oracle on 4 of 6 attribute--dataset pairs but systematically
+escalates severity for socially salient attributes (Sex, Race), confirming
+that metric grounding alone does not prevent narrative overreach.
+\end{abstract}
+
+% ===================================================================
+\section{Introduction}
+
+Automated lending decisions (credit scoring, mortgage approvals, loan
+pricing) increasingly rely on machine learning models. While these models
+improve efficiency, they risk encoding historical biases present in
+training data, leading to disparate outcomes for protected groups defined
+by sex, age, race, or national origin.
+
+Regulatory frameworks such as the U.S.\ Equal Credit Opportunity Act (ECOA)
+and the EU AI Act mandate that lending models be audited for discriminatory
+impact. However, detecting bias requires more than a single metric: it
+demands multi-dimensional quantitative measurement, qualitative root-cause
+analysis, and independent validation.
+
+This project makes three contributions:
+\begin{enumerate}[nosep]
+  \item A \textbf{reproducible fairness pipeline} that preprocesses data,
+        trains classifiers, computes five AIF360-based metrics, and generates
+        structured reports for each protected attribute.
+  \item A \textbf{deterministic qualitative analysis engine} that diagnoses
+        data imbalance, detects proxy features, maps root causes, and
+        recommends specific mitigations.
+  \item An \textbf{OpenAI LLM benchmark} that tests whether a model can turn
+        fixed Python-computed metric evidence into stable, statistically
+        cautious, remediation-ready fairness audits across four prompt
+        strategies. Gemini 2.5 Flash results are included as a comparison
+        baseline.
+\end{enumerate}
+
+% ===================================================================
+\section{Background and Related Work}
+
+\subsection{Fairness Metrics}
+
+We adopt five widely-used group fairness metrics. Let $\hat{Y}$ denote
+predictions, $Y$ ground truth, and $A$ the protected attribute with
+privileged group $a_p$ and unprivileged group $a_u$.
+
+\begin{itemize}[nosep]
+  \item \textbf{Disparate Impact (DI)}: ratio of selection rates.
+        $\text{DI} = P(\hat{Y}{=}1 \mid A{=}a_u)\;/\;P(\hat{Y}{=}1 \mid A{=}a_p)$.
+        Values below 0.8 indicate adverse impact (four-fifths rule).
+  \item \textbf{Demographic Parity Difference (DPD)}: difference of selection
+        rates, $P(\hat{Y}{=}1 \mid A{=}a_u) - P(\hat{Y}{=}1 \mid A{=}a_p)$.
+  \item \textbf{Equal Opportunity Difference (EOD)}: difference of true
+        positive rates,
+        $\text{TPR}(a_u) - \text{TPR}(a_p)$.
+  \item \textbf{Average Odds Difference (AOD)}:
+        $\frac{1}{2}[(\text{FPR}(a_u){-}\text{FPR}(a_p)) +
+        (\text{TPR}(a_u){-}\text{TPR}(a_p))]$.
+  \item \textbf{Theil Index}: an entropy-based inequality measure over
+        predicted benefits.
+\end{itemize}
+
+\subsection{Fairness Toolkits}
+
+\textbf{AIF360}~\cite{aif360} (IBM) provides dataset wrappers, metric
+classes, and pre-/in-/post-processing mitigation algorithms.
+\textbf{Fairlearn}~\cite{fairlearn} (Microsoft) offers constraint-based
+reduction algorithms (\texttt{ExponentiatedGradient}, \texttt{GridSearch})
+and the \texttt{ThresholdOptimizer} post-processor. Our deterministic
+pipeline uses AIF360 metric definitions, while the LLM benchmark is
+constrained to fairlearn.
+
+\subsection{LLMs as Fairness Auditors}
+
+Recent work has explored using large language models to interpret model
+behavior and generate natural-language explanations of bias. In this artifact
+we treat the deterministic Python pipeline as the source of record for
+fairness metrics. The OpenAI benchmark receives the resulting metric context,
+group counts, severity thresholds, and supporting literature context; its
+task is to produce qualitative analysis that is grounded in those values.
+This design avoids overclaiming that an LLM is a reliable calculator and
+instead evaluates the more practical question of whether it can produce
+remediation-ready audit narratives from fixed evidence.
+
+% ===================================================================
+\section{Datasets}
+
+\subsection{German Credit Dataset}
+
+The UCI Statlog German Credit dataset contains 1{,}000 consumer credit
+records. We merge the original Statlog encoding with a Kaggle-hosted
+version to obtain human-readable feature names. Protected attributes are
+derived as follows:
+\begin{itemize}[nosep]
+  \item \textbf{Sex}: extracted from personal status codes (Attribute~9).
+  \item \textbf{AgeGroup}: binarized at 40 ($<$40 $\rightarrow$ \texttt{under\_40}, $\geq$40 $\rightarrow$ \texttt{40\_plus}).
+  \item \textbf{Foreign Worker}: extracted from Attribute~20 (A201/A202 encoding).
+\end{itemize}
+The target variable is credit reliability (1~=~good, 0~=~bad). An 80/20
+train-test split yields 200 test records for fairness evaluation.
+
+\subsection{HMDA Mortgage Lending (Georgia)}
+
+The Home Mortgage Disclosure Act requires U.S.\ lenders to report
+application-level data. We download 2022 Georgia records from the
+CFPB Data Browser API, filtering to originated and denied applications.
+After cleaning, the dataset contains 10{,}978 records.
+Protected attributes:
+\begin{itemize}[nosep]
+  \item \textbf{Race}: White, Black, Asian, American Indian, Pacific Islander, Multiracial.
+  \item \textbf{Sex}: Male, Female.
+  \item \textbf{Age Group}: young ($<$35), mid (35--54), senior ($\geq$55).
+\end{itemize}
+The target is loan approval (1~=~originated, 0~=~denied). A 2{,}196-record
+test set is used for evaluation.
+
+\begin{table}[H]
+\centering
+\caption{Dataset summary.}
+\label{tab:datasets}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Dataset} & \textbf{Records} & \textbf{Test Set} & \textbf{Features} & \textbf{Protected Attrs} & \textbf{Target} & \textbf{\% Favorable} \\
+\midrule
+German Credit    & 1{,}000 & 200   & 10 & 3 (Sex, Age, Foreign) & Credit reliability & 70\% \\
+HMDA (Georgia)   & 10{,}978 & 2{,}196 & 8  & 3 (Race, Sex, Age)    & Loan approval      & 72\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ===================================================================
+\section{Methodology}
+
+\subsection{Pipeline Architecture}
+
+All analysis is orchestrated by a central pipeline (\texttt{run\_pipeline.py})
+that executes six sequential steps per dataset:
+
+\begin{center}
+\texttt{clean} $\rightarrow$ \texttt{train} $\rightarrow$
+\texttt{fairness} $\rightarrow$ \texttt{qualitative} $\rightarrow$
+\texttt{llm\_benchmark} $\rightarrow$ \texttt{visualize}
+\end{center}
+
+A consolidation step then merges per-dataset results into cross-dataset
+reports and comparison visualizations. The pipeline supports selective
+execution (e.g., rerunning only the LLM benchmark step).
+
+\subsection{Model Training}
+
+For each dataset, we train two classifiers (Logistic Regression and
+Random Forest) using scikit-learn. Continuous features are standardized
+(\texttt{StandardScaler}), categorical features are label-encoded, and
+missing values are imputed with the mode. We use an 80/20 stratified
+train-test split. Predictions on the test set are exported with original
+protected attribute labels preserved for downstream fairness analysis.
+
+\subsection{Fairness Metric Computation}
+
+For each protected attribute, we define the privileged group based on
+domain knowledge (Table~\ref{tab:priv}). Five metrics are computed:
+DI, DPD, EOD, AOD, and Theil Index. A bias flag is raised when
+DI~$<$~0.8. Results are exported to CSV and Markdown reports.
+
+\begin{table}[H]
+\centering
+\caption{Privileged group definitions.}
+\label{tab:priv}
+\begin{tabular}{llll}
+\toprule
+\textbf{Dataset} & \textbf{Attribute} & \textbf{Privileged} & \textbf{Rationale} \\
+\midrule
+German Credit & Sex              & Male     & Historically advantaged in credit \\
+              & AgeGroup         & 40+      & Longer credit history \\
+              & Foreign Worker   & Non-foreign (0) & Domestic applicants favored \\
+\midrule
+HMDA          & Race             & White    & Majority, historically favored \\
+              & Sex              & Male     & Historically advantaged \\
+              & Age Group        & Mid (35--54) & Peak earning years \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Qualitative Analysis Engine}
+
+Our deterministic qualitative module (\texttt{qualitative\_analysis.py})
+performs four analyses per protected attribute:
+
+\begin{enumerate}[nosep]
+  \item \textbf{Per-group breakdown}: selection rates, TPR, FPR, and base
+        rates for every subgroup.
+  \item \textbf{Data imbalance diagnosis}: flags group size ratios
+        $>$3$\times$, groups with $<$30 records, and base-rate disparities
+        $>$15\%.
+  \item \textbf{Proxy feature detection}: computes point-biserial
+        correlation (binary attributes) or eta-squared (multi-class) between
+        each numeric feature and the protected attribute, flagging
+        correlations $\geq$0.15.
+  \item \textbf{Root-cause mapping}: a rule engine maps metric patterns
+        (e.g., $|\text{EOD}| > 0.05$) and detected proxies to specific root
+        causes and AIF360 mitigation algorithms.
+\end{enumerate}
+
+Each attribute receives a severity classification: \textsc{Critical}
+(DI~$<$~0.72), \textsc{High} (0.72--0.80), \textsc{Moderate} (0.80--0.95),
+or \textsc{Low} ($\geq$0.95).
+
+\subsection{OpenAI LLM Benchmark}
+
+The primary LLM benchmark uses OpenAI. Python first constructs a metric
+context from the predictions CSV, deterministic fairness metrics, group
+breakdowns, severity thresholds, root-cause candidates, mitigation
+candidates, and Semantic Scholar evidence when available. The prompt then
+instructs OpenAI to:
+\begin{itemize}[nosep]
+  \item Do \textbf{not} recompute fairness metrics.
+  \item Interpret the Python-computed DI, DPD, EOD, AOD, Theil, group counts,
+        and severity context.
+  \item Produce qualitative analysis: what is wrong, why, and how to fix it
+        using AIF360/Fairlearn mitigation concepts.
+  \item Return structured JSON for programmatic comparison.
+\end{itemize}
+
+The benchmark therefore measures metric-grounded reasoning, severity
+alignment, mitigation specificity, and research grounding. Gemini outputs
+from earlier experiments are retained as a secondary comparison baseline.
+
+\subsection{Scholarly Evidence Integration}
+
+The pipeline integrates \textbf{Semantic Scholar} to retrieve relevant
+research papers at benchmark time. For each dataset and protected attribute,
+\texttt{scholarly\_evidence.py} issues up to six queries (general fairness,
+AIF360/Fairlearn methods, proxy discrimination, and dataset-specific
+queries) and injects the returned titles, abstracts, and citation counts
+directly into the LLM prompt under a ``Research evidence'' heading.
+
+This serves two purposes. First, it gives the LLM externally grounded
+citations rather than relying solely on training-time knowledge. Second,
+our scoring oracle flags citations in the LLM response that cannot be
+traced to the provided paper titles (hallucination detection via trigram
+overlap).
+
+\paragraph{Run-time outcome.}
+During the Section C benchmark run, Semantic Scholar returned
+\texttt{HTTP~403~Forbidden} for all queries, so \emph{no} injected
+research context was available to the model. Despite this, gpt-4o
+included paper citations in its responses from its own training
+knowledge. The \texttt{research\_grounding} subscore (10~pts) was
+non-zero for 12 of 24 cycles: the constrained prompt format (Cycle~4)
+achieved 10/10 for every attribute across both datasets, and
+chain-of-thought and self-critique cycles scored 10/10 for several
+attributes (Table~\ref{tab:rg-scores}).
+
+\begin{table}[H]
+\centering
+\caption{Research grounding subscore (max 10 pts) by cycle and dataset.
+         Semantic Scholar was unavailable; scores reflect gpt-4o
+         self-citations from training knowledge.}
+\label{tab:rg-scores}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dataset} & \textbf{Attribute} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} \\
+\midrule
+German Credit & Sex              & 0 & 0  & 0  & 10 \\
+              & AgeGroup         & 0 & 0  & 0  & 10 \\
+              & Foreign Worker   & 0 & 10 & 10 & 10 \\
+\midrule
+HMDA          & Race             & 0 & 10 & 10 & 10 \\
+              & Sex              & 0 & 0  & 0  & 10 \\
+              & Age Group        & 0 & 0  & 0  & 10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Implications.}
+The constrained prompt explicitly requires at least two citations,
+which forces the model to draw on training-time knowledge when live
+retrieval is unavailable. This is effective for producing structured
+output but introduces a reproducibility risk: citations cannot be
+verified against a live corpus, and the hallucination detector flagged
+16 citations across 24 gpt-4o cycles as unverifiable. Future runs
+should set \texttt{SEMANTIC\_SCHOLAR\_API\_KEY} to enable live
+retrieval and reduce reliance on unverifiable self-citation.
+
+% ===================================================================
+\section{Results}
+
+\subsection{German Credit: Fairness Metrics}
+
+\begin{table}[H]
+\centering
+\caption{German Credit fairness metrics (our pipeline).}
+\label{tab:gc-metrics}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Attribute} & \textbf{DI} & \textbf{DPD} & \textbf{EOD} & \textbf{AOD} & \textbf{Theil} \\
+\midrule
+Sex (priv: male)              & 0.8595 & $-$0.1152 & $-$0.0512 & $-$0.1256 & 0.3084 \\
+AgeGroup (priv: 40+)          & 0.8212 & $-$0.1586 & $-$0.0513 & $-$0.1649 & 0.3084 \\
+Foreign Worker (priv: non-fw)  & 0.9402 & $-$0.0498 & $-$0.0889 & $+$0.2013 & 0.3084 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All three attributes fall in the \textsc{Moderate} severity range
+(DI between 0.80 and 0.95). Sex and AgeGroup show consistent disadvantage
+for the unprivileged group across all metrics. Foreign Worker metrics are
+unreliable due to extreme group imbalance (194 vs.\ 6 records).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{german_credit_disparate_impact.png}
+\caption{German Credit: Disparate Impact by protected attribute
+         (pipeline vs.\ LLM).}
+\label{fig:gc-di}
+\end{figure}
+
+\subsection{HMDA: Fairness Metrics}
+
+\begin{table}[H]
+\centering
+\caption{HMDA (Georgia) fairness metrics (our pipeline).}
+\label{tab:hmda-metrics}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Attribute} & \textbf{DI} & \textbf{DPD} & \textbf{EOD} & \textbf{AOD} & \textbf{Theil} \\
+\midrule
+Race (priv: White)     & 0.8956 & $-$0.0776 & $+$0.0025 & $+$0.0117 & 0.4838 \\
+Sex (priv: Male)       & 0.9291 & $-$0.0518 & $-$0.0076 & $-$0.0084 & 0.4838 \\
+Age Group (priv: mid)  & 1.0138 & $+$0.0097 & $+$0.0008 & $-$0.0150 & 0.4838 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Race exhibits \textsc{Moderate} bias (DI~=~0.8956), sex is borderline
+\textsc{Moderate} (DI~=~0.9291), and age group is effectively fair
+(DI~=~1.0138). The small EOD and AOD values for HMDA suggest the model's
+error rates are relatively balanced across groups, with the primary
+disparity being in overall selection rates.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{hmda_disparate_impact.png}
+\caption{HMDA: Disparate Impact by protected attribute
+         (pipeline vs.\ LLM).}
+\label{fig:hmda-di}
+\end{figure}
+
+\subsection{Qualitative Findings}
+
+The qualitative engine identified the following root causes:
+
+\paragraph{German Credit.}
+\begin{itemize}[nosep]
+  \item \textbf{Sex}: Strong proxy feature detected (\texttt{Sex} column,
+        $r{=}1.0$); the encoded Sex feature directly leaks into the model.
+        Weaker proxies include Housing ($r{=}{-}0.27$) and Age ($r{=}0.22$).
+        Root causes: proxy discrimination, unequal opportunity
+        (EOD~$=$~$-$0.05), and unequal odds (AOD~$=$~$-$0.13).
+  \item \textbf{AgeGroup}: Strong proxy via Age ($r{=}{-}0.84$) and the
+        AgeGroup encoding itself. Historical label bias detected: 40+
+        borrowers have a 77.5\% favorable base rate vs.\ 65.9\% for under-40.
+  \item \textbf{Foreign Worker}: Severe size imbalance (194 vs.\ 6 records,
+        32$\times$ ratio). Metrics for the non-foreign group are statistically
+        unreliable ($n{=}6$). Root cause: representation bias.
+\end{itemize}
+
+\paragraph{HMDA.}
+\begin{itemize}[nosep]
+  \item \textbf{Race}: Severe size imbalance (White: 1{,}252 vs.\ Pacific
+        Islander: 5, a 250$\times$ ratio). Base-rate disparity: Asian
+        applicants have 79.8\% favorable outcomes vs.\ Multiracial at 37.5\%
+        (gap~$=$~42.3\%). Root causes: historical/label bias and
+        representation bias.
+  \item \textbf{Sex}: Borderline disparity with no strong root cause
+        detected by the rule engine. Recommended: post-processing threshold
+        calibration.
+  \item \textbf{Age Group}: No significant disparity (DI~$>$~1.0), though
+        historical label bias exists in the ground truth.
+\end{itemize}
+
+\subsection{OpenAI Benchmark Comparison}
+
+The OpenAI benchmark is evaluated against the deterministic baseline over
+fixed refinement cycles. Because OpenAI receives Python-computed metrics, we
+do not compare newly computed LLM metric values. Instead, we compare whether
+the LLM preserves severity, uses the supplied evidence, and produces
+remediation-ready guidance.
+
+\subsubsection{Cycle Scores}
+
+\begin{table}[H]
+\centering
+\caption{OpenAI gpt-4o Section C benchmark: mean score per cycle averaged across all
+         protected attributes (zero\_shot / chain\_of\_thought / self\_critique / constrained).
+         All 24 API calls succeeded (0 quota failures vs.\ 79\% for Gemini 2.5 Flash).}
+\label{tab:openai-cycles}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Dataset} & \textbf{Cycle 1} & \textbf{Cycle 2} & \textbf{Cycle 3} & \textbf{Cycle 4} \\
+              & \small zero\_shot & \small chain\_of\_thought & \small self\_critique & \small constrained \\
+\midrule
+German Credit & 63.3 & 53.3 & 73.3 & 75.7 \\
+HMDA Georgia  & 60.0 & 76.7 & 76.7 & 73.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Severity Agreement}
+
+\begin{table}[H]
+\centering
+\caption{Severity classification agreement: deterministic baseline vs.\ gpt-4o
+         (majority label across 4 cycles shown; instability = label varies across cycles).}
+\label{tab:severity}
+\begin{tabular}{llccl}
+\toprule
+\textbf{Dataset} & \textbf{Attribute} & \textbf{Baseline} & \textbf{gpt-4o majority} & \textbf{Agree?} \\
+\midrule
+German Credit & Sex              & Moderate & \textbf{High} (3/4 cycles)   & No (escalated) \\
+              & AgeGroup         & Moderate & Moderate (3/4 cycles)        & Yes \\
+              & Foreign Worker   & Moderate & Moderate (3/4 cycles)        & Yes \\
+\midrule
+HMDA          & Race             & Moderate & Mixed: High 2, Moderate 2    & Partial \\
+              & Sex              & Moderate & Moderate (3/4 cycles)        & Yes \\
+              & Age Group        & Low      & Low (4/4 cycles)             & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{di_overview.png}
+\caption{Disparate Impact overview across all datasets and attributes.}
+\label{fig:di-overview}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{openai_cycle_scores.png}
+\caption{OpenAI benchmark cycle scores across fixed refinement cycles.}
+\label{fig:openai-cycle-scores}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{openai_severity_agreement.png}
+\caption{Severity agreement between deterministic baseline and OpenAI.}
+\label{fig:severity}
+\end{figure}
+
+\subsection{Cost Analysis}
+
+\begin{table}[H]
+\centering
+\caption{OpenAI gpt-4o Section C benchmark cost breakdown (4 cycles $\times$ 3 attributes
+         $\times$ 2 datasets = 24 API calls; all succeeded).}
+\label{tab:cost}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Dataset} & \textbf{Input Tokens} & \textbf{Output Tokens} & \textbf{Latency (s)} & \textbf{Est.\ Cost} \\
+\midrule
+German Credit & 10{,}353 & 2{,}904 & 121.3 & \$0.0549 \\
+HMDA          & 12{,}185 & 2{,}717 & 109.3 & \$0.0576 \\
+\midrule
+\textbf{Total} & 22{,}538 & 5{,}621 & 230.6 & \textbf{\$0.1125} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The benchmark remains inexpensive enough for artifact review, but cost and
+latency depend on provider pricing, model selection, prompt length, and API
+version.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{cost_summary.png}
+\caption{Token usage, API cost, and latency per dataset.}
+\label{fig:cost}
+\end{figure}
+
+% ===================================================================
+\section{Discussion}
+
+\subsection{Where Pipeline and OpenAI Agree}
+
+The gpt-4o Section C benchmark (4 cycles $\times$ 3 attributes per dataset)
+shows majority-vote agreement with the deterministic baseline in 4 of 6
+attribute-dataset pairs. Agreement is strongest for HMDA Age Group (Low,
+unanimous across all 4 cycles), German Credit AgeGroup and Foreign Worker
+(both Moderate, 3/4 cycles), and HMDA Sex (Moderate, 3/4 cycles). For these
+attributes the LLM translated fixed metric evidence into severity labels that
+match the rule-based oracle, demonstrating the utility of metric-grounded
+prompting.
+
+\subsection{Where the Benchmark Exposes Risk}
+
+Two attributes show instability or disagreement. German Credit
+\texttt{Sex\_original} (DI~=~0.8595, deterministic severity: Moderate)
+receives a majority severity of High from gpt-4o (3 of 4 cycles), indicating
+that the LLM \emph{escalates} socially salient attributes beyond what the
+metric evidence supports. HMDA Race (DI~=~0.8956) splits evenly between High
+and Moderate across cycles, reflecting prompt-format sensitivity.
+
+The broader risk is \textbf{narrative overreach}: an LLM can produce
+plausible causal language or escalated severity claims that exceed what the
+provided evidence supports. This is compounded for small subgroups (German
+Credit foreign-worker, rare HMDA race categories), where the metric context
+itself carries high uncertainty. The protocol therefore records context
+payloads, baseline severities, prompt text, raw responses, and scoring
+outputs so that reviewers can inspect grounding.
+
+Legacy Gemini runs provide a stark contrast: 19 of 24 cycles (79\%) scored
+0/100 due to quota exhaustion and refusals, while gpt-4o achieved 0
+quota failures across all 24 cycles (mean score 67/100). This confirms that
+structural guardrails (deterministic oracle grounding plus a reliable
+provider) are necessary for reproducible audit output.
+
+\subsection{Strengths and Limitations}
+
+\paragraph{Deterministic pipeline.}
+Strengths: fully reproducible, transparent rule logic, specific AIF360
+mitigation recommendations, statistical safeguards (minimum group size,
+confidence warnings). Limitations: rigid rule structure cannot capture
+novel bias patterns; qualitative explanations are templated.
+
+\paragraph{LLM benchmark.}
+Strengths: richer, more natural-language explanations; can identify
+context-specific issues and convert metric tables into operational
+recommendations. Limitations: possible narrative overreach; nondeterminism
+across runs and API/model versions; sensitivity to prompt design; higher
+latency and cost than deterministic Python; and dependence on Python context
+for metric grounding.
+
+\paragraph{Scope disclaimers.}
+This artifact measures statistical group disparity under specific metric
+definitions. We make no causal claims (observed disparities may reflect
+confounding factors not captured in the data), no legal compliance
+determinations (ECOA/Fair Housing Act assessments require legal expertise
+beyond algorithmic auditing), and no guarantee of generalizability to other
+datasets, time periods, or jurisdictions. Small subgroups (e.g.,
+\texttt{foreign\_worker\_original}, rare HMDA race categories) produce
+statistically unreliable metrics; severity labels for these groups should be
+interpreted with caution.
+
+\subsection{Value of Qualitative Analysis}
+
+Raw fairness metrics alone are insufficient for actionable remediation.
+A DI of 0.82 does not explain \emph{why} the model is biased or
+\emph{what to do about it}. Our qualitative engine bridges this gap:
+for AgeGroup, it identifies that (a) the Age feature is a strong proxy
+($r{=}{-}0.84$), (b) ground-truth labels embed historical age
+discrimination, and (c) specific AIF360 algorithms
+(Reweighing, DisparateImpactRemover) can address these root causes.
+
+% ===================================================================
+\section{Conclusion and Future Work}
+
+We presented a reproducible fairness-audit artifact for lending models that
+combines deterministic quantitative metrics, deterministic qualitative
+analysis, and an OpenAI benchmark for remediation-ready audit narratives. Key
+findings:
+\begin{itemize}[nosep]
+  \item Both German Credit and HMDA exhibit \textsc{Moderate} bias on
+        most protected attributes, driven by historical label disparities
+        and proxy features.
+  \item gpt-4o agrees with deterministic severity labels in 4/6 cases
+        (majority-vote across 4 prompt cycles), but escalates severity for
+        socially salient attributes (Sex, Race), confirming that metric
+        grounding alone does not prevent LLM overclaiming.
+  \item LLM auditing can improve remediation narrative quality, but requires
+        explicit guardrails for metric grounding, subgroup-size uncertainty,
+        reproducibility, and API/model versioning.
+  \item The project infrastructure (pipeline orchestration, documentation, and
+        reproducibility scaffold) is part of the deliverable.
+\end{itemize}
+
+\paragraph{Future work.}
+We plan to deepen our analysis within the finance and lending domain:
+\begin{itemize}[nosep]
+  \item \textbf{Additional lending datasets}: incorporate peer-to-peer
+        lending and consumer credit bureau data to test generalizability.
+  \item \textbf{Intersectional fairness}: analyze compound protected groups
+        (e.g., race $\times$ sex) to detect bias invisible at single-attribute
+        granularity.
+  \item \textbf{End-to-end mitigation}: implement the recommended AIF360
+        and fairlearn mitigations (Reweighing, ExponentiatedGradient,
+        ThresholdOptimizer) and measure their impact on both accuracy and
+        fairness.
+  \item \textbf{Uncertainty-aware reporting}: add bootstrap confidence
+        intervals or exact tests for small subgroups before escalating
+        severity claims.
+  \item \textbf{Longitudinal bias monitoring}: track fairness metric drift
+        over time as data distributions shift, enabling early detection of
+        emergent bias.
+\end{itemize}
+
+% ===================================================================
+\begin{thebibliography}{9}
+
+\bibitem{aif360}
+R.~K.~E.~Bellamy et~al.,
+``AI Fairness 360: An extensible toolkit for detecting and mitigating
+algorithmic bias,''
+\textit{IBM Journal of Research and Development}, vol.~63, no.~4/5, 2019.
+\url{https://github.com/Trusted-AI/AIF360}
+
+\bibitem{fairlearn}
+S.~Bird et~al.,
+``Fairlearn: A toolkit for assessing and improving fairness in AI,''
+Microsoft Research, Tech.\ Rep., 2020.
+\url{https://fairlearn.org}
+
+\bibitem{german}
+H.~Hofmann,
+``Statlog (German Credit Data),''
+UCI Machine Learning Repository, 1994.
+\url{https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)}
+
+\bibitem{hmda}
+Consumer Financial Protection Bureau,
+``HMDA Data Browser,''
+\url{https://ffiec.cfpb.gov/data-browser/}
+
+\bibitem{openai}
+OpenAI,
+``OpenAI API Documentation,''
+\url{https://platform.openai.com/docs}
+
+\end{thebibliography}
+
+\end{document}
