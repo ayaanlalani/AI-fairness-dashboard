@@ -1,0 +1,155 @@
+{
+  "dataset_name": "Lending Club P2P Loans",
+  "favorable_label": 0,
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "gender",
+      "privileged_value": "male",
+      "metrics": {
+        "disparate_impact": 0.9930555555555556,
+        "demographic_parity_diff": -0.0069444444444444,
+        "equal_opportunity_diff": 0.0,
+        "average_odds_diff": -0.0357142857142857,
+        "theil_index": null
+      },
+      "group_breakdown": [
+        {
+          "group": "male",
+          "n": 312,
+          "pct_of_total": 52.0,
+          "base_rate": 0.859,
+          "selection_rate": 1.0,
+          "tpr": 1.0,
+          "fpr": 1.0
+        },
+        {
+          "group": "female",
+          "n": 288,
+          "pct_of_total": 48.0,
+          "base_rate": 0.9028,
+          "selection_rate": 0.9931,
+          "tpr": 1.0,
+          "fpr": 0.9286
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "income_level",
+      "privileged_value": "medium",
+      "metrics": {
+        "disparate_impact": 1.0072463768115942,
+        "demographic_parity_diff": 0.0071942446043165,
+        "equal_opportunity_diff": 0.0,
+        "average_odds_diff": 0.032258064516129,
+        "theil_index": null
+      },
+      "group_breakdown": [
+        {
+          "group": "medium",
+          "n": 278,
+          "pct_of_total": 46.3,
+          "base_rate": 0.8885,
+          "selection_rate": 0.9928,
+          "tpr": 1.0,
+          "fpr": 0.9355
+        },
+        {
+          "group": "low",
+          "n": 183,
+          "pct_of_total": 30.5,
+          "base_rate": 0.8525,
+          "selection_rate": 1.0,
+          "tpr": 1.0,
+          "fpr": 1.0
+        },
+        {
+          "group": "high",
+          "n": 139,
+          "pct_of_total": 23.2,
+          "base_rate": 0.8993,
+          "selection_rate": 1.0,
+          "tpr": 1.0,
+          "fpr": 1.0
+        }
+      ],
+      "imbalance_findings": [],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    },
+    {
+      "attribute": "loan_amount_level",
+      "privileged_value": "medium",
+      "metrics": {
+        "disparate_impact": 1.0062893081761006,
+        "demographic_parity_diff": 0.0062499999999999,
+        "equal_opportunity_diff": 0.0,
+        "average_odds_diff": 0.027027027027027,
+        "theil_index": null
+      },
+      "group_breakdown": [
+        {
+          "group": "medium",
+          "n": 320,
+          "pct_of_total": 53.3,
+          "base_rate": 0.8844,
+          "selection_rate": 0.9938,
+          "tpr": 1.0,
+          "fpr": 0.9459
+        },
+        {
+          "group": "small",
+          "n": 181,
+          "pct_of_total": 30.2,
+          "base_rate": 0.8729,
+          "selection_rate": 1.0,
+          "tpr": 1.0,
+          "fpr": 1.0
+        },
+        {
+          "group": "large",
+          "n": 99,
+          "pct_of_total": 16.5,
+          "base_rate": 0.8788,
+          "selection_rate": 1.0,
+          "tpr": 1.0,
+          "fpr": 1.0
+        }
+      ],
+      "imbalance_findings": [
+        "Moderate size imbalance: medium (320) is 3.2x larger than large (99)."
+      ],
+      "severity_thresholds": {
+        "critical_if_di_below": 0.72,
+        "high_if_di_below": 0.8,
+        "moderate_if_di_below": 0.95
+      }
+    }
+  ]
+}

@@ -47,7 +47,13 @@ SPEND_LEDGER_PATH = REPO_ROOT / "artifacts" / "llm_benchmark" / "spend_ledger.js
 MODEL_PRICES: dict[str, tuple[float, float]] = {
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
-    "o3": (2.00, 8.00),
+    # o3 is deliberately held at the higher figure this repo's cost accounting
+    # has always used. It may overstate current list price, which is the safe
+    # direction for a cap (it trips earlier) but means any o3 cost reported
+    # here is an UPPER BOUND, not a billed amount. Flagged rather than silently
+    # "corrected" — picking a lower number without a verifiable source would
+    # understate spend in the paper.
+    "o3": (10.00, 40.00),
     "gemini-2.5-flash": (0.10, 0.40),
 }
 _DEFAULT_PRICE = (2.50, 10.00)

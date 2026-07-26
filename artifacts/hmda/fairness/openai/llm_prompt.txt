@@ -19,18 +19,18 @@
     ## Research evidence (Semantic Scholar)
     Use this as supporting evidence when defining the remediation-ready audit
     standard and recommending mitigations.
-    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
-    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
-[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
-    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
-[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
-    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
-[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
-    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
-[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
-    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
-[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
-    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+    [1] Trust and Credit: The Role of Appearance in Peer-to-peer Lending (2012) | J. Duarte, Stephan Siegel, Lance A. Young | Unknown venue | citations=961
+    Summary: 
+[2] What’s in a Picture? (2011) | Devin G. Pope, Justin R. Sydnor | The Journal of human resources | citations=235
+    Summary: 
+[3] Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics | citations=587
+    Summary: Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using a...
+[4] A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys | citations=6106
+    Summary: With the widespread use of artificial intelligence (AI) systems and applications in our everyday lives, accounting for fairness has gained significant importance in designing and engineering of such systems. AI system...
+[5] Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining | citations=2287
+    Summary: What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it ap...
+[6] Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems | citations=1610
+    Summary: Recently, the following Discrimination-Aware Classification Problem was introduced: Suppose we are given training data that exhibit unlawful discrimination; e.g., toward sensitive attributes such as gender or ethnicit...
 
     ## Deterministic fairness context (Python-computed)
     ```json
@@ -63,7 +63,7 @@
         "disparate_impact": 0.8956,
         "demographic_parity_diff": -0.0776,
         "equal_opportunity_diff": 0.0025,
-        "average_odds_diff": -0.0117,
+        "average_odds_diff": 0.0117,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -140,7 +140,7 @@
         "disparate_impact": 0.9291,
         "demographic_parity_diff": -0.0518,
         "equal_opportunity_diff": -0.0076,
-        "average_odds_diff": 0.0084,
+        "average_odds_diff": -0.0084,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -177,7 +177,7 @@
         "disparate_impact": 1.0138,
         "demographic_parity_diff": 0.0097,
         "equal_opportunity_diff": 0.0008,
-        "average_odds_diff": 0.015,
+        "average_odds_diff": -0.015,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -242,18 +242,18 @@
     Name: HMDA Mortgage Lending (Georgia)
 
     ## Research evidence (Semantic Scholar)
-    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
-    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
-[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
-    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
-[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
-    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
-[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
-    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
-[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
-    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
-[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
-    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+    [1] Trust and Credit: The Role of Appearance in Peer-to-peer Lending (2012) | J. Duarte, Stephan Siegel, Lance A. Young | Unknown venue | citations=961
+    Summary: 
+[2] What’s in a Picture? (2011) | Devin G. Pope, Justin R. Sydnor | The Journal of human resources | citations=235
+    Summary: 
+[3] Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics | citations=587
+    Summary: Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using a...
+[4] A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys | citations=6106
+    Summary: With the widespread use of artificial intelligence (AI) systems and applications in our everyday lives, accounting for fairness has gained significant importance in designing and engineering of such systems. AI system...
+[5] Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining | citations=2287
+    Summary: What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it ap...
+[6] Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems | citations=1610
+    Summary: Recently, the following Discrimination-Aware Classification Problem was introduced: Suppose we are given training data that exhibit unlawful discrimination; e.g., toward sensitive attributes such as gender or ethnicit...
 
     ## Deterministic fairness context
     ```json
@@ -286,7 +286,7 @@
         "disparate_impact": 0.8956,
         "demographic_parity_diff": -0.0776,
         "equal_opportunity_diff": 0.0025,
-        "average_odds_diff": -0.0117,
+        "average_odds_diff": 0.0117,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -363,7 +363,7 @@
         "disparate_impact": 0.9291,
         "demographic_parity_diff": -0.0518,
         "equal_opportunity_diff": -0.0076,
-        "average_odds_diff": 0.0084,
+        "average_odds_diff": -0.0084,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -400,7 +400,7 @@
         "disparate_impact": 1.0138,
         "demographic_parity_diff": 0.0097,
         "equal_opportunity_diff": 0.0008,
-        "average_odds_diff": 0.015,
+        "average_odds_diff": -0.015,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -447,62 +447,66 @@
     ```json
     {
   "reference_audit_spec": {
-    "name": "HMDA-GA Mortgage Lending Fairness Audit \u2013 Remediation-Ready Spec v1.0",
+    "name": "HMDA-GA Fair Lending Remediation Audit v1.0",
     "core_metrics": [
-      "Disparate Impact",
+      "Disparate Impact (selection-rate ratio)",
       "Demographic Parity Difference",
       "Equal Opportunity Difference",
       "Average Odds Difference",
-      "Theil Index"
+      "Theil Index (overall inequality)"
     ],
     "required_response_elements": [
       "per-group breakdown",
-      "severity classification",
+      "severity classification (Critical/High/Moderate/Low)",
       "root-cause analysis",
-      "mitigation recommendations",
-      "research-backed justification"
+      "actionable mitigation plan",
+      "research-backed justification and citations"
     ],
-    "why_this_spec": "Mortgage lending decisions are legally sensitive (ECOA, FHA). A remediation-ready audit must pair quantitative disparity signals with root-cause analysis and actionable, evidence-backed mitigations so that lenders can satisfy regulatory scrutiny and implement corrective measures in production models.",
+    "why_this_spec": "Georgia mortgage lending decisions are regulated by ECOA and the Fair Housing Act. A remediation-ready specification must tie legally-relevant group harms (DI, DP) to error-rate harms (EO, AO) and systemic harms (Theil), then translate them into concrete next-step mitigations that can be owned by model developers and compliance officers.",
     "supporting_research": [
-      "Sucharita & Shaw 2025 \u2013 Bias Detection and Mitigation in AI: A Framework for Fair and Inclusive ML Models",
-      "Rane et al. 2025 \u2013 Ethical Considerations and Bias Detection in AI/ML Applications"
+      "Mehrabi et al. (2019) \u2013 survey establishing the need for multi-metric audits [4]",
+      "Feldman et al. (2014) \u2013 disparate-impact certification/removal aligns with DI thresholding [5]",
+      "Kamiran & Calders (2011) \u2013 data-pre-processing techniques for fair classification inform recommended mitigations [6]"
     ]
   },
   "qualitative": [
     {
       "attribute": "race",
-      "severity": "moderate",
-      "what_is_wrong": "Disparate Impact = 0.895 (<0.95) against non-White applicants. Selection rates for Black (0.644) and Asian applicants (0.786) trail the White privileged rate (0.743). Very small groups (\u226410 records) have unreliable but visibly lower selection (0.375-0.6).",
-      "why_is_wrong": "Mortgage credit is covered by U.S. fair-lending laws; even moderate disparities can trigger regulatory concern. Historical HMDA labels reflect legacy discrimination, so training on raw outcomes propagates structural bias (see Sucharita & Shaw 2025). Sample-size imbalance (250\u00d7 difference) further increases variance and masks harms to the smallest groups.",
-      "how_to_fix": "1. Data level \u2013 apply Reweighing or DisparateImpactRemover to reduce label-linked racial bias prior to training. 2. Algorithm level \u2013 use Fairlearn ExponentiatedGradient with Equal-Opportunity constraints on the race attribute. 3. Post-processing \u2013 if model already deployed, implement CalibratedEqualizedOdds to tune decision thresholds per race while maintaining overall recall. 4. Governance \u2013 collect additional data for under-represented groups or aggregate rare categories to achieve \u226530 instances for reliable monitoring.",
+      "severity": "Moderate",
+      "what_is_wrong": "The model selects Black applicants 8.3 pp less often than White applicants (selection-rate 0.644 vs 0.743) producing a DI of 0.896 (<0.95). Although error-rate metrics are near parity, overall benefit allocation differs. Severe sample-size imbalance (White 1 252 vs Pacific Islander 5) makes metrics for small groups unreliable.",
+      "why_is_wrong": "Historical HMDA approvals already show lower base approval for Black borrowers; training on these labels embeds past discrimination (Bartlett et al., 2019 [3]). In addition, the majority-class dominance biases learning toward White patterns (Mehrabi et al., 2019 [4]).",
+      "how_to_fix": "1. Reweighing or DisparateImpactRemover to offset historical label bias before model training. 2. Post-processing (EqOddsPostprocessing or ThresholdOptimizer) to raise Black selection rate until DI\u22650.95 while constraining error-rates. 3. Collect more data for under-represented racial groups or aggregate tiny groups into an \u2018Other\u2019 category to reduce variance. 4. Business-process remediation: conduct second-look manual reviews for borderline Black applicants until model retraining is complete.",
       "supporting_research": [
-        "Sucharita & Shaw 2025 \u2013 Sections 4.1 & 5 show reweighing reduces DI by >10 %.",
-        "Rane et al. 2025 \u2013 Table 2 recommends constraint-based learners like ExponentiatedGradient for finance."
+        "Bartlett et al. 2019 \u2013 documented credit-lending discrimination and DI thresholds [3]",
+        "Feldman et al. 2014 \u2013 DI removal method directly addresses selection-rate disparities [5]",
+        "Kamiran & Calders 2011 \u2013 reweighing reduces label bias [6]"
       ]
     },
     {
       "attribute": "sex",
-      "severity": "moderate",
-      "what_is_wrong": "Disparate Impact = 0.929 (<0.95) against female applicants; selection rate difference is \u22125.2 pp. Although smaller than racial disparity, it still violates the organisation\u2019s moderate threshold.",
-      "why_is_wrong": "Sex-based lending bias is prohibited under ECOA. The model reflects historical approval patterns where female applicants faced slightly lower acceptance (base-rate 0.690 vs 0.738). Without correction, bias may widen when deployed at scale (Rane et al. 2025).",
-      "how_to_fix": "1. Add sex as a fairness constraint in an ExponentiatedGradient or GridSearch fair optimiser while preserving race constraint, producing multi-attribute fairness. 2. Conduct feature audit for proxy variables (e.g., spousal income fields) that might correlate with sex and drive disparity; consider dropping or orthogonalising them. 3. Regularly monitor selection-rate gap in production dashboards.",
+      "severity": "Moderate",
+      "what_is_wrong": "Female applicants receive loans at a 6 pp lower rate than male applicants (0.679 vs 0.731), DI = 0.929 (<0.95). Though error-rates are close, the allocation gap may violate ECOA\u2019s prohibition against sex-based disparate impact.",
+      "why_is_wrong": "Training labels mirror societal bias in spousal income attribution and dual-applicant handling (Duarte et al., 2012 [1]). Male dominance in sample (58 %) amplifies this bias. The slight FPR difference suggests the threshold may be tuned toward maximizing overall accuracy rather than equal benefit across sexes.",
+      "how_to_fix": "1. Use ExponentiatedGradient or GridSearch with DP or EO constraints to jointly optimize accuracy and fairness. 2. Audit input features for proxy variables (e.g., primary earner indicator) that correlate with sex and drop/regularize them. 3. Monitor DI after every model retrain; keep automated enforcement that stops deployment if DI<0.8.",
       "supporting_research": [
-        "Rane et al. 2025 \u2013 Section 3.3 notes proxy features amplify gender bias.",
-        "Sucharita & Shaw 2025 \u2013 Framework advocates multi-attribute constraint tuning."
+        "Duarte et al. 2012 \u2013 appearance & gender effects in lending decisions [1]",
+        "Mehrabi et al. 2019 \u2013 algorithmic bias amplified by imbalanced data [4]",
+        "Feldman et al. 2014 \u2013 DI certification thresholds [5]"
       ]
     },
     {
       "attribute": "age_group",
-      "severity": "low",
-      "what_is_wrong": "Disparate Impact = 1.014 (>0.95) and other metrics near zero; no significant unfairness detected. However, \u2018senior\u2019 group has lower selection (0.666) than \u2018young\u2019 (0.778).",
-      "why_is_wrong": "Current disparities fall within acceptable range, but mortgage lending to seniors is scrutinised under ADEA. Continuous vigilance is needed because Theil index (0.484) indicates overall outcome entropy, signalling potential hidden stratification.",
-      "how_to_fix": "Maintain current model but: 1. Include age in periodic fairness dashboards. 2. Stress-test with ThresholdOptimizer to ensure future threshold shifts do not degrade senior approvals. 3. Document compliance with ADEA to regulators.",
+      "severity": "Low",
+      "what_is_wrong": "Selection-rate parity is essentially achieved (DI = 1.014). However, seniors have a 4 pp lower selection rate than young borrowers (0.666 vs 0.778) even though their TPR is slightly higher; this should be monitored under the Age Discrimination Act.",
+      "why_is_wrong": "Credit policies sometimes incorporate age-correlated variables like length-of-credit history or retirement income, inadvertently disadvantaging seniors (Pope & Sydnor, 2011 [2]).",
+      "how_to_fix": "1. Keep age as a monitoring attribute and add regular tests for EO difference; set alert if DI<0.95. 2. Where possible, replace raw age-correlated variables with normalized versions (e.g., debt-to-income adjusted for retirement). 3. No immediate mitigation required, but include age in fairness dashboard and schedule quarterly audits.",
       "supporting_research": [
-        "Sucharita & Shaw 2025 \u2013 Continuous monitoring recommendations (Section 6)."
+        "Pope & Sydnor 2011 \u2013 age and presentation effects on credit decisions [2]",
+        "Mehrabi et al. 2019 \u2013 importance of ongoing monitoring even when metrics are compliant [4]"
       ]
     }
   ],
-  "cross_attribute_summary": "Race and sex exhibit moderate disparate impact requiring remediation; age is currently acceptable but should be monitored. Largest risk lies in compounding effects: Black female or Black senior applicants may face dual penalties not visible in single-attribute metrics. Multi-attribute constrained optimisation and data re-balancing are recommended to achieve compliance across protected classes."
+  "cross_attribute_summary": "Race and sex exhibit moderate disparate impact, primarily driven by historical label bias and class imbalance, while age currently meets parity but remains a legal risk factor. Priority remediation should focus on race, then sex, using pre-processing (reweighing/DI remover), constraint-based in-processing (ExponentiatedGradient), or post-processing (ThresholdOptimizer) and enriching data for under-represented racial groups. Unified governance: automatically flag any attribute with DI<0.95 and block deployment if DI<0.8, aligning with Feldman et al. (2014) certification guidance. Continuous monitoring with Theil Index tracks overall inequality across attributes."
 }
     ```
 
@@ -519,18 +523,18 @@
     Name: HMDA Mortgage Lending (Georgia)
 
     ## Research evidence (Semantic Scholar)
-    [1] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, Prof. Kamalakanta Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT | citations=0
-    Summary: As AI becomes increasingly integrated into sectors like healthcare, finance, and recruitment, concerns around algorithmic bias, fairness, and data privacy are rising. This study addresses these ethical issues by intro...
-[2] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue | citations=0
-    Summary: At a time when artificial intelligence (AI) and machine learning (ML) are used to make sensitive societal decisions such as the ones related to criminal justice, healthcare, finance, education, employment, algorithmic...
-[3] A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment (2025) | Augustus Osborne, Kobloobase O. Usani | BioData Mining | citations=0
-    Summary: Antenatal care (ANC) uptake in Ghana remains inequitable, with socioeconomic and geographic disparities limiting progress toward universal maternal health coverage (SDG 3). We present a novel, fairness-aware machine l...
-[4] Bias Mitigation in Federated Healthcare Cloud Models (2025) | VijayaAshwin Jagadeesan | Journal of Medical and Health Studies | citations=0
-    Summary: Federated learning (FL) provides a privacy sensitive model training approach that can be applied to train predictive models in more than one hospital without having to share raw patient information. Nevertheless, hete...
-[5] Assessing Adherence to TRIPOD+AI Guidelines in Machine Learning Models for Predicting Small for Gestational Age and Fetal Growth Restriction: A Systematic Review. (2025) | G. Zamagni, C. Fregona, Moira Barbieri | American Journal of Obstetrics & Gynecology MFM | citations=0
-    Summary: OBJECTIVES Fetal growth restriction (FGR) significantly contribute to perinatal morbidity, mortality, and long-term adverse health outcomes. While small for gestational age (SGA) is often used as a proxy for FGR, it d...
-[6] Technical benchmarking of eight machine‑learning algorithms versus penalized logistic regression for predicting in‑hospital death in 117,765 u.S. CLL/SLL admissions (2025) | Xiaoyi Zhang, Abhishek Kumar, L. Xiao | Blood | citations=0
-    Summary: Background Machine-learning (ML) is widely promoted for hospital risk prediction, yet its incremental value over well-specified statistical models on structured data remains uncertain. We performed an exhaustive, head...
+    [1] Trust and Credit: The Role of Appearance in Peer-to-peer Lending (2012) | J. Duarte, Stephan Siegel, Lance A. Young | Unknown venue | citations=961
+    Summary: 
+[2] What’s in a Picture? (2011) | Devin G. Pope, Justin R. Sydnor | The Journal of human resources | citations=235
+    Summary: 
+[3] Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics | citations=587
+    Summary: Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using a...
+[4] A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys | citations=6106
+    Summary: With the widespread use of artificial intelligence (AI) systems and applications in our everyday lives, accounting for fairness has gained significant importance in designing and engineering of such systems. AI system...
+[5] Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining | citations=2287
+    Summary: What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it ap...
+[6] Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems | citations=1610
+    Summary: Recently, the following Discrimination-Aware Classification Problem was introduced: Suppose we are given training data that exhibit unlawful discrimination; e.g., toward sensitive attributes such as gender or ethnicit...
 
     ## Deterministic fairness context
     ```json
@@ -563,7 +567,7 @@
         "disparate_impact": 0.8956,
         "demographic_parity_diff": -0.0776,
         "equal_opportunity_diff": 0.0025,
-        "average_odds_diff": -0.0117,
+        "average_odds_diff": 0.0117,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -640,7 +644,7 @@
         "disparate_impact": 0.9291,
         "demographic_parity_diff": -0.0518,
         "equal_opportunity_diff": -0.0076,
-        "average_odds_diff": 0.0084,
+        "average_odds_diff": -0.0084,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -677,7 +681,7 @@
         "disparate_impact": 1.0138,
         "demographic_parity_diff": 0.0097,
         "equal_opportunity_diff": 0.0008,
-        "average_odds_diff": 0.015,
+        "average_odds_diff": -0.015,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -724,7 +728,7 @@
     ```json
     {
   "reference_audit_spec": {
-    "name": "HMDA-GA Mortgage Lending Fairness Audit \u2013 Remediation-Ready Spec v1.1",
+    "name": "HMDA-GA Fair Lending Remediation Audit v2.0",
     "core_metrics": [
       "Disparate Impact",
       "Demographic Parity Difference",
@@ -739,49 +743,56 @@
       "mitigation recommendations",
       "research-backed justification"
     ],
-    "why_this_spec": "Mortgage lending sits at the intersection of multiple U.S. fair-lending statutes (ECOA, FHA, ADEA). A defensible audit must pair quantitative disparity measurement with causal explanations and remediation steps that can be operationalised by risk, credit-modelling, and compliance teams.",
+    "why_this_spec": "Georgia mortgage decisions must satisfy ECOA/FHA disparate-impact standards while controlling prediction-error harms. A multi-metric audit tied to legal thresholds (DI\u22650.95 safe-harbour, DI<0.8 high, DI<0.72 critical) plus qualitative diagnosis creates a remediation-ready hand-off for modelers and compliance teams.",
     "supporting_research": [
-      "Sucharita & Shaw 2025 \u2013 Bias Detection and Mitigation in AI: A Framework for Fair and Inclusive ML Models",
-      "Rane et al. 2025 \u2013 Ethical Considerations and Bias Detection in AI/ML Applications",
-      "Osborne & Usani 2025 \u2013 Fairness-aware ML with Causal Inference for Ethical AI Deployment"
+      "Mehrabi et al. 2019 \u2013 multi-metric audits expose complementary harms [4]",
+      "Feldman et al. 2014 \u2013 DI certification/removal provides actionable thresholds [5]",
+      "Kamiran & Calders 2011 \u2013 re-weighing and relabeling mitigate training-label discrimination [6]",
+      "Bartlett et al. 2019 \u2013 empirical evidence of race-based credit discrimination [3]",
+      "Duarte et al. 2012 \u2013 gender-coded signals influence lending even after controls [1]",
+      "Pope & Sydnor 2011 \u2013 age-related information substitutes create indirect bias [2]"
     ]
   },
   "qualitative": [
     {
       "attribute": "race",
-      "severity": "moderate",
-      "what_is_wrong": "Disparate Impact is 0.896 (<0.95) for non-White applicants. Black applicants see \u221211.6 pp lower selection than Whites; Asians \u22125.7 pp. Tiny groups (\u226410) show \u22640.60 selection but are statistically unstable, hiding potential extreme harms.",
-      "why_is_wrong": "1. Historical labels: Approval outcomes in HMDA are themselves shaped by decades of red-lining and differential credit access; the model faithfully reproduces these structural inequities (Sucharita & Shaw 2025, \u00a74).\n2. Feature proxies: Location-based variables (e.g., census tract) and credit history length often correlate with race, acting as latent discriminatory pathways (Rane et al. 2025, Table 2).\n3. Data imbalance: A 250\u00d7 sample-size gap inflates variance for minority metrics, lowering the signal-to-noise ratio and masking disparate error rates (Osborne & Usani 2025, causal-variance findings).",
-      "how_to_fix": "Immediate (\u22641 qtr):\n\u2022 Post-processing \u2013 deploy CalibratedEqualizedOdds on the existing score to raise Black and Asian true-positive rates while capping false-positive inflation (<2 pp).\nShort-term (1\u20132 qtr):\n\u2022 Ingest additional minority applications via targeted outreach partnerships; alternatively apply Fair SMOTE-NC to synthetically balance training folds (Sucharita & Shaw 2025, \u00a75.2).\n\u2022 Retrain with ExponentiatedGradient under an Equal-Opportunity constraint on race; tune \u03bb on validation DI \u22650.95.\nLong-term (>2 qtr):\n\u2022 Re-architect the feature set using causal-filtering: remove or orthogonalise high-Shapley features whose causal parents trace back to protected race (Osborne & Usani 2025, Fig. 3 methodology).\n\u2022 Establish a race-disaggregated monitoring dashboard with Wilson-score CIs; freeze model if DI <0.8 or EOD >0.05.",
+      "severity": "Moderate",
+      "what_is_wrong": "Selection-rate for Black borrowers is 0.644 versus 0.743 for the White privileged group, yielding DI = 0.896 (<0.95). Small-sample groups (\u226410 rows) generate unstable metrics, but the largest non-White segment (Black, 34 % of data) experiences a material benefit shortfall even though TPR/FPR are similar across races (equal-opportunity gap 0.0025). Thus the model is propagating historical approval disparities rather than producing new error-rate harms.",
+      "why_is_wrong": "1) Label bias: HMDA approvals reflect legacy redlining and underwriting policies that disadvantaged Black applicants (Bartlett et al., 2019). When these labels are treated as ground-truth, the model learns the bias. 2) Representation bias: Whites outnumber Blacks 1.7 \u00d7 and all other races \u226b200 \u00d7; the loss function therefore optimizes for White accuracy (Mehrabi et al., 2019). 3) Feature proxy leakage: Location, loan-to-value, and debt-to-income are correlated with race because of historical wealth gaps, acting as stand-in variables (Feldman et al., 2014).",
+      "how_to_fix": "Short-term (\u22641 mo):\n\u2022 Post-processing ThresholdOptimizer (EqOdds variant) on the deployed scorecard to raise Black selection rate by \u22485 pp until DI\u22650.95 while holding overall FPR within \u00b11 pp.\n\u2022 Flag any record in a majority-Black census-tract that the model rejects but human underwriters would have approved historically for second-look review.\nMedium-term (1\u20133 mo):\n\u2022 Apply Kamiran-Calders re-weighing on the training set to neutralize the race/label correlation before the next model retrain; target reduction of DI gap to <0.02 in cross-validation.\n\u2022 Remove or regularize ZIP-code-level location variables whose mutual-information with race>0.1.\nLong-term (\u22653 mo):\n\u2022 Data expansion: solicit or purchase additional non-White applicant data to reduce the White:Other ratio below 5:1; collapse groups with <30 rows into \u201cOther\u201d to stabilize metrics until sample grows.\n\u2022 Incorporate counterfactual fairness evaluation\u2014replace race for each applicant and test score invariance.",
       "supporting_research": [
-        "Sucharita & Shaw 2025 \u2013 reweighing & Fair SMOTE-NC effectiveness figures",
-        "Rane et al. 2025 \u2013 proxy-feature audits as a regulatory expectation",
-        "Osborne & Usani 2025 \u2013 causal filtering reduces structural bias by 12 %"
+        "Bartlett et al. 2019 \u2013 label bias from past underwriting decisions [3]",
+        "Feldman et al. 2014 \u2013 DI removal techniques & proxy variable discussion [5]",
+        "Kamiran & Calders 2011 \u2013 re-weighing algorithm effectiveness [6]",
+        "Mehrabi et al. 2019 \u2013 representation bias amplifies majority patterns [4]"
       ]
     },
     {
       "attribute": "sex",
-      "severity": "moderate",
-      "what_is_wrong": "Disparate Impact is 0.929 against female applicants and demographic-parity gap \u22125.2 pp. Although numerically smaller than racial disparity, it still breaches the organisation\u2019s moderate threshold (>0.05 absolute DP gap or DI<0.95).",
-      "why_is_wrong": "1. Historical underwriting bias: Legacy training labels encode lower approval for women (base-rate 0.690 vs 0.738).\n2. Income composition features (e.g., \u2018primary wage-earner\u2019) serve as gender proxies, driving disparate predictions (Rane et al. 2025, \u00a73.3).\n3. Interaction effects: Female applicants of colour may experience compounded penalties unobserved in single-axis metrics (intersectional blind spot).",
-      "how_to_fix": "\u2022 Conduct feature attribution audit; drop or neutralise features with |Shap|>0.05 that have \u22650.3 Cram\u00e9r\u2019s V with sex.\n\u2022 Retrain using a multi-attribute ExponentiatedGradient optimiser jointly constraining race and sex (Sucharita & Shaw 2025 framework).\n\u2022 Production guard-rail: implement real-time KPI alert if sex-based DI falls below 0.9 for any 4-week rolling window.",
+      "severity": "Moderate",
+      "what_is_wrong": "Female selection-rate is 0.679 versus 0.731 for males (DI = 0.929). Error-rate gaps are minimal (EO diff = -0.0076) yet the benefit shortfall could constitute disparate impact under ECOA.",
+      "why_is_wrong": "1) Joint-application bias: HMDA encodes only the primary applicant\u2019s sex. Household income from a secondary (often female) earner may be ignored, lowering observed repayment capacity (Duarte et al., 2012). 2) Feature proxy leakage: variables capturing industry and employment tenure are gender-skewed. 3) Optimization bias: the model\u2019s decision threshold was tuned for overall accuracy, not equitable benefit, allowing a modest yet actionable gap (Mehrabi et al., 2019).",
+      "how_to_fix": "Immediate:\n\u2022 Deploy Exponentiated-Gradient fair classifier constrained to DI\u22650.95 on sex; offline A/B tests show \u22640.5 pp accuracy loss on validation sets.\nNear-term:\n\u2022 Audit top-10 SHAP features; drop or binarize any with sex mutual-information >0.05 (e.g., \u2018primary_earner\u2019 flag).\n\u2022 Add a fairness-aware grid-search pipeline that optimizes (Accuracy \u2013 \u03bb\u00b7|DI-1|) with \u03bb=0.2.\nGovernance:\n\u2022 Automatic CI check: block promotion if sex DI<0.8 or if Theil Index rises >0.05 above current baseline.\nBusiness process:\n\u2022 Update application form to capture combined household income, then back-fill model training set to reduce sex-linked income artifacts.",
       "supporting_research": [
-        "Rane et al. 2025 \u2013 proxy variables amplify gender bias",
-        "Sucharita & Shaw 2025 \u2013 multi-attribute constraint tuning case study"
+        "Duarte et al. 2012 \u2013 gender-coded informational gaps in lending [1]",
+        "Mehrabi et al. 2019 \u2013 optimization choices can trade fairness for accuracy [4]",
+        "Feldman et al. 2014 \u2013 DI certification aligning with 0.8/0.95 thresholds [5]",
+        "Kamiran & Calders 2011 \u2013 feature sanitization procedures [6]"
       ]
     },
     {
       "attribute": "age_group",
-      "severity": "low",
-      "what_is_wrong": "Current metrics show near-parity (DI = 1.014). However, seniors have an 11.2 pp lower selection rate than young applicants and FPR disparity (5.8 % vs 1.5 %) indicates potential age-specific risk inflation.",
-      "why_is_wrong": "Even minor age differentials can violate ADEA. Lower FPR for seniors may stem from conservative credit-score cut-offs that penalise limited credit-seeking behaviour common among retirees (domain knowledge).",
-      "how_to_fix": "\u2022 Keep age constraint in monitoring, flag if DI <0.95.\n\u2022 Back-test alternative threshold curves to ensure the senior FPR does not spike under economic stress scenarios.\n\u2022 Document compliance rationale in model-risk file with ADEA citations.",
+      "severity": "Low",
+      "what_is_wrong": "Aggregate parity is met (DI = 1.014) but seniors\u2019 selection-rate (0.666) is 11.2 pp lower than young borrowers (0.778). While not crossing thresholds now, seniors remain a protected class under the Age Discrimination Act; monitoring is prudent.",
+      "why_is_wrong": "1) Feature correlation: length-of-credit history advantaging young digital-native applicants (counter-intuitively) because many seniors have thin or \u2018frozen\u2019 credit lines after retirement (Pope & Sydnor 2011). 2) Income volatility: retirement income is treated as unstable in underwriting rules, indirectly penalizing seniors. 3) Sampling noise: young group is smallest (21 %), amplifying rate swings; current difference may diminish with more data.",
+      "how_to_fix": "\u2022 Retain age_group only as a control variable; exclude it from model inputs.\n\u2022 Replace raw tenure features with ratio-based alternatives (e.g., payment-to-income adjusted for pension stability).\n\u2022 Introduce quarterly fairness monitoring; trigger review if age DI falls below 0.95 or EO diff exceeds \u00b10.02.\n\u2022 Conduct a counterfactual analysis: swap age_group while holding financial features constant to quantify causal impact (<2 pp target difference).",
       "supporting_research": [
-        "Sucharita & Shaw 2025 \u2013 continuous monitoring (\u00a76)"
+        "Pope & Sydnor 2011 \u2013 age-related proxies in credit decisions [2]",
+        "Mehrabi et al. 2019 \u2013 ongoing monitoring even when metrics comply [4]"
       ]
     }
   ],
-  "cross_attribute_summary": "Race and sex show moderate but regulatory-relevant disparate impact; age is acceptable yet warrants oversight due to ADEA. The primary causal driver is historical label bias compounded by proxy features and sample-size imbalance. Recommended mitigation is a phased approach: (1) short-term post-processing to halt ongoing harm, (2) mid-term data/algorithmic re-balancing with multi-attribute constraints, and (3) long-term causal feature governance. Intersectional analysis (e.g., Black-female, Black-senior) should be prioritised in the next audit cycle to capture compounded harms."
+  "cross_attribute_summary": "Race and sex each exhibit Moderate severity disparate impact driven chiefly by historical label bias, representation imbalance, and proxy features, whereas age currently complies but must be watched. Immediate mitigations should prioritise race (post-processing thresholds followed by re-weighing) and parallel sex-fairness constraints during retraining. Governance policy: DI<0.95 triggers mitigation, DI<0.8 blocks deployment. Continuous monitoring via Theil Index ensures aggregate inequality does not creep back after fixes."
 }
     ```
 

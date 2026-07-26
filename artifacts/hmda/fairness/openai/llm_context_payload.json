@@ -27,7 +27,7 @@
         "disparate_impact": 0.8956,
         "demographic_parity_diff": -0.0776,
         "equal_opportunity_diff": 0.0025,
-        "average_odds_diff": -0.0117,
+        "average_odds_diff": 0.0117,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -104,7 +104,7 @@
         "disparate_impact": 0.9291,
         "demographic_parity_diff": -0.0518,
         "equal_opportunity_diff": -0.0076,
-        "average_odds_diff": 0.0084,
+        "average_odds_diff": -0.0084,
         "theil_index": 0.4838
       },
       "group_breakdown": [
@@ -141,7 +141,7 @@
         "disparate_impact": 1.0138,
         "demographic_parity_diff": 0.0097,
         "equal_opportunity_diff": 0.0008,
-        "average_odds_diff": 0.015,
+        "average_odds_diff": -0.015,
         "theil_index": 0.4838
       },
       "group_breakdown": [

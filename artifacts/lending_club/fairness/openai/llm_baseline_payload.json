@@ -1,0 +1,74 @@
+{
+  "reference_audit_spec": {
+    "name": "Reference Audit Specification",
+    "core_metrics": [
+      "Disparate Impact",
+      "Demographic Parity Difference",
+      "Equal Opportunity Difference",
+      "Average Odds Difference",
+      "Theil Index"
+    ],
+    "required_response_elements": [
+      "per-group breakdown",
+      "severity classification",
+      "root-cause analysis",
+      "mitigation recommendations",
+      "research-backed justification"
+    ],
+    "why_this_spec": "A remediation-ready fairness audit should combine quantitative disparity measurement with interpretable causes, explicit severity, and concrete recommended interventions."
+  },
+  "attributes": [
+    {
+      "attribute": "gender",
+      "severity": "LOW (fair)",
+      "root_cause_labels": [],
+      "root_causes": [
+        "No significant disparate impact detected. The model treats groups approximately equally on the measured metrics."
+      ],
+      "mitigations": [
+        "Continue monitoring: fairness can drift as data distributions change. Re-run this analysis periodically and after any model retraining."
+      ],
+      "research_titles": [
+        "Trust and Credit: The Role of Appearance in Peer-to-peer Lending",
+        "What\u2019s in a Picture?",
+        "Consumer-lending discrimination in the FinTech Era"
+      ]
+    },
+    {
+      "attribute": "income_level",
+      "severity": "LOW (fair)",
+      "root_cause_labels": [
+        "proxy_discrimination"
+      ],
+      "root_causes": [
+        "Proxy discrimination: features that correlate with the protected attribute allow the model to indirectly discriminate even without direct access to the attribute. Proxy features detected: annual_inc (r=0.916), loan_amnt (r=0.458), installment (r=0.437), revol_bal (r=0.309)."
+      ],
+      "mitigations": [
+        "Pre-processing -- Disparate Impact Remover (aif360.algorithms.preprocessing.DisparateImpactRemover): transform feature distributions to reduce correlation with the protected attribute while preserving rank-ordering."
+      ],
+      "research_titles": [
+        "Consumer-lending discrimination in the FinTech Era",
+        "Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?",
+        "Certifying and Removing Disparate Impact"
+      ]
+    },
+    {
+      "attribute": "loan_amount_level",
+      "severity": "LOW (fair)",
+      "root_cause_labels": [
+        "proxy_discrimination"
+      ],
+      "root_causes": [
+        "Proxy discrimination: features that correlate with the protected attribute allow the model to indirectly discriminate even without direct access to the attribute. Proxy features detected: loan_amnt (r=0.922), installment (r=0.876), annual_inc (r=0.424), term_60_months (r=0.4), revol_bal (r=0.321)."
+      ],
+      "mitigations": [
+        "Pre-processing -- Disparate Impact Remover (aif360.algorithms.preprocessing.DisparateImpactRemover): transform feature distributions to reduce correlation with the protected attribute while preserving rank-ordering."
+      ],
+      "research_titles": [
+        "Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?",
+        "Certifying and Removing Disparate Impact",
+        "Data preprocessing techniques for classification without discrimination"
+      ]
+    }
+  ]
+}

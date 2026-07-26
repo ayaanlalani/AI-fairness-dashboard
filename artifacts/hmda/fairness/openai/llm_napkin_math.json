@@ -1,44 +1,44 @@
 {
   "projection": {
-    "projected_input_tokens": 2327,
+    "projected_input_tokens": 2109,
     "projected_output_tokens": 5000,
-    "projected_total_tokens": 7327,
-    "projected_input_cost_usd": 0.02327,
+    "projected_total_tokens": 7109,
+    "projected_input_cost_usd": 0.02109,
     "projected_output_cost_usd": 0.2,
-    "projected_total_cost_usd": 0.22327
+    "projected_total_cost_usd": 0.22109
   },
-  "projected_run_cost_usd": 0.66981,
+  "projected_run_cost_usd": 0.66327,
   "usage": {
     "model": "o3",
     "attempts": 1,
-    "wall_clock_s": 14.22,
-    "input_tokens": 4032,
-    "output_tokens": 1666,
-    "total_tokens": 5698,
-    "input_cost_usd": 0.04032,
-    "output_cost_usd": 0.06664,
-    "total_cost_usd": 0.10696,
+    "wall_clock_s": 10.78,
+    "input_tokens": 4271,
+    "output_tokens": 1898,
+    "total_tokens": 6169,
+    "input_cost_usd": 0.04271,
+    "output_cost_usd": 0.07592,
+    "total_cost_usd": 0.11863,
     "price_input_per_m": 10.0,
     "price_output_per_m": 40.0,
     "projection": {
-      "projected_input_tokens": 2327,
+      "projected_input_tokens": 2109,
       "projected_output_tokens": 5000,
-      "projected_total_tokens": 7327,
-      "projected_input_cost_usd": 0.02327,
+      "projected_total_tokens": 7109,
+      "projected_input_cost_usd": 0.02109,
       "projected_output_cost_usd": 0.2,
-      "projected_total_cost_usd": 0.22327
+      "projected_total_cost_usd": 0.22109
     },
-    "max_cost_usd": 37.0,
-    "max_cost_cad": 50.0,
-    "projected_run_cost_usd": 0.66981,
+    "max_cost_usd": 15.0,
+    "max_cost_cad": 20.27,
+    "projected_run_cost_usd": 0.66327,
     "stage_timings_s": {
-      "load_predictions": 0.0,
-      "build_metric_context": 11.78,
+      "load_predictions": 0.01,
+      "build_metric_context": 32.35,
       "prompt_build": 0.0,
-      "api_call": 62.58,
+      "api_call": 37.45,
       "report_generation": 0.0,
       "comparison_generation": 0.0,
-      "total_benchmark": 74.37
+      "total_benchmark": 69.83
     }
   }
 }

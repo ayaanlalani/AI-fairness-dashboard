@@ -34,9 +34,9 @@
         "Data collection: gather more samples from underrepresented groups. In the interim, use class-weighted training (class_weight='balanced' in scikit-learn) to upweight minority-group errors."
       ],
       "research_titles": [
-        "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
-        "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
-        "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment"
+        "A Survey on Bias and Fairness in Machine Learning",
+        "Certifying and Removing Disparate Impact",
+        "Data preprocessing techniques for classification without discrimination"
       ]
     },
     {
@@ -48,9 +48,9 @@
         "Post-processing -- Calibrated Equalized Odds (aif360.algorithms.postprocessing.CalibratedEqOddsPostprocessing): a minimal intervention that adjusts thresholds to bring DI above the 0.8 threshold while preserving calibration."
       ],
       "research_titles": [
-        "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
-        "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
-        "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment"
+        "Trust and Credit: The Role of Appearance in Peer-to-peer Lending",
+        "What\u2019s in a Picture?",
+        "Consumer-lending discrimination in the FinTech Era"
       ]
     },
     {
@@ -66,9 +66,9 @@
         "Pre-processing -- Reweighing (aif360.algorithms.preprocessing.Reweighing): assign sample weights that compensate for historical label imbalance across groups before training."
       ],
       "research_titles": [
-        "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models",
-        "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications",
-        "A fairness-aware machine learning framework for maternal health in Ghana: integrating explainability, bias mitigation, and causal inference for ethical AI deployment"
+        "A Survey on Bias and Fairness in Machine Learning",
+        "Certifying and Removing Disparate Impact",
+        "Data preprocessing techniques for classification without discrimination"
       ]
     }
   ]

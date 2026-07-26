@@ -1,0 +1,375 @@
+{
+  "result": {
+    "reference_audit_spec": {
+      "name": "Remediation-Ready LendingClub Audit v3",
+      "core_metrics": [
+        "Disparate Impact",
+        "Demographic Parity Difference",
+        "Equal Opportunity Difference",
+        "Average Odds Difference",
+        "Theil Index",
+        "Sample Size Imbalance Ratio"
+      ],
+      "required_response_elements": [
+        "per-group breakdown",
+        "severity classification",
+        "root-cause analysis",
+        "mitigation recommendations",
+        "research-backed justification"
+      ],
+      "why_this_spec": "Fin-tech lenders must show both statistical neutrality and a concrete remediation plan under ECOA/Reg B. A spec that pairs classical fairness metrics with representation diagnostics (Sample-Size Imbalance Ratio) creates an audit trail that regulators, risk officers, and data scientists can simultaneously validate.",
+      "supporting_research": [
+        "[3] Bartlett et al., 2019 \u2013 documents how seemingly neutral credit models hide disparate impact once thresholds tighten.",
+        "[5] Feldman et al., 2014 \u2013 formalises disparate-impact certification and algorithmic repair frameworks.",
+        "[6] Kamiran & Calders, 2011 \u2013 shows pre-processing (re-weighing, sampling) methods to reduce both class imbalance and inter-group unfairness.",
+        "[2] Pope & Sydnor, 2011 \u2013 evidence of gender-linked approval gaps when credit standards increase.",
+        "[1] Duarte et al., 2012 \u2013 highlights interaction between loan characteristics and appearance that can mask amount-related bias."
+      ]
+    },
+    "qualitative": [
+      {
+        "attribute": "gender",
+        "severity": "none",
+        "what_is_wrong": "Current disparate-impact (0.99) and other parity metrics exceed the 0.95 safe threshold, so no immediate statistical violation. However, a confusion matrix with TPR = 1.0 and FPR \u2248 0.93\u20131.0 shows the model is granting loans to essentially every applicant\u2014a near-trivial classifier. This masks any gender-specific denial risk that will appear once the lender adopts a realistic approval cut-off.",
+        "why_is_wrong": "Credit models must differentiate between good and bad risks. When the operating threshold is artificially lenient, fairness metrics lose diagnostic power (Bartlett et al., 2019). Historic evidence shows that tightening cut-offs disproportionately harms women (Pope & Sydnor, 2011). Therefore the apparent neutrality is likely an artefact of the lax threshold, not an assurance of gender fairness.",
+        "how_to_fix": "1. Re-balance the label distribution by augmenting legitimately defaulting cases (e.g., SMOTE-NC for categorical/continuous mix) so that the classifier must learn a decision boundary.\n2. Perform a threshold sweep: compute DI, \u0394DP, and \u0394EO at multiple prospective approval rates (e.g., 90 %, 75 %, 50 %). Use the resulting fairness\u2013utility frontier to select a threshold.\n3. If disparities emerge post-sweep, apply pre-processing re-weighing or post-processing equalised-odds (Fairlearn\u2019s GridSearch) targeted to the gender attribute.\n4. Document threshold-selection rationale and mitigation efficacy for compliance records.",
+        "supporting_research": [
+          "[3] Bartlett et al., 2019 \u2013 threshold choice as a latent source of disparate impact.",
+          "[2] Pope & Sydnor, 2011 \u2013 empirical proof that women face higher rejection odds when standards rise.",
+          "[6] Kamiran & Calders, 2011 \u2013 re-weighing to correct class and group imbalance."
+        ]
+      },
+      {
+        "attribute": "income_level",
+        "severity": "none",
+        "what_is_wrong": "Measured DI = 1.01 (> 0.95) at the single operating point, but the same trivial-classifier pattern (TPR/FPR \u2248 1) again nullifies the diagnostic value. Historical studies show that low-income borrowers are disproportionately screened out when capital supply tightens.",
+        "why_is_wrong": "Income correlates with repayment capacity, so any future credit-tightening interacts with income to create potential disparate impact. A point-in-time audit without stress testing therefore underestimates compliance risk (Bartlett et al., 2019; Butler et al., 2017).",
+        "how_to_fix": "1. Conduct stress tests by simulating progressively lower approval rates and plotting DI and \u0394EO across income tiers.\n2. Use Theil-index decomposition to quantify within- vs. between-income inequality and identify if disparities are driven by systematic under-prediction for low-income applicants.\n3. If stress tests reveal high disparity, train with exponentiated-gradient reduction (Fairlearn) using income as a protected feature to jointly optimise accuracy and fairness.\n4. Establish ongoing monitoring triggers (e.g., DI < 0.95 for income) so production drift cannot silently introduce bias.",
+        "supporting_research": [
+          "[4] Butler et al., 2017 \u2013 capital-market contractions disproportionately affect low-income consumers.",
+          "[5] Feldman et al., 2014 \u2013 threshold-independent fairness diagnostics framework."
+        ]
+      },
+      {
+        "attribute": "loan_amount_level",
+        "severity": "moderate",
+        "what_is_wrong": "Statistical parity appears fine (DI \u2248 1.006); however, representation is imbalanced: the \u2018large\u2019-loan segment (n = 99) is only 31 % of the \u2018medium\u2019 segment (n = 320), yielding a Sample-Size Imbalance Ratio of 3.2 \u00d7, which exceeds the 3 \u00d7 \u2018moderate\u2019 threshold. Under-represented large-loan applicants therefore contribute little to parameter estimation, inflating variance and hiding any amount-based disparate impact.",
+        "why_is_wrong": "Models trained on majority groups generalise poorly to minority segments; risk under-estimation for large-loan requests may create hidden bias in real-world deployment. Duarte et al. (2012) show that loan characteristics can interact with borrower attributes to exacerbate such hidden bias.",
+        "how_to_fix": "1. Data collection: solicit or purchase additional historical data for large-loan applicants until each tier\u2019s sample count is at least 50 % of the majority tier (target ratio \u2264 2 \u00d7).\n2. Interim mitigation: apply stratified bootstrap oversampling or importance weighting (Kamiran & Calders, 2011) so that the effective training weight of each loan-amount tier is equal.\n3. Post-mitigation validation: recompute per-tier TPR/FPR and fairness metrics to confirm variance reduction; include confidence intervals to show statistical sufficiency.\n4. Maintain separate monitoring dashboards for each loan-amount tier once deployed.",
+        "supporting_research": [
+          "[1] Duarte et al., 2012 \u2013 interaction of loan characteristics and borrower traits can conceal bias.",
+          "[6] Kamiran & Calders, 2011 \u2013 oversampling and re-weighing correct minority under-representation."
+        ]
+      }
+    ],
+    "cross_attribute_summary": "Metric-wise, no protected attribute currently violates the disparate-impact threshold, but this stems from a near-trivial classifier that approves almost every application. Once realistic credit thresholds are enforced, literature suggests latent gender and income disparities are likely. Additionally, a moderate representation risk exists for the \u2018large\u2019 loan tier due to a 3.2 \u00d7 sample-size imbalance. Priority remediation steps: (i) rebuild a discriminative model with balanced default examples; (ii) stress-test fairness across multiple operating points for gender and income; (iii) boost or re-weight the large-loan sample before final model freeze; and (iv) document threshold-selection and monitoring triggers to satisfy ECOA/Reg B compliance audits."
+  },
+  "cycles": [
+    {
+      "cycle": 1,
+      "result": {
+        "reference_audit_spec": {
+          "name": "Remediation-Ready LendingClub Audit v1",
+          "core_metrics": [
+            "Disparate Impact",
+            "Demographic Parity Difference",
+            "Equal Opportunity Difference",
+            "Average Odds Difference",
+            "Theil Index",
+            "Sample Size Imbalance Ratio"
+          ],
+          "required_response_elements": [
+            "per-group breakdown",
+            "severity classification",
+            "root-cause analysis",
+            "mitigation recommendations",
+            "research-backed justification"
+          ],
+          "why_this_spec": "The Lending-Club loan-approval context is governed by U.S. fair-lending statutes that recognize both disparate impact and disparate treatment. A remediation-ready audit must therefore (1) retain the canonical group-level disparity metrics; (2) add an explicit representation/imbalance check to guard against the illusion of fairness created by tiny or homogeneous sub-groups; (3) label each issue with standardized severity levels that map directly onto regulatory triage; and (4) tie every recommendation to peer-reviewed evidence so that future mitigation plans are defensible to compliance officers.",
+          "supporting_research": [
+            "[3] Bartlett et al., 2019 \u2013 shows that FinTech credit models can exhibit hidden disparate impact even when headline metrics appear neutral.",
+            "[5] Feldman et al., 2014 \u2013 motivates disparate-impact certification and removal as a legal requirement.",
+            "[6] Kamiran & Calders, 2011 \u2013 establishes data-preprocessing and reweighing as effective mitigations for imbalanced datasets."
+          ]
+        },
+        "qualitative": [
+          {
+            "attribute": "gender",
+            "severity": "none",
+            "what_is_wrong": "Current statistical metrics (DI = 0.993, \u0394DP \u2248 -0.007) sit well above the moderate-risk threshold, suggesting no measurable disparity. However, both TPR and FPR are reported as 1.0 for males and TPR = 1.0, FPR \u2248 0.93 for females, indicating the model is effectively approving almost every application and therefore offers little discriminatory power. This masks any real-world gender bias that could surface once stricter credit thresholds are applied.",
+            "why_is_wrong": "A model that predicts almost all positives defeats the purpose of credit risk assessment and invalidates fairness conclusions (the \u2018trivial classifier\u2019 problem). In production, where a non-trivial threshold will be set, gender-based differences in default behavior may re-emerge, potentially violating ECOA/Reg B requirements.",
+            "how_to_fix": "1. Re-label or obtain additional negative-outcome examples to enable meaningful TPR/FPR estimation.\n2. Freeze a realistic decision threshold (e.g., desired default rate) before re-computing fairness.\n3. If disparities reappear, apply pre-processing reweighing or post-processing equalized odds (AIF360, Fairlearn) to correct them.",
+            "supporting_research": [
+              "[3] Bartlett et al., 2019 \u2013 warns that apparent neutrality can vanish once real credit constraints are applied.",
+              "[6] Kamiran & Calders, 2011 \u2013 recommends class-imbalance aware reweighing to avoid trivial classifiers."
+            ]
+          },
+          {
+            "attribute": "income_level",
+            "severity": "none",
+            "what_is_wrong": "All groups show DI\u22481.01 and identical TPR/FPR patterns, again driven by an almost always-approve model. Although no unfairness is detected now, the lack of decision granularity hides the possibility that low-income applicants could be disproportionately declined once more realistic cut-offs are set.",
+            "why_is_wrong": "Income is tightly correlated with ability-to-repay and therefore with credit risk. A fairness analysis that does not stress-test different thresholds may overlook indirect discrimination that becomes apparent only under tightening credit supply.",
+            "how_to_fix": "1. Simulate multiple decision thresholds and recompute fairness curves.\n2. Use Theil index and between-group entropy to detect subtle allocation inequities.\n3. If disparities arise, consider Exponentiated Gradient (Fairlearn) to impose demographic parity or equal opportunity under utility constraints.",
+            "supporting_research": [
+              "[4] Butler et al., 2017 \u2013 illustrates how local capital market conditions disproportionately affect low-income borrowers.",
+              "[5] Feldman et al., 2014 \u2013 advocates threshold-agnostic disparate-impact detection."
+            ]
+          },
+          {
+            "attribute": "loan_amount_level",
+            "severity": "none",
+            "what_is_wrong": "Statistical parity appears satisfied (DI \u2248 1.006). The main issue is representation: the \u2018large\u2019 loan group (n = 99) is only 31 % the size of the \u2018medium\u2019 group, triggering a moderate sample-size imbalance warning. Small cells can inflate variance and hide disparate impact.",
+            "why_is_wrong": "Under-represented high-amount borrowers may behave differently (e.g., higher default volatility). Model parameters trained predominantly on medium loans may generalize poorly and unintentionally penalize applicants requesting large amounts.",
+            "how_to_fix": "1. Collect or up-sample additional \u2018large\u2019-loan observations to reduce the 3.2\u00d7 imbalance.\n2. During training, apply stratified reweighing so that each amount tier contributes proportionally.\n3. Audit outcome-conditional metrics (e.g., conditional TPR) once sample sizes stabilize.",
+            "supporting_research": [
+              "[1] Duarte et al., 2012 \u2013 finds that loan characteristics interact with borrower appearance and can trigger hidden biases.",
+              "[6] Kamiran & Calders, 2011 \u2013 shows that rebalancing mitigates bias from minority sub-groups."
+            ]
+          }
+        ],
+        "cross_attribute_summary": "No attribute currently exceeds the moderate disparate-impact threshold; however, the uniformly high TPR/FPR values reveal a trivial, almost always-positive classifier, undermining the credibility of fairness conclusions. The dominant cross-attribute risk is data and label imbalance rather than direct metric violations. A production-ready model must be retrained with richer negative examples, realistic decision thresholds, and imbalance-aware reweighing; only then should final fairness metrics be certified."
+      },
+      "usage": {
+        "model": "o3",
+        "attempts": 1,
+        "wall_clock_s": 12.62,
+        "input_tokens": 2101,
+        "output_tokens": 1883,
+        "total_tokens": 3984,
+        "input_cost_usd": 0.02101,
+        "output_cost_usd": 0.07532,
+        "total_cost_usd": 0.09633,
+        "price_input_per_m": 10.0,
+        "price_output_per_m": 40.0
+      },
+      "score": {
+        "total_score": 65.0,
+        "subscores": {
+          "completeness": 40.0,
+          "severity_agreement": 0.0,
+          "cause_alignment": 0.0,
+          "mitigation_specificity": 10.0,
+          "research_grounding": 15.0
+        },
+        "summary": "Total score: 65.0/100. Completeness=40.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=10.0, Research grounding=15.0."
+      }
+    },
+    {
+      "cycle": 2,
+      "result": {
+        "reference_audit_spec": {
+          "name": "Remediation-Ready LendingClub Audit v2",
+          "core_metrics": [
+            "Disparate Impact",
+            "Demographic Parity Difference",
+            "Equal Opportunity Difference",
+            "Average Odds Difference",
+            "Theil Index",
+            "Sample Size Imbalance Ratio"
+          ],
+          "required_response_elements": [
+            "per-group breakdown",
+            "severity classification",
+            "root-cause analysis",
+            "mitigation recommendations",
+            "research-backed justification"
+          ],
+          "why_this_spec": "FinTech lending is regulated by ECOA and Reg B, which emphasize disparate-impact testing and require institutions to document both the statistical basis and the compliance remediation plan. The chosen spec therefore joins the canonical fairness metrics with an explicit representation/imbalance check so that any mitigation can be defended to both data-science and legal stakeholders.",
+          "supporting_research": [
+            "[3] Bartlett et al., 2019 \u2013 documents hidden disparate impact in automated credit models even when headline metrics appear neutral.",
+            "[5] Feldman et al., 2014 \u2013 formalises disparate-impact certification and algorithmic repair.",
+            "[6] Kamiran & Calders, 2011 \u2013 demonstrates re-weighing and sampling techniques that directly reduce unfairness without sacrificing much accuracy."
+          ]
+        },
+        "qualitative": [
+          {
+            "attribute": "gender",
+            "severity": "none",
+            "what_is_wrong": "All group-level disparity metrics are within the safe zone (DI \u2248 0.99 > 0.95).  However, the confusion-matrix shows TPR = 1.0 and FPR \u2265 0.93 for both genders, meaning the current model effectively grants credit to almost everyone.  Such a \u2018trivial accept-all\u2019 classifier conceals any gender-specific disparate impact that would materialise once a meaningful approval threshold is deployed.",
+            "why_is_wrong": "Credit-risk models are required to differentiate between likely and unlikely defaulters.  A model whose operating point is set so low that virtually every applicant is approved invalidates both predictive utility and any downstream fairness audit (Bartlett et al., 2019).  Historically, once lenders tighten cut-offs, female borrowers have faced higher rejection odds relative to equally risky males (Pope & Sydnor, 2011), so ignoring threshold effects understates legal risk.",
+            "how_to_fix": "1. Re-establish class balance by adding or synthetically generating negative (default) cases so that the model must learn a non-trivial boundary.\n2. Perform threshold-sweep fairness curves (Feldman et al., 2014) before selecting an operating point compatible with business loss limits.\n3. If post-sweep disparities emerge, apply pre-processing reweighing or post-processing equalised-odds (AIF360, Fairlearn).",
+            "supporting_research": [
+              "[3] Bartlett et al., 2019 \u2013 threshold choice can create sudden disparate impact in credit models.",
+              "[2] Pope & Sydnor, 2011 \u2013 shows gender-linked appearance effects once approvals are selective.",
+              "[6] Kamiran & Calders, 2011 \u2013 provides reweighing recipe for class-imbalance and fairness."
+            ]
+          },
+          {
+            "attribute": "income_level",
+            "severity": "none",
+            "what_is_wrong": "Measured DI is 1.01 (>0.95) and opportunity metrics are at parity.  As with gender, the near-perfect TPR/FPR pattern indicates the model is not discriminative; therefore any neutrality is provisional.  Low-income borrowers historically face higher marginal rejection rates once capital tightens (Butler et al., 2017).  The audit does not yet test that scenario.",
+            "why_is_wrong": "Income is strongly correlated with repayment ability, so any future tightening of approval thresholds can readily translate into disparate impact against low-income applicants if not explicitly monitored (Bartlett et al., 2019).  A single-point audit therefore offers false reassurance.",
+            "how_to_fix": "1. Simulate declining approval-rate scenarios (e.g., 90%, 75%, 50%) and plot DI/\u0394DP across those cut-offs.\n2. Add Theil index decomposition to isolate within- vs between-group allocation inequity.\n3. If low-income disparity emerges, use exponentiated-gradient reduction (Fairlearn) to balance utility and fairness during threshold selection.",
+            "supporting_research": [
+              "[4] Butler et al., 2017 \u2013 capital-market tightening disproportionately harms low-income consumers.",
+              "[5] Feldman et al., 2014 \u2013 recommends threshold-agnostic disparate-impact diagnostics."
+            ]
+          },
+          {
+            "attribute": "loan_amount_level",
+            "severity": "moderate",
+            "what_is_wrong": "Statistical parity holds (DI \u2248 1.006) but representation is skewed: the \u2018large\u2019 loan group (n = 99) is only 31 % the size of the \u2018medium\u2019 group (n = 320), triggering a Sample-Size-Imbalance Ratio of 3.2\u00d7 (above the 3\u00d7 moderate flag).  Small cells inflate variance, so true disparate impact on large-amount requests could be missed.",
+            "why_is_wrong": "Model coefficients are primarily informed by majority-class patterns.  Under-represented large-loan applicants may face higher default volatility and therefore misestimated risk, a phenomenon highlighted by Duarte et al. (2012), who found that loan characteristics interact with borrower visibility to create hidden biases.",
+            "how_to_fix": "1. Actively collect or synthetically up-sample additional \u2018large\u2019-loan cases until the largest-to-smallest group ratio is \u2264 2\u00d7 (Kamiran & Calders, 2011).\n2. During training, apply stratified reweighing so each amount tier\u2019s effective sample weight is equal.\n3. Re-audit conditional performance (TPR/FPR by loan tier) once representation is balanced.",
+            "supporting_research": [
+              "[1] Duarte et al., 2012 \u2013 loan characteristic interactions can mask bias for high amounts.",
+              "[6] Kamiran & Calders, 2011 \u2013 demonstrates sampling/reweighing to correct minority under-representation."
+            ]
+          }
+        ],
+        "cross_attribute_summary": "No attribute breaches the disparate-impact thresholds, so metric-based severity is \u2018none\u2019 except for a \u2018moderate\u2019 representation risk on loan-amount.  Nevertheless, the uniformly high approval rates expose a trivial classifier problem; any future tightening of credit thresholds could surface concealed gender or income disparities well documented in the literature.  Priority actions: (i) rebuild a discriminative model using balanced positive/negative labels; (ii) stress-test fairness across multiple operating points; (iii) address the 3.2\u00d7 loan-tier imbalance before final deployment."
+      },
+      "usage": {
+        "model": "o3",
+        "attempts": 1,
+        "wall_clock_s": 11.11,
+        "input_tokens": 3313,
+        "output_tokens": 1806,
+        "total_tokens": 5119,
+        "input_cost_usd": 0.03313,
+        "output_cost_usd": 0.07224,
+        "total_cost_usd": 0.10537,
+        "price_input_per_m": 10.0,
+        "price_output_per_m": 40.0
+      },
+      "score": {
+        "total_score": 70.0,
+        "subscores": {
+          "completeness": 40.0,
+          "severity_agreement": 0.0,
+          "cause_alignment": 0.0,
+          "mitigation_specificity": 15.0,
+          "research_grounding": 15.0
+        },
+        "summary": "Total score: 70.0/100. Completeness=40.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=15.0."
+      }
+    },
+    {
+      "cycle": 3,
+      "result": {
+        "reference_audit_spec": {
+          "name": "Remediation-Ready LendingClub Audit v3",
+          "core_metrics": [
+            "Disparate Impact",
+            "Demographic Parity Difference",
+            "Equal Opportunity Difference",
+            "Average Odds Difference",
+            "Theil Index",
+            "Sample Size Imbalance Ratio"
+          ],
+          "required_response_elements": [
+            "per-group breakdown",
+            "severity classification",
+            "root-cause analysis",
+            "mitigation recommendations",
+            "research-backed justification"
+          ],
+          "why_this_spec": "Fin-tech lenders must show both statistical neutrality and a concrete remediation plan under ECOA/Reg B. A spec that pairs classical fairness metrics with representation diagnostics (Sample-Size Imbalance Ratio) creates an audit trail that regulators, risk officers, and data scientists can simultaneously validate.",
+          "supporting_research": [
+            "[3] Bartlett et al., 2019 \u2013 documents how seemingly neutral credit models hide disparate impact once thresholds tighten.",
+            "[5] Feldman et al., 2014 \u2013 formalises disparate-impact certification and algorithmic repair frameworks.",
+            "[6] Kamiran & Calders, 2011 \u2013 shows pre-processing (re-weighing, sampling) methods to reduce both class imbalance and inter-group unfairness.",
+            "[2] Pope & Sydnor, 2011 \u2013 evidence of gender-linked approval gaps when credit standards increase.",
+            "[1] Duarte et al., 2012 \u2013 highlights interaction between loan characteristics and appearance that can mask amount-related bias."
+          ]
+        },
+        "qualitative": [
+          {
+            "attribute": "gender",
+            "severity": "none",
+            "what_is_wrong": "Current disparate-impact (0.99) and other parity metrics exceed the 0.95 safe threshold, so no immediate statistical violation. However, a confusion matrix with TPR = 1.0 and FPR \u2248 0.93\u20131.0 shows the model is granting loans to essentially every applicant\u2014a near-trivial classifier. This masks any gender-specific denial risk that will appear once the lender adopts a realistic approval cut-off.",
+            "why_is_wrong": "Credit models must differentiate between good and bad risks. When the operating threshold is artificially lenient, fairness metrics lose diagnostic power (Bartlett et al., 2019). Historic evidence shows that tightening cut-offs disproportionately harms women (Pope & Sydnor, 2011). Therefore the apparent neutrality is likely an artefact of the lax threshold, not an assurance of gender fairness.",
+            "how_to_fix": "1. Re-balance the label distribution by augmenting legitimately defaulting cases (e.g., SMOTE-NC for categorical/continuous mix) so that the classifier must learn a decision boundary.\n2. Perform a threshold sweep: compute DI, \u0394DP, and \u0394EO at multiple prospective approval rates (e.g., 90 %, 75 %, 50 %). Use the resulting fairness\u2013utility frontier to select a threshold.\n3. If disparities emerge post-sweep, apply pre-processing re-weighing or post-processing equalised-odds (Fairlearn\u2019s GridSearch) targeted to the gender attribute.\n4. Document threshold-selection rationale and mitigation efficacy for compliance records.",
+            "supporting_research": [
+              "[3] Bartlett et al., 2019 \u2013 threshold choice as a latent source of disparate impact.",
+              "[2] Pope & Sydnor, 2011 \u2013 empirical proof that women face higher rejection odds when standards rise.",
+              "[6] Kamiran & Calders, 2011 \u2013 re-weighing to correct class and group imbalance."
+            ]
+          },
+          {
+            "attribute": "income_level",
+            "severity": "none",
+            "what_is_wrong": "Measured DI = 1.01 (> 0.95) at the single operating point, but the same trivial-classifier pattern (TPR/FPR \u2248 1) again nullifies the diagnostic value. Historical studies show that low-income borrowers are disproportionately screened out when capital supply tightens.",
+            "why_is_wrong": "Income correlates with repayment capacity, so any future credit-tightening interacts with income to create potential disparate impact. A point-in-time audit without stress testing therefore underestimates compliance risk (Bartlett et al., 2019; Butler et al., 2017).",
+            "how_to_fix": "1. Conduct stress tests by simulating progressively lower approval rates and plotting DI and \u0394EO across income tiers.\n2. Use Theil-index decomposition to quantify within- vs. between-income inequality and identify if disparities are driven by systematic under-prediction for low-income applicants.\n3. If stress tests reveal high disparity, train with exponentiated-gradient reduction (Fairlearn) using income as a protected feature to jointly optimise accuracy and fairness.\n4. Establish ongoing monitoring triggers (e.g., DI < 0.95 for income) so production drift cannot silently introduce bias.",
+            "supporting_research": [
+              "[4] Butler et al., 2017 \u2013 capital-market contractions disproportionately affect low-income consumers.",
+              "[5] Feldman et al., 2014 \u2013 threshold-independent fairness diagnostics framework."
+            ]
+          },
+          {
+            "attribute": "loan_amount_level",
+            "severity": "moderate",
+            "what_is_wrong": "Statistical parity appears fine (DI \u2248 1.006); however, representation is imbalanced: the \u2018large\u2019-loan segment (n = 99) is only 31 % of the \u2018medium\u2019 segment (n = 320), yielding a Sample-Size Imbalance Ratio of 3.2 \u00d7, which exceeds the 3 \u00d7 \u2018moderate\u2019 threshold. Under-represented large-loan applicants therefore contribute little to parameter estimation, inflating variance and hiding any amount-based disparate impact.",
+            "why_is_wrong": "Models trained on majority groups generalise poorly to minority segments; risk under-estimation for large-loan requests may create hidden bias in real-world deployment. Duarte et al. (2012) show that loan characteristics can interact with borrower attributes to exacerbate such hidden bias.",
+            "how_to_fix": "1. Data collection: solicit or purchase additional historical data for large-loan applicants until each tier\u2019s sample count is at least 50 % of the majority tier (target ratio \u2264 2 \u00d7).\n2. Interim mitigation: apply stratified bootstrap oversampling or importance weighting (Kamiran & Calders, 2011) so that the effective training weight of each loan-amount tier is equal.\n3. Post-mitigation validation: recompute per-tier TPR/FPR and fairness metrics to confirm variance reduction; include confidence intervals to show statistical sufficiency.\n4. Maintain separate monitoring dashboards for each loan-amount tier once deployed.",
+            "supporting_research": [
+              "[1] Duarte et al., 2012 \u2013 interaction of loan characteristics and borrower traits can conceal bias.",
+              "[6] Kamiran & Calders, 2011 \u2013 oversampling and re-weighing correct minority under-representation."
+            ]
+          }
+        ],
+        "cross_attribute_summary": "Metric-wise, no protected attribute currently violates the disparate-impact threshold, but this stems from a near-trivial classifier that approves almost every application. Once realistic credit thresholds are enforced, literature suggests latent gender and income disparities are likely. Additionally, a moderate representation risk exists for the \u2018large\u2019 loan tier due to a 3.2 \u00d7 sample-size imbalance. Priority remediation steps: (i) rebuild a discriminative model with balanced default examples; (ii) stress-test fairness across multiple operating points for gender and income; (iii) boost or re-weight the large-loan sample before final model freeze; and (iv) document threshold-selection and monitoring triggers to satisfy ECOA/Reg B compliance audits."
+      },
+      "usage": {
+        "model": "o3",
+        "attempts": 1,
+        "wall_clock_s": 11.81,
+        "input_tokens": 3478,
+        "output_tokens": 1906,
+        "total_tokens": 5384,
+        "input_cost_usd": 0.03478,
+        "output_cost_usd": 0.07624,
+        "total_cost_usd": 0.11102,
+        "price_input_per_m": 10.0,
+        "price_output_per_m": 40.0,
+        "projection": {
+          "projected_input_tokens": 1796,
+          "projected_output_tokens": 5000,
+          "projected_total_tokens": 6796,
+          "projected_input_cost_usd": 0.01796,
+          "projected_output_cost_usd": 0.2,
+          "projected_total_cost_usd": 0.21796
+        },
+        "max_cost_usd": 15.0,
+        "max_cost_cad": 20.27,
+        "projected_run_cost_usd": 0.65388
+      },
+      "score": {
+        "total_score": 65.0,
+        "subscores": {
+          "completeness": 40.0,
+          "severity_agreement": 0.0,
+          "cause_alignment": 0.0,
+          "mitigation_specificity": 10.0,
+          "research_grounding": 15.0
+        },
+        "summary": "Total score: 65.0/100. Completeness=40.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=10.0, Research grounding=15.0."
+      }
+    }
+  ],
+  "usage": {
+    "model": "o3",
+    "attempts": 1,
+    "wall_clock_s": 11.81,
+    "input_tokens": 3478,
+    "output_tokens": 1906,
+    "total_tokens": 5384,
+    "input_cost_usd": 0.03478,
+    "output_cost_usd": 0.07624,
+    "total_cost_usd": 0.11102,
+    "price_input_per_m": 10.0,
+    "price_output_per_m": 40.0,
+    "projection": {
+      "projected_input_tokens": 1796,
+      "projected_output_tokens": 5000,
+      "projected_total_tokens": 6796,
+      "projected_input_cost_usd": 0.01796,
+      "projected_output_cost_usd": 0.2,
+      "projected_total_cost_usd": 0.21796
+    },
+    "max_cost_usd": 15.0,
+    "max_cost_cad": 20.27,
+    "projected_run_cost_usd": 0.65388
+  }
+}

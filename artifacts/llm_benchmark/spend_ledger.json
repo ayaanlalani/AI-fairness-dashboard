@@ -1,6 +1,6 @@
 {
   "max_cost_usd": 15.0,
-  "total_usd": 0.227376,
+  "total_usd": 0.596919,
   "entries": [
     {
       "ts": "2026-07-25T18:57:52",
@@ -397,6 +397,70 @@
       "dataset": "lending_club",
       "attribute": "loan_amount_level",
       "cycle": 4
+    },
+    {
+      "ts": "2026-07-25T19:15:23",
+      "run": "track_h/German Credit",
+      "cost_usd": 0.1218,
+      "input_tokens": 3400,
+      "output_tokens": 2195,
+      "model": "o3",
+      "dataset": "German Credit",
+      "track": "H",
+      "cycles": 3,
+      "note": "retro-recorded: run predates the ledger hook"
+    },
+    {
+      "ts": "2026-07-25T19:16:40",
+      "run": "track_h/HMDA Mortgage Lending (Georgia)",
+      "cost_usd": 0.11863,
+      "input_tokens": 4271,
+      "output_tokens": 1898,
+      "model": "o3",
+      "dataset": "HMDA Mortgage Lending (Georgia)",
+      "track": "H",
+      "cycles": 3
+    },
+    {
+      "ts": "2026-07-25T19:17:49",
+      "run": "track_h/Lending Club P2P Loans",
+      "cost_usd": 0.11102,
+      "input_tokens": 3478,
+      "output_tokens": 1906,
+      "model": "o3",
+      "dataset": "Lending Club P2P Loans",
+      "track": "H",
+      "cycles": 3
+    },
+    {
+      "ts": "2026-07-25T19:23:05",
+      "run": "track_h_judge/German Credit",
+      "cost_usd": 0.006268,
+      "input_tokens": 2179,
+      "output_tokens": 82,
+      "model": "gpt-4o",
+      "dataset": "German Credit",
+      "track": "H-judge"
+    },
+    {
+      "ts": "2026-07-25T19:23:06",
+      "run": "track_h_judge/HMDA Mortgage Lending (Georgia)",
+      "cost_usd": 0.006072,
+      "input_tokens": 2045,
+      "output_tokens": 96,
+      "model": "gpt-4o",
+      "dataset": "HMDA Mortgage Lending (Georgia)",
+      "track": "H-judge"
+    },
+    {
+      "ts": "2026-07-25T19:23:08",
+      "run": "track_h_judge/Lending Club P2P Loans",
+      "cost_usd": 0.005752,
+      "input_tokens": 1933,
+      "output_tokens": 92,
+      "model": "gpt-4o",
+      "dataset": "Lending Club P2P Loans",
+      "track": "H-judge"
     }
   ]
 }

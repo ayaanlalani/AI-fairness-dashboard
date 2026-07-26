@@ -71,7 +71,7 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs 'Sex_original:male,AgeGroup_original:40_plus,foreign_worker_original:0'"
                 " --out_dir metrics/fairness/openai"
                 " --dataset_name 'German Credit'"
-                " --max_cost_usd 37.00"
+                " --max_cost_usd 15.00"
             ),
             "benchmark": (
                 f"{PYTHON} ../scripts/llm_benchmark.py"
@@ -125,7 +125,7 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs 'race:White,sex:Male,age_group:mid'"
                 " --out_dir metrics/fairness/openai"
                 " --dataset_name 'HMDA Mortgage Lending (Georgia)'"
-                " --max_cost_usd 37.00"
+                " --max_cost_usd 15.00"
             ),
             "benchmark": (
                 f"{PYTHON} ../scripts/llm_benchmark.py"
@@ -174,6 +174,24 @@ DATASETS: dict[str, dict] = {
                 " --protected_attrs gender,income_level,loan_amount_level"
                 " --out_dir metrics/fairness"
                 " --dataset_name 'Lending Club P2P Loans'"
+            ),
+            # Track H. lending_club had no llm_benchmark step at all, so
+            # "one narrative audit per use case" (staging prompt Stage 4) was
+            # unreachable for UC3. Note the three deliberate deviations from
+            # german_credit/hmda: enriched predictions, the normalized fairness
+            # CSV, and --favorable_label 0 (target is loan_default, so the
+            # favorable outcome is a predicted non-default).
+            "llm_benchmark": (
+                "mkdir -p metrics/fairness/openai && "
+                f"{PYTHON} ../scripts/openai_fairness_analysis.py"
+                " --predictions metrics/classification_predictions_enriched.csv"
+                " --fairness_csv metrics/fairness/fairness_metrics_normalized.csv"
+                " --qualitative_report metrics/fairness/qualitative_report.md"
+                " --target actual --pred_col predicted --favorable_label 0"
+                " --protected_attrs 'gender:male,income_level:medium,loan_amount_level:medium'"
+                " --out_dir metrics/fairness/openai"
+                " --dataset_name 'Lending Club P2P Loans'"
+                " --max_cost_usd 15.00"
             ),
             "benchmark": (
                 f"{PYTHON} ../scripts/llm_benchmark.py"

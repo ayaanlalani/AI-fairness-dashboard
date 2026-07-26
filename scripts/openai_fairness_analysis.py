@@ -28,8 +28,10 @@ from typing import Any
 import pandas as pd
 
 from llm_benchmark_common import (
+    SpendLedger,
     build_context_and_baseline,
     enforce_llm_gate,
+    model_prices,
     score_llm_output,
 )
 from scholarly_evidence import format_evidence_for_prompt
@@ -50,8 +52,10 @@ except ImportError:
 DEFAULT_MODEL = "o3"
 MAX_RETRIES = 3
 RETRY_BACKOFF_BASE = 20
-PRICE_INPUT_PER_M = 10.00
-PRICE_OUTPUT_PER_M = 40.00
+# Single source of truth: llm_benchmark_common.MODEL_PRICES. Previously this
+# script carried its own constants, so Track H and Track Q could price the same
+# model differently.
+PRICE_INPUT_PER_M, PRICE_OUTPUT_PER_M = model_prices(DEFAULT_MODEL)
 CAD_TO_USD = 0.74
 DEFAULT_MAX_COST_CAD = 50.0
 DEFAULT_MAX_COST_USD = round(DEFAULT_MAX_COST_CAD * CAD_TO_USD, 2)
@@ -721,6 +725,12 @@ def run_llm_benchmark(
     (out_dir / "llm_napkin_math.json").write_text(
         json.dumps({"projection": projection, "projected_run_cost_usd": projected_total, "usage": usage_stats}, indent=2),
         encoding="utf-8",
+    )
+    # Record Track H spend in the shared ledger so program-level totals include
+    # it. Without this, only Track Q spend was tracked and any "total spend"
+    # claim would have been an undercount.
+    SpendLedger(max_cost_usd=max_cost_usd, run_label=f"track_h/{dataset_name}").record(
+        usage_stats, dataset=dataset_name, track="H", cycles=cycles
     )
     log.info(
         "OpenAI benchmark complete: "

@@ -1,0 +1,284 @@
+[
+  {
+    "use_case": "german_credit",
+    "dataset_name": "German Credit",
+    "attributes": [
+      "Sex_original",
+      "AgeGroup_original",
+      "foreign_worker_original"
+    ],
+    "guardrails": [
+      {
+        "id": "G1",
+        "name": "No forbidden refusal patterns",
+        "passed": true,
+        "detail": "none present"
+      },
+      {
+        "id": "G2",
+        "name": "Required fields present for every attribute",
+        "passed": true,
+        "detail": "3 attributes x 4 fields"
+      },
+      {
+        "id": "G3",
+        "name": "At least 1 citation per attribute",
+        "passed": true,
+        "detail": "all attributes cited"
+      },
+      {
+        "id": "G4",
+        "name": "Mitigation names a named algorithm",
+        "passed": false,
+        "detail": "missing: ['foreign_worker_original']"
+      },
+      {
+        "id": "G5",
+        "name": "Mitigation states a measurable target",
+        "passed": true,
+        "detail": "all attributes quantified"
+      }
+    ],
+    "h_criteria": [
+      {
+        "id": "H1",
+        "name": "Names concrete stakeholders and their consequence",
+        "passed": true,
+        "detail": "2 stakeholder roles: ['applicant', 'regulator']"
+      },
+      {
+        "id": "H2",
+        "name": "Situates each finding in the decision context",
+        "passed": true,
+        "detail": "every attribute framed in decision terms"
+      },
+      {
+        "id": "H3",
+        "name": "Root causes tied to a metric, property, or citation",
+        "passed": true,
+        "detail": "all causes grounded"
+      },
+      {
+        "id": "H4",
+        "name": "Remediation names an algorithm AND a measurable target",
+        "passed": true,
+        "detail": "all remediations actionable"
+      },
+      {
+        "id": "H5",
+        "name": "States its own epistemic limits",
+        "passed": true,
+        "detail": "3/3 limit classes: small_sample_or_power ('statistical power'), non_causal ('causal linkage'), proxy_or_confound ('proxy')"
+      }
+    ],
+    "citations": {
+      "cited": 10,
+      "verified": 10,
+      "unverified": [],
+      "evidence_pool": 6
+    },
+    "cycles": 3,
+    "judge": {
+      "model": "gpt-4o",
+      "scores": {
+        "clarity": 4,
+        "actionability": 5,
+        "evidence_quality": 5,
+        "consistency": 5,
+        "non_contradiction": 5
+      },
+      "weighted_score": 4.8,
+      "max_weighted": 5.0,
+      "justification": "The report is largely clear, though its technical jargon slightly impairs understanding for non-technical readers. Recommendations are comprehensive, specific, supported by research, and logically consistent throughout.",
+      "cost_usd": 0.006268
+    }
+  },
+  {
+    "use_case": "hmda",
+    "dataset_name": "HMDA Mortgage Lending (Georgia)",
+    "attributes": [
+      "race",
+      "sex",
+      "age_group"
+    ],
+    "guardrails": [
+      {
+        "id": "G1",
+        "name": "No forbidden refusal patterns",
+        "passed": true,
+        "detail": "none present"
+      },
+      {
+        "id": "G2",
+        "name": "Required fields present for every attribute",
+        "passed": true,
+        "detail": "3 attributes x 4 fields"
+      },
+      {
+        "id": "G3",
+        "name": "At least 1 citation per attribute",
+        "passed": true,
+        "detail": "all attributes cited"
+      },
+      {
+        "id": "G4",
+        "name": "Mitigation names a named algorithm",
+        "passed": true,
+        "detail": "race: counterfactual; sex: exponentiated gradient; age_group: counterfactual"
+      },
+      {
+        "id": "G5",
+        "name": "Mitigation states a measurable target",
+        "passed": true,
+        "detail": "all attributes quantified"
+      }
+    ],
+    "h_criteria": [
+      {
+        "id": "H1",
+        "name": "Names concrete stakeholders and their consequence",
+        "passed": true,
+        "detail": "3 stakeholder roles: ['applicant', 'borrower', 'compliance']"
+      },
+      {
+        "id": "H2",
+        "name": "Situates each finding in the decision context",
+        "passed": true,
+        "detail": "every attribute framed in decision terms"
+      },
+      {
+        "id": "H3",
+        "name": "Root causes tied to a metric, property, or citation",
+        "passed": true,
+        "detail": "all causes grounded"
+      },
+      {
+        "id": "H4",
+        "name": "Remediation names an algorithm AND a measurable target",
+        "passed": true,
+        "detail": "all remediations actionable"
+      },
+      {
+        "id": "H5",
+        "name": "States its own epistemic limits",
+        "passed": false,
+        "detail": "1/3 limit classes: proxy_or_confound ('proxy')"
+      }
+    ],
+    "citations": {
+      "cited": 10,
+      "verified": 10,
+      "unverified": [],
+      "evidence_pool": 6
+    },
+    "cycles": 3,
+    "judge": {
+      "model": "gpt-4o",
+      "scores": {
+        "clarity": 5,
+        "actionability": 4,
+        "evidence_quality": 5,
+        "consistency": 5,
+        "non_contradiction": 5
+      },
+      "weighted_score": 4.7,
+      "max_weighted": 5.0,
+      "justification": "The report is clear and concise, providing understandable explanations and detailed, prioritized recommendations for action. Claims are well-supported by relevant research citations. Severity labels and logical flow are consistent throughout, and there are no internal contradictions between identified issues and proposed solutions.",
+      "cost_usd": 0.006072
+    }
+  },
+  {
+    "use_case": "lending_club",
+    "dataset_name": "Lending Club P2P Loans",
+    "attributes": [
+      "gender",
+      "income_level",
+      "loan_amount_level"
+    ],
+    "guardrails": [
+      {
+        "id": "G1",
+        "name": "No forbidden refusal patterns",
+        "passed": true,
+        "detail": "none present"
+      },
+      {
+        "id": "G2",
+        "name": "Required fields present for every attribute",
+        "passed": true,
+        "detail": "3 attributes x 4 fields"
+      },
+      {
+        "id": "G3",
+        "name": "At least 1 citation per attribute",
+        "passed": true,
+        "detail": "all attributes cited"
+      },
+      {
+        "id": "G4",
+        "name": "Mitigation names a named algorithm",
+        "passed": false,
+        "detail": "missing: ['loan_amount_level']"
+      },
+      {
+        "id": "G5",
+        "name": "Mitigation states a measurable target",
+        "passed": true,
+        "detail": "all attributes quantified"
+      }
+    ],
+    "h_criteria": [
+      {
+        "id": "H1",
+        "name": "Names concrete stakeholders and their consequence",
+        "passed": true,
+        "detail": "5 stakeholder roles: ['applicant', 'borrower', 'compliance', 'lender', 'regulator']"
+      },
+      {
+        "id": "H2",
+        "name": "Situates each finding in the decision context",
+        "passed": true,
+        "detail": "every attribute framed in decision terms"
+      },
+      {
+        "id": "H3",
+        "name": "Root causes tied to a metric, property, or citation",
+        "passed": true,
+        "detail": "all causes grounded"
+      },
+      {
+        "id": "H4",
+        "name": "Remediation names an algorithm AND a measurable target",
+        "passed": true,
+        "detail": "all remediations actionable"
+      },
+      {
+        "id": "H5",
+        "name": "States its own epistemic limits",
+        "passed": false,
+        "detail": "1/3 limit classes: small_sample_or_power ('n =')"
+      }
+    ],
+    "citations": {
+      "cited": 7,
+      "verified": 7,
+      "unverified": [],
+      "evidence_pool": 6
+    },
+    "cycles": 3,
+    "judge": {
+      "model": "gpt-4o",
+      "scores": {
+        "clarity": 5,
+        "actionability": 5,
+        "evidence_quality": 5,
+        "consistency": 5,
+        "non_contradiction": 5
+      },
+      "weighted_score": 5.0,
+      "max_weighted": 5.0,
+      "justification": "The report is exceptionally clear and actionable, providing precise and measurable recommendations. Claims are well-supported by credible research citations, and there is a consistent narrative across attributes. No internal contradictions are found between diagnosis, severity, and mitigation.",
+      "cost_usd": 0.005752
+    }
+  }
+]
