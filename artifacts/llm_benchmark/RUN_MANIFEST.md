@@ -37,20 +37,57 @@ planning number. Either way the run is far below the cap.
 
 ## Research evidence provenance
 
-- `german_credit`, `hmda`: packs embed the retained Semantic Scholar harvest
-  (3 papers/attribute) via `--research_json artifacts/<ds>/fairness/qualitative_research_evidence.json`.
-- `lending_club`: evidence list is empty — the keyless Semantic Scholar API
-  returned HTTP 429 during Stage 1, Stage 2 pack generation, and repeated
-  retries spaced over ~70 minutes on 2026-07-17. This appears to be the
-  keyless tier's steady state, not a transient. The reliable refresh path is
-  `SEMANTIC_SCHOLAR_API_KEY` (a free key; the only permitted network
-  dependency, not gated by the LLM guardrail): with it set, rerun
-  `python3.11 run_pipeline.py --datasets lending_club --steps qualitative`
-  then regenerate the lending_club packs with the dry-run command. A later
-  successful harvest is now retained across subsequent 429s
-  (`scripts/qualitative_analysis.py` keeps non-empty evidence on disk), and
-  the run commands below already pass `--research_json` so the refreshed
-  JSON is picked up.
+All three datasets now embed 3 papers/attribute via
+`--research_json artifacts/<ds>/fairness/qualitative_research_evidence.json`.
+Resolved 2026-07-25 (Stage A).
+
+- `german_credit`, `hmda`: unchanged. Packs embed the retained live-search
+  Semantic Scholar harvest from the original Stage 1 run. The Stage A re-harvest
+  left both evidence JSONs **byte-identical** (verified by SHA-256:
+  `b8484281d763908a` and `376ad8b87c8b23f1` before and after), so the frozen
+  prompts below are still exactly what Stage 3 will replay.
+- `lending_club`: evidence went from 0 to 3 papers/attribute, raising the
+  dry-run cycle average from **83.33 to 98.33** (gender 95.0, income_level
+  100.0, loan_amount_level 100.0 — the `research_grounding` subscore moved
+  0.0 → 10.0). The 95.0 on gender is the scorer's ceiling for that attribute,
+  matching `hmda/sex`; it is not a missing-evidence signal.
+
+### How the 429 blocker was actually resolved
+
+The Stage 2 note above attributed the failure to keyless-tier throttling and
+prescribed a `SEMANTIC_SCHOLAR_API_KEY`. That prescription does not work:
+
+- The key now present in `.env` returns **HTTP 403 Forbidden on every
+  endpoint** — it is invalid/inactive, not rate-limited. Sending it is
+  strictly worse than sending nothing.
+- `scripts/qualitative_analysis.py` never calls `load_dotenv()`, so the key was
+  never picked up during harvest anyway; the 429s were genuine keyless
+  throttling of `/paper/search`, which remains throttled.
+- The keyless **`/paper/DOI:<doi>` lookup endpoint still serves requests** even
+  while `/paper/search` returns 429.
+
+Stage A therefore changed `scripts/scholarly_evidence.py` to:
+
+1. Drop a rejected key (401/403) and retry keyless within the same call, so a
+   bad key can never degrade the harvest below the keyless baseline.
+2. Backfill from a curated list of **real, verified DOIs** through the lookup
+   endpoint when search yields nothing. Records are fetched from Semantic
+   Scholar, never hand-written, so titles/authors/years stay authoritative and
+   the `detect_hallucinations` 3-gram check keeps working against them.
+
+`scripts/qualitative_analysis.py` retention was tightened at the same time:
+retained evidence now also wins when a fresh harvest returns **DOI seeds
+only**, not just when it returns nothing. Without this, the seed fallback would
+have overwritten the german_credit/hmda live-search evidence and silently
+changed the prompts the frozen packs were built from.
+
+lending_club's papers are the topical seeds for its attributes — Duarte et al.
+(2012) *Trust and Credit* and Pope & Sydnor (2011) *What's in a Picture?* on
+P2P appearance-based disparity, Bartlett et al. (2019) on FinTech-era
+consumer-lending discrimination, plus Butler & Cornaggia (2017), Feldman et al.
+(2014) and Kamiran & Calders (2011) for the economic-proxy attributes. Coverage
+is honest but generic relative to a live topical search; it is recorded here as
+a provenance caveat, not presented as a targeted harvest.
 
 ## Exact post-approval commands
 
@@ -92,9 +129,13 @@ cd lending_club_dataset && python3.11 ../scripts/llm_benchmark.py \
 
 ## Validation performed (Stage 2, no API calls)
 
-- 36/36 frozen packs built via `--dry-run`; every pack carries its full prompt.
-- Scoring harness round-trips the deterministic mock (100/100 with research
-  context for GC/HMDA; 80–85/100 for lending_club pending evidence).
+- 36/36 frozen packs built via `--dry-run`; every pack carries its full prompt
+  and non-empty research context (re-verified after the Stage A harvest).
+- Scoring harness round-trips the deterministic mock: german_credit 100/100,
+  hmda 98.33, lending_club 98.33 (was 83.33 before the Stage A harvest).
+- Semantic Scholar resilience (rejected-key fallback, DOI seeds, retention
+  precedence) covered by `tests/test_scholarly_evidence_resilience.py`.
+  Full suite: 28 tests passing.
 - Refusal detector and hallucination detector validated in
   `tests/test_llm_benchmark_detectors.py`, including one deliberately
   hallucinated metric value (DI = 0.4321 absent from context → flagged) and a

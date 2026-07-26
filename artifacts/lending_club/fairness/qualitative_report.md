@@ -39,6 +39,16 @@ No significant disparity detected (DI = 0.9931). The model treats gender groups 
 
 1. Continue monitoring: fairness can drift as data distributions change. Re-run this analysis periodically and after any model retraining.
 
+### Research-backed evidence
+
+1. **Trust and Credit: The Role of Appearance in Peer-to-peer Lending** (2012), J. Duarte, Stephan Siegel, Lance A. Young. *Unknown venue*. Citations: 961.
+   https://www.semanticscholar.org/paper/b9475170ca58eb83868376517d7ab50bb4f52d65
+2. **What’s in a Picture?** (2011), Devin G. Pope, Justin R. Sydnor. *The Journal of human resources*. Citations: 235.
+   https://www.semanticscholar.org/paper/6e57ef0eacc47268313df14dbe0448d1842481b4
+3. **Consumer-lending discrimination in the FinTech Era** (2019), Robert P. Bartlett, Adair Morse, Richard Stanton. *Journal of Financial Economics*. Citations: 587.
+   Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using a...
+   https://www.semanticscholar.org/paper/97a98065c1fec5c36104f586c93ca756caf5caaf
+
 ---
 ## income_level  (DI = 1.0072, severity: LOW (fair))
 
@@ -72,6 +82,17 @@ No significant disparity detected (DI = 1.0072). The model treats income_level g
 ### How to fix it
 
 1. Pre-processing -- Disparate Impact Remover (aif360.algorithms.preprocessing.DisparateImpactRemover): transform feature distributions to reduce correlation with the protected attribute while preserving rank-ordering.
+
+### Research-backed evidence
+
+1. **Consumer-lending discrimination in the FinTech Era** (2019), Robert P. Bartlett, Adair Morse, Richard Stanton. *Journal of Financial Economics*. Citations: 587.
+   Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using a...
+   https://www.semanticscholar.org/paper/97a98065c1fec5c36104f586c93ca756caf5caaf
+2. **Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?** (2017), Alexander W. Butler, Jess Cornaggia, Umit G. Gurun. *Management Sciences*. Citations: 99.
+   https://www.semanticscholar.org/paper/b39f69b46e868c55a81a2649d1dae6366b5038cd
+3. **Certifying and Removing Disparate Impact** (2014), Michael Feldman, Sorelle A. Friedler, John Moeller. *Knowledge Discovery and Data Mining*. Citations: 2287.
+   What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it ap...
+   https://www.semanticscholar.org/paper/0fee3b6c72f7676b4934651e517d0a328048c600
 
 ---
 ## loan_amount_level  (DI = 1.0063, severity: LOW (fair))
@@ -109,6 +130,17 @@ No significant disparity detected (DI = 1.0063). The model treats loan_amount_le
 ### How to fix it
 
 1. Pre-processing -- Disparate Impact Remover (aif360.algorithms.preprocessing.DisparateImpactRemover): transform feature distributions to reduce correlation with the protected attribute while preserving rank-ordering.
+
+### Research-backed evidence
+
+1. **Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?** (2017), Alexander W. Butler, Jess Cornaggia, Umit G. Gurun. *Management Sciences*. Citations: 99.
+   https://www.semanticscholar.org/paper/b39f69b46e868c55a81a2649d1dae6366b5038cd
+2. **Certifying and Removing Disparate Impact** (2014), Michael Feldman, Sorelle A. Friedler, John Moeller. *Knowledge Discovery and Data Mining*. Citations: 2287.
+   What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it ap...
+   https://www.semanticscholar.org/paper/0fee3b6c72f7676b4934651e517d0a328048c600
+3. **Data preprocessing techniques for classification without discrimination** (2011), F. Kamiran, T. Calders. *Knowledge and Information Systems*. Citations: 1610.
+   Recently, the following Discrimination-Aware Classification Problem was introduced: Suppose we are given training data that exhibit unlawful discrimination; e.g., toward sensitive attributes such as gender or ethnicit...
+   https://www.semanticscholar.org/paper/3ac3c11bf6cd8ccc657eb629148d6e346e52c8e0
 
 ---
 ## Summary

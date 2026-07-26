@@ -664,6 +664,13 @@ def run_qualitative_analysis(
 
     # A transient Semantic Scholar failure (e.g. keyless-tier 429) must not
     # clobber a previously successful harvest on disk with empty lists.
+    #
+    # The DOI-seed fallback widens this: a throttled run now returns curated
+    # seeds rather than nothing, so "empty" is no longer the only degraded
+    # outcome. A prior live-search harvest is strictly better evidence than a
+    # generic seed list, and overwriting it would also change the prompts that
+    # the frozen benchmark packs were built from. So retained evidence wins
+    # unless the fresh harvest actually reached the search API.
     evidence_path = out_dir / "qualitative_research_evidence.json"
     if evidence_path.exists():
         try:
@@ -671,12 +678,22 @@ def run_qualitative_analysis(
         except json.JSONDecodeError:
             retained = {}
         for attr, papers in research_evidence_by_attr.items():
-            if not papers and retained.get(attr):
-                research_evidence_by_attr[attr] = retained[attr]
-                log.warning(
-                    f"Semantic Scholar returned no papers for '{attr}'; "
-                    f"keeping {len(retained[attr])} retained papers from the prior harvest."
-                )
+            if not retained.get(attr):
+                continue
+            seed_only = bool(papers) and all(
+                p.get("source") == "doi_seed" for p in papers
+            )
+            if not papers:
+                reason = "returned no papers"
+            elif seed_only:
+                reason = "fell back to DOI seeds only"
+            else:
+                continue
+            research_evidence_by_attr[attr] = retained[attr]
+            log.warning(
+                f"Semantic Scholar {reason} for '{attr}'; "
+                f"keeping {len(retained[attr])} retained papers from the prior harvest."
+            )
 
     report = generate_qualitative_report(
         predictions_df=predictions_df,

@@ -4,14 +4,14 @@
   "model": "gpt-4o",
   "total_results": 12,
   "total_cost_usd": 0.0,
-  "elapsed_s": 14.2,
+  "elapsed_s": 0.1,
   "refusal_count": 0,
   "hallucination_count": 0,
   "cycle_avg_score": {
-    "1": 83.33,
-    "2": 83.33,
-    "3": 83.33,
-    "4": 83.33
+    "1": 98.33,
+    "2": 98.33,
+    "3": 98.33,
+    "4": 98.33
   },
   "attributes": [
     "gender",
@@ -23,7 +23,7 @@
       "cycle": 1,
       "prompt_format": "zero_shot",
       "attribute": "gender",
-      "score": 80.0,
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -31,7 +31,7 @@
       "cycle": 2,
       "prompt_format": "chain_of_thought",
       "attribute": "gender",
-      "score": 80.0,
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -39,7 +39,7 @@
       "cycle": 3,
       "prompt_format": "self_critique",
       "attribute": "gender",
-      "score": 80.0,
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -47,7 +47,7 @@
       "cycle": 4,
       "prompt_format": "constrained",
       "attribute": "gender",
-      "score": 80.0,
+      "score": 95.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -55,7 +55,7 @@
       "cycle": 1,
       "prompt_format": "zero_shot",
       "attribute": "income_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -63,7 +63,7 @@
       "cycle": 2,
       "prompt_format": "chain_of_thought",
       "attribute": "income_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -71,7 +71,7 @@
       "cycle": 3,
       "prompt_format": "self_critique",
       "attribute": "income_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -79,7 +79,7 @@
       "cycle": 4,
       "prompt_format": "constrained",
       "attribute": "income_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -87,7 +87,7 @@
       "cycle": 1,
       "prompt_format": "zero_shot",
       "attribute": "loan_amount_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -95,7 +95,7 @@
       "cycle": 2,
       "prompt_format": "chain_of_thought",
       "attribute": "loan_amount_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -103,7 +103,7 @@
       "cycle": 3,
       "prompt_format": "self_critique",
       "attribute": "loan_amount_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     },
@@ -111,7 +111,7 @@
       "cycle": 4,
       "prompt_format": "constrained",
       "attribute": "loan_amount_level",
-      "score": 85.0,
+      "score": 100.0,
       "refusal_detected": false,
       "hallucination_count": 0
     }

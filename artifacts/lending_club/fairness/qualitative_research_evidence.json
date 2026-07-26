@@ -1,5 +1,174 @@
 {
-  "gender": [],
-  "income_level": [],
-  "loan_amount_level": []
+  "gender": [
+    {
+      "paper_id": "b9475170ca58eb83868376517d7ab50bb4f52d65",
+      "title": "Trust and Credit: The Role of Appearance in Peer-to-peer Lending",
+      "year": 2012,
+      "venue": "",
+      "citation_count": 961,
+      "url": "https://www.semanticscholar.org/paper/b9475170ca58eb83868376517d7ab50bb4f52d65",
+      "abstract": "",
+      "authors": [
+        "J. Duarte",
+        "Stephan Siegel",
+        "Lance A. Young"
+      ],
+      "query": "DOI seed: 10.1093/rfs/hhs071",
+      "doi": "10.1093/rfs/hhs071",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    },
+    {
+      "paper_id": "6e57ef0eacc47268313df14dbe0448d1842481b4",
+      "title": "What\u2019s in a Picture?",
+      "year": 2011,
+      "venue": "The Journal of human resources",
+      "citation_count": 235,
+      "url": "https://www.semanticscholar.org/paper/6e57ef0eacc47268313df14dbe0448d1842481b4",
+      "abstract": "",
+      "authors": [
+        "Devin G. Pope",
+        "Justin R. Sydnor"
+      ],
+      "query": "DOI seed: 10.3368/jhr.46.1.53",
+      "doi": "10.3368/jhr.46.1.53",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    },
+    {
+      "paper_id": "97a98065c1fec5c36104f586c93ca756caf5caaf",
+      "title": "Consumer-lending discrimination in the FinTech Era",
+      "year": 2019,
+      "venue": "Journal of Financial Economics",
+      "citation_count": 587,
+      "url": "https://www.semanticscholar.org/paper/97a98065c1fec5c36104f586c93ca756caf5caaf",
+      "abstract": "Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using an identification under this rule, we show risk-equivalent Latinx/Black borrowers pay significantly higher interest rates on GSE-securitized and FHA-insured loans, particularly in high-minority-share neighborhoods. We estimate these rate differences cost minority borrowers over $450 million yearly. FinTech lenders\u2019 rate disparities were similar to those of non-Fintech lenders for GSE mortgages, but lower for FHA mortgages issued in 2009\u20132015 and for FHA refi mortgages issued in 2018\u20132019.",
+      "authors": [
+        "Robert P. Bartlett",
+        "Adair Morse",
+        "Richard Stanton",
+        "N. Wallace"
+      ],
+      "query": "DOI seed: 10.1016/j.jfineco.2021.05.047",
+      "doi": "10.1016/j.jfineco.2021.05.047",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    }
+  ],
+  "income_level": [
+    {
+      "paper_id": "97a98065c1fec5c36104f586c93ca756caf5caaf",
+      "title": "Consumer-lending discrimination in the FinTech Era",
+      "year": 2019,
+      "venue": "Journal of Financial Economics",
+      "citation_count": 587,
+      "url": "https://www.semanticscholar.org/paper/97a98065c1fec5c36104f586c93ca756caf5caaf",
+      "abstract": "Abstract U.S. fair-lending law prohibits lenders from making credit determinations that disparately affect minority borrowers if those determinations are based on characteristics unrelated to creditworthiness. Using an identification under this rule, we show risk-equivalent Latinx/Black borrowers pay significantly higher interest rates on GSE-securitized and FHA-insured loans, particularly in high-minority-share neighborhoods. We estimate these rate differences cost minority borrowers over $450 million yearly. FinTech lenders\u2019 rate disparities were similar to those of non-Fintech lenders for GSE mortgages, but lower for FHA mortgages issued in 2009\u20132015 and for FHA refi mortgages issued in 2018\u20132019.",
+      "authors": [
+        "Robert P. Bartlett",
+        "Adair Morse",
+        "Richard Stanton",
+        "N. Wallace"
+      ],
+      "query": "DOI seed: 10.1016/j.jfineco.2021.05.047",
+      "doi": "10.1016/j.jfineco.2021.05.047",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    },
+    {
+      "paper_id": "b39f69b46e868c55a81a2649d1dae6366b5038cd",
+      "title": "Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?",
+      "year": 2017,
+      "venue": "Management Sciences",
+      "citation_count": 99,
+      "url": "https://www.semanticscholar.org/paper/b39f69b46e868c55a81a2649d1dae6366b5038cd",
+      "abstract": "",
+      "authors": [
+        "Alexander W. Butler",
+        "Jess Cornaggia",
+        "Umit G. Gurun"
+      ],
+      "query": "DOI seed: 10.1287/mnsc.2016.2560",
+      "doi": "10.1287/mnsc.2016.2560",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    },
+    {
+      "paper_id": "0fee3b6c72f7676b4934651e517d0a328048c600",
+      "title": "Certifying and Removing Disparate Impact",
+      "year": 2014,
+      "venue": "Knowledge Discovery and Data Mining",
+      "citation_count": 2287,
+      "url": "https://www.semanticscholar.org/paper/0fee3b6c72f7676b4934651e517d0a328048c600",
+      "abstract": "What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it appears to be neutral. This legal determination hinges on a definition of a protected class (ethnicity, gender) and an explicit description of the process. When computers are involved, determining disparate impact (and hence bias) is harder. It might not be possible to disclose the process. In addition, even if the process is open, it might be hard to elucidate in a legal setting how the algorithm makes its decisions. Instead of requiring access to the process, we propose making inferences based on the data it uses. We present four contributions. First, we link disparate impact to a measure of classification accuracy that while known, has received relatively little attention. Second, we propose a test for disparate impact based on how well the protected class can be predicted from the other attributes. Third, we describe methods by which data might be made unbiased. Finally, we present empirical evidence supporting the effectiveness of our test for disparate impact and our approach for both masking bias and preserving relevant information in the data. Interestingly, our approach resembles some actual selection practices that have recently received legal scrutiny.",
+      "authors": [
+        "Michael Feldman",
+        "Sorelle A. Friedler",
+        "John Moeller",
+        "C. Scheidegger",
+        "S. Venkatasubramanian"
+      ],
+      "query": "DOI seed: 10.1145/2783258.2783311",
+      "doi": "10.1145/2783258.2783311",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    }
+  ],
+  "loan_amount_level": [
+    {
+      "paper_id": "b39f69b46e868c55a81a2649d1dae6366b5038cd",
+      "title": "Do Local Capital Market Conditions Affect Consumers' Borrowing Decisions?",
+      "year": 2017,
+      "venue": "Management Sciences",
+      "citation_count": 99,
+      "url": "https://www.semanticscholar.org/paper/b39f69b46e868c55a81a2649d1dae6366b5038cd",
+      "abstract": "",
+      "authors": [
+        "Alexander W. Butler",
+        "Jess Cornaggia",
+        "Umit G. Gurun"
+      ],
+      "query": "DOI seed: 10.1287/mnsc.2016.2560",
+      "doi": "10.1287/mnsc.2016.2560",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    },
+    {
+      "paper_id": "0fee3b6c72f7676b4934651e517d0a328048c600",
+      "title": "Certifying and Removing Disparate Impact",
+      "year": 2014,
+      "venue": "Knowledge Discovery and Data Mining",
+      "citation_count": 2287,
+      "url": "https://www.semanticscholar.org/paper/0fee3b6c72f7676b4934651e517d0a328048c600",
+      "abstract": "What does it mean for an algorithm to be biased? In U.S. law, unintentional bias is encoded via disparate impact, which occurs when a selection process has widely different outcomes for different groups, even as it appears to be neutral. This legal determination hinges on a definition of a protected class (ethnicity, gender) and an explicit description of the process. When computers are involved, determining disparate impact (and hence bias) is harder. It might not be possible to disclose the process. In addition, even if the process is open, it might be hard to elucidate in a legal setting how the algorithm makes its decisions. Instead of requiring access to the process, we propose making inferences based on the data it uses. We present four contributions. First, we link disparate impact to a measure of classification accuracy that while known, has received relatively little attention. Second, we propose a test for disparate impact based on how well the protected class can be predicted from the other attributes. Third, we describe methods by which data might be made unbiased. Finally, we present empirical evidence supporting the effectiveness of our test for disparate impact and our approach for both masking bias and preserving relevant information in the data. Interestingly, our approach resembles some actual selection practices that have recently received legal scrutiny.",
+      "authors": [
+        "Michael Feldman",
+        "Sorelle A. Friedler",
+        "John Moeller",
+        "C. Scheidegger",
+        "S. Venkatasubramanian"
+      ],
+      "query": "DOI seed: 10.1145/2783258.2783311",
+      "doi": "10.1145/2783258.2783311",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    },
+    {
+      "paper_id": "3ac3c11bf6cd8ccc657eb629148d6e346e52c8e0",
+      "title": "Data preprocessing techniques for classification without discrimination",
+      "year": 2011,
+      "venue": "Knowledge and Information Systems",
+      "citation_count": 1610,
+      "url": "https://www.semanticscholar.org/paper/3ac3c11bf6cd8ccc657eb629148d6e346e52c8e0",
+      "abstract": "Recently, the following Discrimination-Aware Classification Problem was introduced: Suppose we are given training data that exhibit unlawful discrimination; e.g., toward sensitive attributes such as gender or ethnicity. The task is to learn a classifier that optimizes accuracy, but does not have this discrimination in its predictions on test data. This problem is relevant in many settings, such as when the data are generated by a biased decision process or when the sensitive attribute serves as a proxy for unobserved features. In this paper, we concentrate on the case with only one binary sensitive attribute and a two-class classification problem. We first study the theoretically optimal trade-off between accuracy and non-discrimination for pure classifiers. Then, we look at algorithmic solutions that preprocess the data to remove discrimination before a classifier is learned. We survey and extend our existing data preprocessing techniques, being suppression of the sensitive attribute, massaging the dataset by changing class labels, and reweighing or resampling the data to remove discrimination without relabeling instances. These preprocessing techniques have been implemented in a modified version of Weka and we present the results of experiments on real-life data.",
+      "authors": [
+        "F. Kamiran",
+        "T. Calders"
+      ],
+      "query": "DOI seed: 10.1007/s10115-011-0463-8",
+      "doi": "10.1007/s10115-011-0463-8",
+      "source": "doi_seed",
+      "meets_citation_threshold": true
+    }
+  ]
 }
