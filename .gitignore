@@ -103,6 +103,9 @@ AI-fairness-dashboard.zip
 # -----------------------------
 !artifacts/
 !artifacts/**
+# But still exclude system junk inside artifacts
+artifacts/.DS_Store
+artifacts/**/.DS_Store
 !.env.example
 
 # LaTeX build intermediates
