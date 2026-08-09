@@ -54,10 +54,13 @@ mortgage origination, and peer-to-peer default risk --- in which a deterministic
 pipeline computes every metric and assigns every severity label, and a language
 model supplies only interpretation. Auditing the full cleaned population rather
 than a held-out split, we find that ordinary, defensible components of the audit
-stack change its conclusions. A subgroup reporting floor of $n \geq 15$
-suppressed five of eleven cells in the mortgage audit; three were worse than
-anything the audit reported, so it named the wrong group as most disadvantaged
-and understated severity by two bands. Auditing age at the $40{+}$ threshold
+stack change its conclusions. Auditing a $2{,}196$-row sample, the pipeline
+ranked American Indian men as the \emph{best}-treated group in the mortgage data
+--- disparate impact $1.1504$, above parity --- on the evidence of four
+applicants who happened all to be approved. Over all $10{,}978$ applicants the
+same model puts that group at $\mathbf{0.6734}$, the worst in the dataset. Small
+samples do not merely hide disparities; they invert them, and a reporting floor
+cannot tell the two cases apart. Auditing age at the $40{+}$ threshold
 borrowed from employment law returns near parity ($0.9791$) where the threshold
 credit law actually specifies, $62{+}$, returns the largest age disparity in the
 data ($0.8897$). A favorable-label convention inverted a headline ratio from
@@ -156,11 +159,11 @@ transcribed.}
 \toprule
 \textbf{Finding} & \textbf{Evidence} & \textbf{Proof}\\
 \midrule
-A reporting floor erased the largest disparities
-& $n \geq 15$ suppressed 5 of 11 HMDA \texttt{race}$\times$\texttt{sex} cells on a
-held-out split. The audit reported \textsc{moderate} at $0.8169$; the worst real
-disparity was $0.1917$. All five suppressed cells were racial minorities. At full
-population, 1 of 12 is suppressed and the worst cell ($0.6734$) is visible.
+Small samples inverted a disparity
+& On a held-out split, \texttt{American Indian $\times$ Male} reads $1.1504$ ---
+above parity, the best cell --- on four applicants. At full population the same
+group is $\mathbf{0.6734}$, the worst cell in the data. Small samples invert
+disparities, not merely hide them.
 & \texttt{scripts/compare\_populations.py}; \texttt{population\_comparison.json}\\
 \addlinespace
 The age audit used the wrong statute
@@ -200,9 +203,9 @@ Prompt sensitivity is model-generation-specific
 \paragraph{Contributions.} (i) An empirical demonstration, on real lending data,
 that four standard components of an audit stack --- a reporting floor, a
 protected-class threshold, a label convention, and two output detectors --- each
-change what the audit concludes. (ii) A quantification of the reporting floor's
-cost that separates it from every other variable by holding the model fixed and
-varying only the audited population. (iii) A cross-model result showing that the
+change what the audit concludes. (ii) A demonstration that small-sample audits
+invert disparities rather than only hiding them, isolated by holding the model
+fixed and varying only the audited population. (iii) A cross-model result showing that the
 prompt-sensitivity finding widely reported for LLM evaluators is specific to a
 model generation. (iv) A released, cost-capped, offline-reproducible audit
 pipeline in which every claim above is regenerable.
@@ -339,7 +342,7 @@ Setting & Attribute & DI\\
 \end{tabular}
 \end{table}
 
-\subsection{A reporting floor erases the largest disparities}
+\subsection{Small samples invert disparities, and the floor cannot help}
 \label{sec:floor}
 
 Subgroup reporting floors are standard and defensible: a ratio computed on six
@@ -358,21 +361,34 @@ Identical model; only the audited population differs.}
 & ($n{=}2{,}196$) & ($n{=}10{,}978$)\\
 \midrule
 Cells suppressed & \textbf{5 of 11} & 1 of 12\\
-Worst cell \emph{reported} & 0.8169 (\textsc{mod.}) & 0.6734 (\textsc{crit.})\\
-Worst cell that \emph{exists} & \textbf{0.1917} (\textsc{crit.}) & 0.6734 (\textsc{crit.})\\
-Suppressed cells worse than & \textbf{3} & 0\\
-\quad anything reported & & \\
+Worst cell \emph{reported} & 0.8169 (\textsc{mod.}) & \textbf{0.6734} (\textsc{crit.})\\
+\texttt{Am.\ Indian}$\times$\texttt{Male} & \textbf{1.1504} (best cell) & \textbf{0.6734} (worst cell)\\
+\texttt{Am.\ Indian}$\times$\texttt{Female} & 0.1917 ($n{=}6$, noise) & 0.8815 ($n{=}25$)\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-On the split, the audit returns \textsc{moderate} for
-\texttt{Black $\times$ Male} at $0.8169$ while \texttt{American Indian $\times$
-Female} sits at $0.1917$, unreported. The audit is wrong about which group is
-most disadvantaged and wrong by two severity bands about how severe the worst
-case is. Every suppressed cell belonged to a racial minority --- which is the
-mechanism, not a coincidence: a floor on group size is a floor on group
-population.
+The failure is sharper than suppression. On the split,
+\texttt{American Indian $\times$ Male} appears at $\mathrm{DI} = 1.1504$ ---
+\emph{above} parity, the best-treated cell in the table. Four applicants, four
+approvals. At full population that same group is at $0.6734$ with $n{=}31$: the
+worst cell in the dataset, in the \textsc{critical} band. The audit did not miss
+the disparity; it \textbf{inverted} it, and attached a reassuring number to the
+inversion.
+
+The floor was right to suppress what it suppressed. \texttt{American Indian
+$\times$ Female} reads $0.1917$ on the split --- one approval in six --- which
+looks like the most severe disparity in the study and is in fact noise: at full
+population the same cell is $0.8815$ ($n{=}25$). A reader who overrode the floor
+to surface that number would have reported a catastrophe that does not exist.
+
+That is the uncomfortable shape of this result. The floor is not the error and
+removing it is not the fix. At this sample size the estimates for small groups
+are unreliable \emph{in both directions} --- one group looked catastrophic and
+another looked flawless, and both were wrong. Every affected cell belonged to a
+racial minority, which is mechanism rather than coincidence: a floor on group
+size is a floor on group population, so the groups whose treatment is least
+certain are exactly the groups least likely to be counted.
 
 At full population the same floor suppresses one cell of twelve and the worst
 disparity, \texttt{American Indian $\times$ Male} at $0.6734$ ($n{=}31$), becomes
@@ -640,8 +656,8 @@ cycle differences mix prompt strategy with sampling noise.
 \section{Conclusion}
 
 We set out to measure whether a language model can audit fairness. The more
-durable result concerns the measuring apparatus. A reporting floor decided which
-racial groups appeared in a mortgage audit's conclusion. A threshold borrowed
+durable result concerns the measuring apparatus. A sample too small decided that the
+worst-treated racial group in a mortgage dataset was the best-treated one. A threshold borrowed
 from employment law decided that the age class credit law protects was fine. A
 column name decided whether a disparity ratio read $0.9931$ or $0.0$. A character
 count decided that a correct answer was a refusal, and then decided that a vendor

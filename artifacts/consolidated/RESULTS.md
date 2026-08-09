@@ -114,7 +114,7 @@ to check.
 
 ---
 
-## 3. The reporting floor erases the largest disparities
+## 3. Small samples invert disparities
 
 This is the strongest result in the re-analysis. Both rows use the **same
 leak-free model**; only the audited population differs, so the comparison
@@ -122,18 +122,29 @@ isolates sample size.
 
 ### HMDA `race × sex`, floor n ≥ 15
 
-| | Test split (n=2,196) | Full population (n=10,978) |
+| Cell | Test split (n=2,196) | Full population (n=10,978) |
 |---|---|---|
-| Cells suppressed | **5 of 11** | 1 of 12 |
-| Worst cell the audit **reports** | `Black × Male` 0.8169 (**MODERATE**) | `American Indian × Male` 0.6734 (CRITICAL) |
-| Worst cell that **exists** | `American Indian × Female` **0.1917** (CRITICAL) | `American Indian × Male` 0.6734 (CRITICAL) |
-| Suppressed cells worse than anything reported | **3** | 0 |
+| Cells suppressed at n<15 | **5 of 11** | 1 of 12 |
+| Worst cell the audit **reports** | `Black × Male` 0.8169 (MODERATE) | `American Indian × Male` **0.6734** (CRITICAL) |
+| `American Indian × Male` | **1.1504** — *best cell in the table* (n=4) | **0.6734** — *worst cell in the data* (n=31) |
+| `American Indian × Female` | 0.1917 (n=6) — noise | 0.8815 (n=25) |
 
-On the test split the audit reports MODERATE while the worst real disparity is
-0.1917 — wrong by two full severity bands, and it names the wrong group. The
-floor is a defensible statistical commitment; its effect is to remove the
-smallest and most marginalised groups from the conclusion precisely where the
-disparity is largest.
+**The failure is inversion, not suppression.** On the split, `American Indian ×
+Male` reads 1.1504 — above parity, the best-treated cell — because four
+applicants were sampled and all four were approved. At full population that group
+is the worst in the dataset.
+
+**The floor was right about what it suppressed.** `American Indian × Female` at
+0.1917 (one approval in six) looks like the most severe disparity in the study
+and is noise: the full-population value is 0.8815. A reader who overrode the
+floor to surface that number would have reported a catastrophe that does not
+exist.
+
+So the floor is not the error, and removing it is not the fix. At this sample
+size the estimates for small groups are unreliable **in both directions** — one
+group looked catastrophic, another looked flawless, and both were wrong. Every
+affected cell belonged to a racial minority, which is mechanism rather than
+coincidence: a floor on group size is a floor on group population.
 
 Full-population cell table:
 
@@ -251,7 +262,7 @@ costs are upper bounds rather than billed amounts.
 | Metric orientation inverted the headline number (DI 0.0 vs 0.9931) | **Holds.** Independent of population size. Magnitude remains a property of the degenerate classifier. |
 | Refusal detector measures brevity (6 flags, 0 refusals) | **Holds.** |
 | Refusal detector produced a governance decision (Gemini blocked) | **Holds.** Excluding detector-zeroed cycles moves the mean from 19.79 to 70.0. |
-| Reporting floor erases the largest disparities | **Strengthened and quantified.** Now a measurable function of sample size. |
+| Small samples invert disparities | **Corrected and strengthened.** The earlier framing (floor hides the worst cell) was itself a small-sample artifact; the real result is that a group ranked best-treated at n=4 is worst-treated at n=31. |
 | ECOA age asymmetry and pooling | **Newly measured.** `age_62_plus` 0.8897 vs pooled `age_group` 0.9791. |
 | Fabrication detector penalises arithmetic | **New.** 67% of flags derivable from context. |
 | `under_40 × female` is CRITICAL at 0.6087 | **Withdrawn.** 0.8201 at full population; clears the screen. |
