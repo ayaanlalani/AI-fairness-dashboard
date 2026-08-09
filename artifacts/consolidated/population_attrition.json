@@ -1,0 +1,122 @@
+{
+  "generator": "scripts/hmda_attrition.py",
+  "raw_file": "hmda_dataset/data/hmda_raw.csv",
+  "raw_rows": 20000,
+  "final_rows": 10978,
+  "attrition": [
+    {
+      "step": "raw file",
+      "rule": "-",
+      "dropped": 0,
+      "remaining": 20000
+    },
+    {
+      "step": "race",
+      "rule": "derived_race not in RACE_MAP or mapped to None",
+      "dropped": 4423,
+      "remaining": 15577,
+      "dropped_by_category": {
+        "Race Not Available": 4140,
+        "Joint": 280,
+        "Free Form Text Only": 3
+      }
+    },
+    {
+      "step": "sex",
+      "rule": "derived_sex not in {Male, Female}",
+      "dropped": 4598,
+      "remaining": 10979,
+      "dropped_by_category": {
+        "Joint": 4529,
+        "Sex Not Available": 69
+      }
+    },
+    {
+      "step": "age",
+      "rule": "applicant_age not a mapped band",
+      "dropped": 1,
+      "remaining": 10978,
+      "dropped_by_category": {
+        "8888": 1
+      }
+    }
+  ],
+  "race_di_with_dropped_categories": {
+    "outcome": "raw approval (action_taken == 1), not model predictions",
+    "population": "all 20,000 raw rows",
+    "rows": [
+      {
+        "race": "Joint",
+        "retained_by_pipeline": false,
+        "n": 280,
+        "approval_rate": 0.8036,
+        "di_vs_white": 1.0225,
+        "di_vs_best": 1.0
+      },
+      {
+        "race": "Asian",
+        "retained_by_pipeline": true,
+        "n": 1063,
+        "approval_rate": 0.7959,
+        "di_vs_white": 1.0127,
+        "di_vs_best": 0.9904
+      },
+      {
+        "race": "White",
+        "retained_by_pipeline": true,
+        "n": 9822,
+        "approval_rate": 0.7859,
+        "di_vs_white": 1.0,
+        "di_vs_best": 0.978
+      },
+      {
+        "race": "Race Not Available",
+        "retained_by_pipeline": false,
+        "n": 4140,
+        "approval_rate": 0.7234,
+        "di_vs_white": 0.9205,
+        "di_vs_best": 0.9003
+      },
+      {
+        "race": "Black",
+        "retained_by_pipeline": true,
+        "n": 4541,
+        "approval_rate": 0.641,
+        "di_vs_white": 0.8157,
+        "di_vs_best": 0.7977
+      },
+      {
+        "race": "Pacific Islander",
+        "retained_by_pipeline": true,
+        "n": 32,
+        "approval_rate": 0.5312,
+        "di_vs_white": 0.676,
+        "di_vs_best": 0.6611
+      },
+      {
+        "race": "American Indian",
+        "retained_by_pipeline": true,
+        "n": 63,
+        "approval_rate": 0.5238,
+        "di_vs_white": 0.6665,
+        "di_vs_best": 0.6519
+      },
+      {
+        "race": "Multiracial",
+        "retained_by_pipeline": true,
+        "n": 56,
+        "approval_rate": 0.5,
+        "di_vs_white": 0.6362,
+        "di_vs_best": 0.6222
+      },
+      {
+        "race": "Free Form Text Only",
+        "retained_by_pipeline": false,
+        "n": 3,
+        "approval_rate": 0.0,
+        "di_vs_white": 0.0,
+        "di_vs_best": 0.0
+      }
+    ]
+  }
+}

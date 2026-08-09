@@ -1,0 +1,5 @@
+aif360==0.6.1 fairlearn==0.13.0 numpy==2.4.4 pandas==3.0.2
+default favorable_label=1.0 on 'loan_default':  DI = 1.2072
+oriented favorable_label=0.0:                   DI = 0.9862
+fairlearn demographic_parity_ratio on the column as encoded: 0.8284 (a min/max ratio of default rates)
+fairlearn demographic_parity_ratio, column re-encoded by hand: 0.9862 (no favorable-label parameter exists to say which)

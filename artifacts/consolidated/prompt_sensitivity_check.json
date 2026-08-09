@@ -1,0 +1,178 @@
+{
+  "constrained_cycle": 4,
+  "gemini": {
+    "empty_but_scored_records": [
+      {
+        "path": "artifacts/llm_benchmark/gemini-2.5-flash/hmda/sex_cycle1.json",
+        "total_score": 10.0
+      },
+      {
+        "path": "artifacts/llm_benchmark/gemini-2.5-flash/hmda/sex_cycle2.json",
+        "total_score": 10.0
+      },
+      {
+        "path": "artifacts/llm_benchmark/gemini-2.5-flash/hmda/sex_cycle3.json",
+        "total_score": 10.0
+      },
+      {
+        "path": "artifacts/llm_benchmark/gemini-2.5-flash/hmda/sex_cycle4.json",
+        "total_score": 10.0
+      }
+    ],
+    "empty_result_records": 18,
+    "flagged_content_scores": [
+      85.0
+    ],
+    "mean_all": 19.7917,
+    "mean_content_bearing_only": 72.5,
+    "mean_excluding_score_zero": 47.5,
+    "notes": [
+      "Every empty record has result == {} (an API failure), which the 40-character rule also counts as a refusal; the flag conflates transport failure with model behaviour.",
+      "mean_excluding_score_zero reproduces the previously published 47.50, but that figure still includes empty-result records scored above zero: _score_cause_alignment returns a flat 10.0 whenever the baseline lists no root_cause_labels (scripts/llm_benchmark_common.py, 'if total == 0: return 10.0'), so an empty response earns 10/15 on that subscore. mean_content_bearing_only excludes all empty results."
+    ],
+    "records": 24,
+    "refusal_flags_on_content": 1,
+    "refusal_flags_total": 19,
+    "score_zero_records": 14
+  },
+  "generator": "scripts/recheck_prompt_sensitivity.py",
+  "spreads": {
+    "gpt-4o": {
+      "german_credit": {
+        "cycle4_decomposition": {
+          "cycle4_mean_cause_alignment_flagged": 0.0,
+          "cycle4_mean_cause_alignment_unflagged": null,
+          "cycle4_records": 3,
+          "cycle4_refusal_flagged": 3,
+          "subscore_deltas": {
+            "cause_alignment": 0.0,
+            "completeness": 8.0,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 2.2222
+          },
+          "subscore_shares_of_dip": {
+            "cause_alignment": 0.0,
+            "completeness": 0.7826,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 0.2174
+          },
+          "total_dip": 10.2222
+        },
+        "cycle_means": {
+          "1": 71.6667,
+          "2": 71.6667,
+          "3": 78.3333,
+          "4": 63.6667
+        },
+        "refusal_flags": 3,
+        "spread_excluding_constrained": 6.6667,
+        "spread_published": 14.6667,
+        "zeroed_records": 0
+      },
+      "hmda": {
+        "cycle4_decomposition": {
+          "cycle4_mean_cause_alignment_flagged": 5.0,
+          "cycle4_mean_cause_alignment_unflagged": null,
+          "cycle4_records": 4,
+          "cycle4_refusal_flagged": 4,
+          "subscore_deltas": {
+            "cause_alignment": 0.0,
+            "completeness": 3.5833,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 5.0
+          },
+          "subscore_shares_of_dip": {
+            "cause_alignment": 0.0,
+            "completeness": 0.4175,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 0.5825
+          },
+          "total_dip": 8.5833
+        },
+        "cycle_means": {
+          "1": 83.75,
+          "2": 85.0,
+          "3": 85.0,
+          "4": 76.0
+        },
+        "refusal_flags": 4,
+        "spread_excluding_constrained": 1.25,
+        "spread_published": 9.0,
+        "zeroed_records": 0
+      }
+    },
+    "gpt-5-mini": {
+      "german_credit": {
+        "cycle4_decomposition": {
+          "cycle4_mean_cause_alignment_flagged": 0.0,
+          "cycle4_mean_cause_alignment_unflagged": 0.0,
+          "cycle4_records": 3,
+          "cycle4_refusal_flagged": 1,
+          "subscore_deltas": {
+            "cause_alignment": 0.0,
+            "completeness": 0.0,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 0.0
+          },
+          "subscore_shares_of_dip": {
+            "cause_alignment": null,
+            "completeness": null,
+            "mitigation_specificity": null,
+            "research_grounding": null,
+            "severity_agreement": null
+          },
+          "total_dip": 0.0
+        },
+        "cycle_means": {
+          "1": 85.0,
+          "2": 85.0,
+          "3": 85.0,
+          "4": 85.0
+        },
+        "refusal_flags": 1,
+        "spread_excluding_constrained": 0.0,
+        "spread_published": 0.0,
+        "zeroed_records": 0
+      },
+      "hmda": {
+        "cycle4_decomposition": {
+          "cycle4_mean_cause_alignment_flagged": 0.0,
+          "cycle4_mean_cause_alignment_unflagged": 6.6667,
+          "cycle4_records": 4,
+          "cycle4_refusal_flagged": 1,
+          "subscore_deltas": {
+            "cause_alignment": 0.625,
+            "completeness": 0.0,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 0.0
+          },
+          "subscore_shares_of_dip": {
+            "cause_alignment": 1.0,
+            "completeness": 0.0,
+            "mitigation_specificity": 0.0,
+            "research_grounding": 0.0,
+            "severity_agreement": 0.0
+          },
+          "total_dip": 0.625
+        },
+        "cycle_means": {
+          "1": 91.875,
+          "2": 90.0,
+          "3": 90.0,
+          "4": 90.0
+        },
+        "refusal_flags": 1,
+        "spread_excluding_constrained": 1.875,
+        "spread_published": 1.875,
+        "zeroed_records": 0
+      }
+    }
+  },
+  "verdict": "The refusal flag never feeds total_score and neither gpt-4o nor gpt-5-mini has a zeroed record, so the published spread contrast is unchanged by removing the refusal penalty. However, the gpt-4o spread is concentrated in the constrained cycle (german_credit: spread 14.6667 -> 6.6667 excluding the constrained cycle (dip decomposition: completeness 78%, severity_agreement 22%); hmda: spread 9.0 -> 1.25 excluding the constrained cycle (dip decomposition: severity_agreement 58%, completeness 42%)). The dip is carried by the completeness and severity_agreement subscores on deliberately terse output, not by cause_alignment. The residual spread excluding that cycle remains larger than gpt-5-mini's, so a model-generation difference survives, but the published magnitude is partly an artifact of how the scorer treats terse output."
+}
