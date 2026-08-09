@@ -117,3 +117,7 @@ artifacts/**/.DS_Store
 *.toc
 *.fls
 *.fdb_latexmk
+
+# Built papers ARE deliverables, so they override the blanket *.pdf ignore
+# above. Intermediates stay ignored by the rules just listed.
+!report/*.pdf

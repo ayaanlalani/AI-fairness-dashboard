@@ -1,0 +1,47 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "race",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The measured Disparate Impact is \"0.9371\", which falls below the 0.95 threshold defined in the audit and therefore indicates a moderate disparate impact by race. The provided per-group selection rates show differences that contribute to this: White selection_rate = 0.8128; Black = 0.7447; Asian = 0.8556; Pacific Islander = 0.7037 (others listed in the breakdown).",
+    "why_is_wrong": "The Disparate Impact (\"0.9371\") and demographic_parity_diff = -0.0512 point to a measurable gap in overall selection rates across race groups (example gap: White vs Black selection_rate difference = 0.0681). In contrast, equal_opportunity_diff = 0.0032 and average_odds_diff = -0.0133 are near zero, indicating true positive rates and average error rates are largely similar across groups. The imbalance findings note severe sample-size skew (e.g., Pacific Islander n=27) and large base-rate differences (Asian base_rate 0.7975 vs Pacific Islander base_rate 0.4444), which can both affect the DI and the stability of subgroup metrics; therefore the primary concern supported by the numbers is a moderate disparity in selection rates rather than large differences in TPR/FPR.",
+    "how_to_fix": "Reweighing",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [
+    "metric value 0.0681 in 'why_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 20.85,
+    "input_tokens": 1636,
+    "output_tokens": 2544,
+    "total_tokens": 4180,
+    "input_cost_usd": 0.000409,
+    "output_cost_usd": 0.005088,
+    "total_cost_usd": 0.005497
+  },
+  "dry_run": false
+}

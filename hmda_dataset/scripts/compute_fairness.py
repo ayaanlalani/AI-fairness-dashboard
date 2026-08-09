@@ -62,6 +62,24 @@ PROTECTED_CONFIGS = {
         "column": "age_group",
         "privileged": "mid",
     },
+    # The ECOA cut. Reg B Sec. 1002.2(o) defines "elderly" as 62 or older; the
+    # 40+ threshold commonly used in fairness work comes from the ADEA, an
+    # employment statute with no application to credit.
+    #
+    # Kept alongside age_group deliberately. age_group pools young and senior
+    # applicants against the middle band, and because those two move in opposite
+    # directions they cancel: the pooled ratio reads near parity while the
+    # senior-versus-young comparison does not. Auditing both is what makes that
+    # visible.
+    #
+    # Note the asymmetry this metric cannot express: Reg B Sec. 1002.6(b)(2)
+    # expressly permits favouring an elderly applicant, so a ratio above 1 here
+    # is lawful and is not a reverse-disparity finding. Disparate impact is a
+    # symmetric measure applied to an asymmetric protection.
+    "age_62_plus": {
+        "column": "age_62_plus",
+        "privileged": "under_62",
+    },
 }
 
 

@@ -1,0 +1,48 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_62_plus",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_62_plus",
+    "severity": "MODERATE",
+    "what_is_wrong": "The protected group 62_plus experiences a measurable disadvantage: disparate impact = 0.8897 (selection rate 0.7165 vs 0.8054 for under_62; demographic parity difference = -0.0889). Equal opportunity difference is -0.0638 (TPR 0.8576 vs 0.9214) and average odds difference = -0.0545. The group is underrepresented in the sample (under_62 n=9232 vs 62_plus n=1746, ~5.3x) and has a lower base rate of favorable labels (0.6558 vs 0.7292), while the Theil index = 0.296 indicates nontrivial outcome inequality. Taken together, these metrics meet the provided severity rule for a MODERATE finding.",
+    "why_is_wrong": "A specific, data-driven mechanism explains the disparity: 62_plus has both a lower base rate of positive labels and much smaller representation in training data, so the learning algorithm sees fewer positive examples from this group and estimates lower propensity/decision thresholds for them, producing lower selection and TPR. The lower FPR for 62_plus (0.4476 vs 0.4928) suggests a tradeoff in how errors are distributed rather than parity of true-positive access. These patterns are consistent with sample-bias and label-distribution effects (pre-existing structural differences) that the model reproduces, as also signaled by the Theil index rather than an isolated implementation bug.",
+    "how_to_fix": "Start with targeted preprocessing: apply AIF360 Reweighing (group\u00d7label instance weights) on the training set to reduce the impact of the base-rate and representation imbalance, then retrain the model using weighted training and re-evaluate the core metrics (Disparate Impact, Demographic Parity Diff, Equal Opportunity Diff, Average Odds Diff, Theil). If TPR gaps persist, apply a postprocessing constraint such as AIF360's EqOddsPostprocessing or CalibratedEqOddsPostprocessing, or use Fairlearn's ThresholdOptimizer or ExponentiatedGradient/GridSearch to enforce equalized opportunity/odds constraints. As complementary or alternative in-processing, consider Fairlearn ExponentiatedGradient or GridSearch to directly trade off accuracy and specified fairness constraints. Operational fixes: collect additional representative 62_plus data and audit features for proxies of age to avoid encoding unfair correlations. Continuously monitor subgroup metrics and Theil index and assess legal/contextual appropriateness of interventions.",
+    "supporting_research": [
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | KDD",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 5.3 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 18.91,
+    "input_tokens": 1847,
+    "output_tokens": 1656,
+    "total_tokens": 3503,
+    "input_cost_usd": 0.000462,
+    "output_cost_usd": 0.003312,
+    "total_cost_usd": 0.003774
+  },
+  "dry_run": false
+}

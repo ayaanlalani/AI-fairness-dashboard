@@ -1,0 +1,44 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "AgeGroup_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "AgeGroup_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact for the 'AgeGroup_original' attribute is 0.9258.",
+    "why_is_wrong": "A disparate impact value of 0.9258 indicates moderate bias as it is below the 0.95 threshold but above 0.8. The age group 'under_40' has a lower selection rate and true positive rate, hinting at potential disadvantages in credit outcomes compared to the '40_plus' group.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 77.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 77.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.0,
+    "input_tokens": 1238,
+    "output_tokens": 214,
+    "total_tokens": 1452,
+    "input_cost_usd": 0.003095,
+    "output_cost_usd": 0.00214,
+    "total_cost_usd": 0.005235
+  },
+  "dry_run": false
+}

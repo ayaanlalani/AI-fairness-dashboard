@@ -1,0 +1,48 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_62_plus",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_62_plus",
+    "severity": "MODERATE",
+    "what_is_wrong": "The protected group 62_plus experiences a measurable disadvantage: disparate impact = 0.8897 (selection rate 0.7165 vs 0.8054 for under_62; demographic parity difference = -0.0889). True positive rate for 62_plus is lower (TPR 0.8576 vs 0.9214; equal opportunity difference = -0.0638) and average odds difference = -0.0545. There is a notable sample imbalance (under_62 is 5.3x larger) and a lower base rate for favorable outcomes in 62_plus (0.6558 vs 0.7292), which together produce the observed moderate disparity.",
+    "why_is_wrong": "The combination of (a) lower base-rate of favorable labels for 62_plus and (b) training-set imbalance means the model sees fewer positive examples from the protected group and thus yields lower selection and TPR for that group. These patterns point to structural, pre-existing differences (reflected in base rates and representation) that the model has learned and amplified rather than an isolated algorithmic artifact. The theil index (0.296) further indicates nontrivial outcome inequality that aligns with these distributional causes.",
+    "how_to_fix": "Apply AIF360 Reweighing as a first-line mitigation: reweigh training instances by group\u00d7label to reduce the correlation between age_62_plus and the label, directly addressing sample imbalance and base-rate-driven learning bias. Reweighing is a preprocessing method that preserves features but alters training importance so downstream models are less likely to internalize the historical imbalance. After reweighing, retrain and evaluate the same core metrics (DI, DP diff, EOp diff, AvgOdds). If TPR gaps persist, follow with a constrained postprocessing (e.g., EqOddsPostprocessing or Fairlearn's ThresholdOptimizer targeting equalized opportunity/odds) and collect more representative 62_plus data to reduce sampling skew. Monitor Theil index and subgroup metrics continuously and ensure interventions are legally and contextually appropriate.",
+    "supporting_research": [
+      "[6] Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "[5] Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "[3] Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton",
+      "[4] A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 5.3 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 29.62,
+    "input_tokens": 1254,
+    "output_tokens": 2453,
+    "total_tokens": 3707,
+    "input_cost_usd": 0.000313,
+    "output_cost_usd": 0.004906,
+    "total_cost_usd": 0.00522
+  },
+  "dry_run": false
+}

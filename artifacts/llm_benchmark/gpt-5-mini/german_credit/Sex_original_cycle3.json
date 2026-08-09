@@ -1,0 +1,48 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "Sex_original",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "Sex_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The protected group (female) is experiencing a measurable adverse impact at a moderate level: Disparate Impact = 0.8888 (below the 0.95 moderate threshold), Demographic Parity Difference = -0.0921 (females are ~9.2 percentage points less likely to receive the favorable outcome), selection rates male=0.8275 vs female=0.7355, Equal Opportunity Difference = -0.065 (female TPR 0.8408 vs male TPR 0.9058), Average Odds Difference = -0.0734, and Theil Index = 0.2808. These consistent gaps across selection and error-rate metrics indicate a stable, moderate disadvantage for females in approvals/positive outcomes.",
+    "why_is_wrong": "Mechanisms consistent with the observed metrics: (1) historical label imbalance \u2014 male base_rate 0.7232 vs female 0.6484 \u2014 means training labels differ by group and the model can learn those differing outcomes; (2) representation imbalance (690 male vs 310 female) can bias model fitting toward majority-group patterns, producing higher male TPR and selection rates; (3) dataset features likely act as proxies for sex (socio-economic or behavioral correlates), allowing disparate historical patterns to propagate into predictions; (4) observed lower female FPR (0.5413 vs 0.623) coupled with lower TPR shows a tradeoff in error rates rather than a simple threshold shift, suggesting both labeling and model decision boundaries contribute. Together these point to sampling/label bias plus proxy-feature effects as root causes, rather than a single noisy measurement.",
+    "how_to_fix": "Use a staged, toolkit-specific remediation plan and track utility-fairness tradeoffs: (A) Preprocessing: apply AIF360 Reweighing to remove statistical dependence between Sex and outcome in training data and/or AIF360 DisparateImpactRemover to repair proxy features; re-train and re-evaluate DI, DP diff, TPR/FPR and Theil. (B) If group TPR/FPR gaps persist, apply in-processing fairness-aware training such as Fairlearn ExponentiatedGradient (with equalized-odds or demographic-parity constraints) or Fairlearn GridSearch to find classifiers on the accuracy\u2013fairness frontier. (C) If necessary as a final step, apply calibrated post-processing (AIF360 CalibratedEqOddsPostprocessing or Fairlearn ThresholdOptimizer) to adjust decision thresholds to meet desired parity constraints. Throughout, perform cross-validated evaluation on the specified core metrics, inspect feature importance for proxies and consider targeted feature transformation/removal or PrejudiceRemover if appropriate, and document utility loss and legal/regulatory implications before deployment.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 9.2 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 14.46,
+    "input_tokens": 1773,
+    "output_tokens": 1746,
+    "total_tokens": 3519,
+    "input_cost_usd": 0.000443,
+    "output_cost_usd": 0.003492,
+    "total_cost_usd": 0.003935
+  },
+  "dry_run": false
+}

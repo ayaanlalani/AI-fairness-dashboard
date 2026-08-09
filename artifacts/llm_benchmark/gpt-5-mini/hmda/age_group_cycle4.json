@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_group",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The measured Disparate Impact for age_group is 0.9791, which is a small deviation from parity (1.0) and above the moderate threshold specified in the audit.",
+    "why_is_wrong": "The DI of 0.9791 stems from modest differences in selection rates and performance across age groups: selection_rate(mid)=0.7995, selection_rate(senior)=0.7433, selection_rate(young)=0.8372. Supporting fairness metrics are near parity (demographic_parity_diff = -0.0167, equal_opportunity_diff = -0.006, average_odds_diff = -0.0134) and theil_index = 0.296. TPRs (mid=0.9151, senior=0.8764, young=0.9488) and FPRs (mid=0.4947, senior=0.4712, young=0.4790) show only small differences, so the observed DI reflects minor selection-rate variation rather than large systematic exclusion.",
+    "how_to_fix": "Apply Reweighing on the training data to adjust instance weights by age_group and outcome so that the weighted group-outcome distributions align more closely with parity; retrain the model on the reweighted data and re-evaluate DI and related metrics to confirm improvement.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining | citations=2293",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems | citations=1619",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys | citations=6164"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 24.57,
+    "input_tokens": 1304,
+    "output_tokens": 2100,
+    "total_tokens": 3404,
+    "input_cost_usd": 0.000326,
+    "output_cost_usd": 0.0042,
+    "total_cost_usd": 0.004526
+  },
+  "dry_run": false
+}

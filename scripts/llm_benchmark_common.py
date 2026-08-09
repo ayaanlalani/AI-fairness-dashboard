@@ -47,6 +47,18 @@ SPEND_LEDGER_PATH = REPO_ROOT / "artifacts" / "llm_benchmark" / "spend_ledger.js
 MODEL_PRICES: dict[str, tuple[float, float]] = {
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
+    # gpt-5-mini. Two operational notes, both verified against the API rather
+    # than assumed:
+    #   1. It rejects `temperature` outright ("Only the default (1) value is
+    #      supported"), so the temperature sweep cannot run on this model. Any
+    #      repeated sampling here measures variance at the fixed default.
+    #   2. It requires `max_completion_tokens`; `max_tokens` is refused. The
+    #      client in llm_benchmark.py sets neither, so it works unchanged.
+    # Reasoning tokens bill as output. As with o3, the output figure below is
+    # held deliberately high: an over-estimate trips the cap early, which is the
+    # safe direction, and it means reported gpt-5-mini cost is an upper bound
+    # rather than a billed amount.
+    "gpt-5-mini": (0.25, 2.00),
     # o3 is deliberately held at the higher figure this repo's cost accounting
     # has always used. It may overstate current list price, which is the safe
     # direction for a cap (it trips earlier) but means any o3 cost reported

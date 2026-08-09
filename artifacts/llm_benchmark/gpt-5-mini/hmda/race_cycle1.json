@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "race",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The model shows a moderate disparate impact by race: Disparate Impact = 0.9371 and Demographic Parity Difference = -0.0512, indicating that non-White groups on average receive slightly lower selection rates than the privileged group (White). Per-group selection rates reveal gaps (White 0.8128 vs Black 0.7447 and lower rates for smaller groups such as American Indian 0.6607 and Multiracial 0.6383). Equal Opportunity Difference (0.0032) and Average Odds Difference (-0.0133) are small, so true-positive and overall error-rate disparities are limited; however, base-rate heterogeneity (e.g., Asian base rate 0.7975 vs Pacific Islander 0.4444) and severe sample-size imbalance (White 6337 vs Pacific Islander 27) complicate interpretation and risk masking subgroup harms.",
+    "why_is_wrong": "Likely root causes include historical label bias in lending outcomes (ground-truth base-rate differences that may reflect systemic discrimination), features that act as proxies for race, and heavy class-size imbalance that inflates uncertainty for small groups. The modest adverse selection-rate gap can therefore arise from the model faithfully reproducing biased historical patterns or from operational decisions (thresholds, cost optimization) that favor the majority group. Metrics for very small groups are unreliable (wide CI) so some apparent disparities could be statistical noise, but persistent gaps for larger groups (e.g., Black vs White) point to real, actionable disparity.",
+    "how_to_fix": "Adopt a layered remediation plan: (1) Data-level: increase sample sizes for underrepresented groups where feasible, inspect and, where appropriate, correct label bias or censoring, and remove or transform proxy features. (2) Preprocessing: apply techniques such as Reweighing or DisparateImpactRemover to reduce training-set bias. (3) In-processing: consider fairness-aware learners (AIF360 PrejudiceRemover; Fairlearn ExponentiatedGradient or GridSearch with fairness constraints) to directly trade off accuracy and parity. (4) Post-processing: if model changes are infeasible, use calibrated post-processing (EqOddsPostprocessing, CalibratedEqOddsPostprocessing, or ThresholdOptimizer) to adjust decision thresholds per group while monitoring utility. (5) Evaluation & governance: set an operational target (e.g., meet or exceed the four\u2011fifths rule DI \u2265 0.8 and reduce demographic-parity gap), measure confidence intervals and subgroup-specific metrics, conduct cost-utility trade-off analysis, and maintain ongoing disaggregated monitoring and legal review before deployment.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton [3]",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller [5]",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders [6]",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi et al. [4]"
+    ]
+  },
+  "score": {
+    "total_score": 92.5,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 7.5,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 92.5/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=7.5, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 16.48,
+    "input_tokens": 1524,
+    "output_tokens": 1789,
+    "total_tokens": 3313,
+    "input_cost_usd": 0.000381,
+    "output_cost_usd": 0.003578,
+    "total_cost_usd": 0.003959
+  },
+  "dry_run": false
+}

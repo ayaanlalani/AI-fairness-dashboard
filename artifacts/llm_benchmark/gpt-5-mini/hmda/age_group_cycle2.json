@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_group",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "Metrics indicate only small group-level disparities by age: disparate impact = 0.9791 (near parity), demographic parity difference = -0.0167, equal opportunity difference = -0.006, and average odds difference = -0.0134. However, group breakdowns show systematic under-selection of seniors (selection_rate 0.7433) relative to young (0.8372) and mid (0.7995), and a lower TPR for seniors (0.8764 vs 0.9488 for young). Theil index = 0.296 signals some residual distributional inequality even though formal DI thresholds classify severity as low.",
+    "why_is_wrong": "The pattern (lower selection rate and TPR for seniors) is consistent with models learning age-correlated signals or reflecting historical underwriting practices that disadvantage older applicants. Even when aggregate fairness metrics are near parity, models can perpetuate legacy disparities via proxy features (e.g., employment, income stability, retirement indicators) or label bias from historical decisions. These structural/historical causes produce modest but systematic under-selection of the senior group.",
+    "how_to_fix": "Apply AIF360 Reweighing as a first remediation: compute group\u00d7label weights to offset historical outcome imbalances for age_group, retrain the model using these weights, and re-evaluate Disparate Impact, DP diff, EOD, AOD, and Theil. Reweighing directly targets historical label-driven bias without altering model features, which fits when the root cause is legacy disparate treatment or label imbalance. If feature-level proxies are identified and need correction, follow-up with DisparateImpactRemover (feature repair) or a postprocessing optimizer (EqOddsPostprocessing or Fairlearn ThresholdOptimizer) to manage tradeoffs between overall accuracy and group-specific error rates. Iterate with stakeholder/legal review and monitoring.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 20.52,
+    "input_tokens": 1284,
+    "output_tokens": 1879,
+    "total_tokens": 3163,
+    "input_cost_usd": 0.000321,
+    "output_cost_usd": 0.003758,
+    "total_cost_usd": 0.004079
+  },
+  "dry_run": false
+}

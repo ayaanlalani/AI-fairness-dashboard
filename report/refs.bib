@@ -1,5 +1,6 @@
-% refs.bib — every entry verified against a live Semantic Scholar record or an
-% authoritative tool/dataset source. No entry was written from memory.
+% refs.bib — every entry verified against a live Semantic Scholar record, a
+% CrossRef publisher record, or an authoritative tool/dataset source. No entry
+% was written from memory.
 %
 % Provenance of each group:
 %   - lee2020 is the designated framing exemplar.
@@ -10,6 +11,25 @@
 %     and embedded in the benchmark prompts; they appear in
 %     artifacts/*/fairness/qualitative_research_evidence.json.
 %   - aif360, fairlearn, germancredit, hmda are tool/dataset sources.
+%   - The "audit practice" and "extended citation graph" groups below were added
+%     for report_facct.tex. Each was resolved by DOI or exact-title match on
+%     Semantic Scholar, then re-resolved against CrossRef for publisher-
+%     authoritative year, venue, volume and pages: S2 returns preprint years,
+%     which would have mis-dated Holstein et al. to 2018, Gebru et al. to 2018,
+%     Mitchell et al. to 2018 and Chouldechova to 2016. Where CrossRef truncates
+%     a subtitle (holstein2019, raji2019, kroll2021) the fuller S2 title is kept.
+%
+% Deliberately ABSENT, having failed verification — do not add without a
+% resolvable record:
+%   - Crenshaw 1989. The only CrossRef hit for the title is a 2024 German
+%     chapter *about* Crenshaw by a different author, which would have read as
+%     a genuine citation. Intersectionality is instead grounded in
+%     buolamwini2018 (the canonical empirical intersectional audit) and
+%     foulds2020 (the formal definition).
+%   - Hardt et al. 2016 (equality of opportunity) and Kearns et al. 2018
+%     (fairness gerrymandering): neither resolved by title, arXiv DOI, or
+%     arXiv-native identifier. The equal-odds argument in §6 is made from the
+%     computed EOD/AOD values instead of by citation.
 
 % ---------------------------------------------------------------- exemplar
 @inproceedings{lee2020,
@@ -117,6 +137,7 @@
   title   = {Algorithmic Lending Bias: Evaluating the Fairness of Historical Records},
   journal = {IEEE International Congress on Big Data},
   year    = {2024},
+  verifynote = {Harvested by the pipeline; record retained verbatim in artifacts/*/fairness/qualitative_research_evidence.json},
 }
 
 % ------------------------------------------------------- tools and datasets
@@ -143,6 +164,7 @@
   institution = {Microsoft},
   number      = {MSR-TR-2020-32},
   year        = {2020},
+  verifynote  = {Microsoft technical report, not a registrar-indexed paper; identifier MSR-TR-2020-32},
 }
 
 @misc{germancredit,
@@ -158,4 +180,310 @@
   title        = {Home Mortgage Disclosure Act ({HMDA}) Loan/Application Records},
   howpublished = {\url{https://www.consumerfinance.gov/data-research/hmda/}},
   year         = {2017},
+  verifynote   = {Government data release, not a paper; served at the CFPB URL given},
+}
+
+% =====================================================================
+%  Audit practice, fairness toolkits, and measurement critique
+% =====================================================================
+
+@inproceedings{deng2022,
+  author    = {Deng, Wesley Hanwen and Nagireddy, Manish and Lee, Michelle Seng Ah
+               and Singh, Jatinder and Wu, Zhiwei Steven and Holstein, Kenneth
+               and Zhu, Haiyi},
+  title     = {Exploring How Machine Learning Practitioners (Try To) Use Fairness Toolkits},
+  booktitle = {Proceedings of the 2022 ACM Conference on Fairness, Accountability,
+               and Transparency},
+  series    = {FAccT '22},
+  pages     = {473--484},
+  year      = {2022},
+  doi       = {10.1145/3531146.3533113},
+}
+
+@inproceedings{leesingh2021,
+  author    = {Lee, Michelle Seng Ah and Singh, Jat},
+  title     = {The Landscape and Gaps in Open Source Fairness Toolkits},
+  booktitle = {Proceedings of the 2021 CHI Conference on Human Factors in
+               Computing Systems},
+  series    = {CHI '21},
+  pages     = {1--13},
+  year      = {2021},
+  doi       = {10.1145/3411764.3445261},
+}
+
+@inproceedings{holstein2019,
+  author    = {Holstein, Kenneth and Wortman Vaughan, Jennifer and Daum{\'e}, III, Hal
+               and Dudik, Miro and Wallach, Hanna},
+  title     = {Improving Fairness in Machine Learning Systems: What Do Industry
+               Practitioners Need?},
+  booktitle = {Proceedings of the 2019 CHI Conference on Human Factors in
+               Computing Systems},
+  series    = {CHI '19},
+  pages     = {1--16},
+  year      = {2019},
+  doi       = {10.1145/3290605.3300830},
+}
+
+@inproceedings{selbst2019,
+  author    = {Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle A.
+               and Venkatasubramanian, Suresh and Vertesi, Janet},
+  title     = {Fairness and Abstraction in Sociotechnical Systems},
+  booktitle = {Proceedings of the Conference on Fairness, Accountability, and
+               Transparency},
+  series    = {FAT* '19},
+  pages     = {59--68},
+  year      = {2019},
+  doi       = {10.1145/3287560.3287598},
+}
+
+@inproceedings{raji2019,
+  author    = {Raji, Inioluwa Deborah and Buolamwini, Joy},
+  title     = {Actionable Auditing: Investigating the Impact of Publicly Naming
+               Biased Performance Results of Commercial {AI} Products},
+  booktitle = {Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics, and
+               Society},
+  series    = {AIES '19},
+  pages     = {429--435},
+  year      = {2019},
+  doi       = {10.1145/3306618.3314244},
+}
+
+@inproceedings{raji2020,
+  author    = {Raji, Inioluwa Deborah and Smart, Andrew and White, Rebecca N.
+               and Mitchell, Margaret and Gebru, Timnit and Hutchinson, Ben
+               and Smith-Loud, Jamila and Theron, Daniel and Barnes, Parker},
+  title     = {Closing the {AI} Accountability Gap: Defining an End-to-End
+               Framework for Internal Algorithmic Auditing},
+  booktitle = {Proceedings of the 2020 Conference on Fairness, Accountability,
+               and Transparency},
+  series    = {FAT* '20},
+  pages     = {33--44},
+  year      = {2020},
+  doi       = {10.1145/3351095.3372873},
+}
+
+@inproceedings{mitchell2019,
+  author    = {Mitchell, Margaret and Wu, Simone and Zaldivar, Andrew
+               and Barnes, Parker and Vasserman, Lucy and Hutchinson, Ben
+               and Spitzer, Elena and Raji, Inioluwa Deborah and Gebru, Timnit},
+  title     = {Model Cards for Model Reporting},
+  booktitle = {Proceedings of the Conference on Fairness, Accountability, and
+               Transparency},
+  series    = {FAT* '19},
+  pages     = {220--229},
+  year      = {2019},
+  doi       = {10.1145/3287560.3287596},
+}
+
+@article{gebru2021,
+  author  = {Gebru, Timnit and Morgenstern, Jamie and Vecchione, Briana
+             and Wortman Vaughan, Jennifer and Wallach, Hanna
+             and Daum{\'e}, III, Hal and Crawford, Kate},
+  title   = {Datasheets for Datasets},
+  journal = {Communications of the ACM},
+  volume  = {64},
+  number  = {12},
+  pages   = {86--92},
+  year    = {2021},
+  doi     = {10.1145/3458723},
+}
+
+@inproceedings{madaio2020,
+  author    = {Madaio, Michael A. and Stark, Luke and Wortman Vaughan, Jennifer
+               and Wallach, Hanna},
+  title     = {Co-Designing Checklists to Understand Organizational Challenges
+               and Opportunities around Fairness in {AI}},
+  booktitle = {Proceedings of the 2020 CHI Conference on Human Factors in
+               Computing Systems},
+  series    = {CHI '20},
+  pages     = {1--14},
+  year      = {2020},
+  doi       = {10.1145/3313831.3376445},
+}
+
+@article{metaxa2021,
+  author  = {Metaxa, Dana{\"e} and Park, Joon Sung and Robertson, Ronald E.
+             and Karahalios, Karrie and Wilson, Christo and Hancock, Jeff
+             and Sandvig, Christian},
+  title   = {Auditing Algorithms: Understanding Algorithmic Systems from the
+             Outside In},
+  journal = {Foundations and Trends in Human--Computer Interaction},
+  volume  = {14},
+  number  = {4},
+  pages   = {272--344},
+  year    = {2021},
+  doi     = {10.1561/1100000083},
+}
+
+@inproceedings{kroll2021,
+  author    = {Kroll, Joshua A.},
+  title     = {Outlining Traceability: A Principle for Operationalizing
+               Accountability in Computing Systems},
+  booktitle = {Proceedings of the 2021 ACM Conference on Fairness, Accountability,
+               and Transparency},
+  series    = {FAccT '21},
+  pages     = {758--771},
+  year      = {2021},
+  doi       = {10.1145/3442188.3445937},
+}
+
+% =====================================================================
+%  Fairness measurement: incompatibility, intersectionality, legal limits
+% =====================================================================
+
+@article{chouldechova2017,
+  author  = {Chouldechova, Alexandra},
+  title   = {Fair Prediction with Disparate Impact: A Study of Bias in
+             Recidivism Prediction Instruments},
+  journal = {Big Data},
+  volume  = {5},
+  number  = {2},
+  pages   = {153--163},
+  year    = {2017},
+  doi     = {10.1089/big.2016.0047},
+}
+
+@inproceedings{kleinberg2017,
+  author    = {Kleinberg, Jon and Mullainathan, Sendhil and Raghavan, Manish},
+  title     = {Inherent Trade-Offs in the Fair Determination of Risk Scores},
+  booktitle = {8th Innovations in Theoretical Computer Science Conference
+               (ITCS 2017)},
+  year      = {2017},
+  doi       = {10.4230/LIPIcs.ITCS.2017.43},
+}
+
+@inproceedings{buolamwini2018,
+  author    = {Buolamwini, Joy and Gebru, Timnit},
+  title     = {Gender Shades: Intersectional Accuracy Disparities in Commercial
+               Gender Classification},
+  booktitle = {Proceedings of the 1st Conference on Fairness, Accountability and
+               Transparency},
+  series    = {Proceedings of Machine Learning Research},
+  year      = {2018},
+}
+
+@inproceedings{foulds2020,
+  author    = {Foulds, James R. and Islam, Rashidul and Keya, Kamrun Naher
+               and Pan, Shimei},
+  title     = {An Intersectional Definition of Fairness},
+  booktitle = {2020 IEEE 36th International Conference on Data Engineering (ICDE)},
+  pages     = {1918--1921},
+  year      = {2020},
+  doi       = {10.1109/ICDE48307.2020.00203},
+}
+
+@misc{corbettdavies2018,
+  author       = {Corbett-Davies, Sam and Goel, Sharad},
+  title        = {The Measure and Mismeasure of Fairness: A Critical Review of
+                  Fair Machine Learning},
+  howpublished = {arXiv preprint},
+  year         = {2018},
+  verifynote   = {arXiv-only preprint with no DOI; Semantic Scholar record confirmed by title during bibliography construction},
+}
+
+@article{barocas2016,
+  author  = {Barocas, Solon and Selbst, Andrew D.},
+  title   = {Big Data's Disparate Impact},
+  journal = {SSRN Electronic Journal},
+  year    = {2016},
+  doi     = {10.2139/ssrn.2477899},
+}
+
+@article{wachter2021,
+  author  = {Wachter, Sandra and Mittelstadt, Brent and Russell, Chris},
+  title   = {Why Fairness Cannot Be Automated: Bridging the Gap Between {EU}
+             Non-Discrimination Law and {AI}},
+  journal = {Computer Law \& Security Review},
+  volume  = {41},
+  pages   = {105567},
+  year    = {2021},
+  doi     = {10.1016/j.clsr.2021.105567},
+}
+
+% =====================================================================
+%  Extended citation graph of lee2020, plus LLM-as-judge
+% =====================================================================
+
+@inproceedings{wester2024,
+  author    = {Wester, Joel and Schrills, Tim and Pohl, Henning
+               and van Berkel, Niels},
+  title     = {``As an {AI} Language Model, I Cannot'': Investigating {LLM}
+               Denials of User Requests},
+  booktitle = {Proceedings of the CHI Conference on Human Factors in Computing
+               Systems},
+  series    = {CHI '24},
+  pages     = {1--14},
+  year      = {2024},
+  doi       = {10.1145/3613904.3642135},
+}
+
+@article{luo2025,
+  author  = {Luo, Lin and Nakao, Yuri and Chollet, Mathieu and Inakoshi, Hiroya
+             and Stumpf, Simone},
+  title   = {{EARN} Fairness: Explaining, Asking, Reviewing, and Negotiating
+             Artificial Intelligence Fairness Metrics Among Stakeholders},
+  journal = {Proceedings of the ACM on Human-Computer Interaction},
+  volume  = {9},
+  number  = {2},
+  pages   = {1--37},
+  year    = {2025},
+  doi     = {10.1145/3710908},
+}
+
+@inproceedings{luo2026,
+  author    = {Luo, Lin and Nakao, Yuri and Chollet, Mathieu and Inakoshi, Hiroya
+               and Stumpf, Simone},
+  title     = {``I Think This Is Fair'': Uncovering the Complexities of
+               Stakeholder Decision-Making in {AI} Fairness Assessment},
+  booktitle = {Proceedings of the 2026 CHI Conference on Human Factors in
+               Computing Systems},
+  series    = {CHI '26},
+  pages     = {1--30},
+  year      = {2026},
+  doi       = {10.1145/3772318.3790770},
+}
+
+@misc{luo2026b,
+  author       = {Luo, Lin and Ghanta, Satwik and Nakao, Yuri and Chollet, Mathieu
+                  and Stumpf, Simone},
+  title        = {Empowering Affected Individuals to Shape {AI} Fairness
+                  Assessments: Processes, Criteria, and Tools},
+  howpublished = {arXiv preprint arXiv:2602.06984},
+  year         = {2026},
+  doi          = {10.48550/arXiv.2602.06984},
+}
+
+@inproceedings{zamfirescu2022,
+  author    = {Zamfirescu-Pereira, J.D. and Chen, Jerry and Wen, Emily
+               and Koenecke, Allison and Garg, Nikhil and Pierson, Emma},
+  title     = {Trucks Don't Mean Trump: Diagnosing Human Error in Image Analysis},
+  booktitle = {Proceedings of the 2022 ACM Conference on Fairness, Accountability,
+               and Transparency},
+  series    = {FAccT '22},
+  pages     = {799--813},
+  year      = {2022},
+  doi       = {10.1145/3531146.3533145},
+}
+
+@inproceedings{deshpande2022,
+  author    = {Deshpande, Advait and Sharp, Helen},
+  title     = {Responsible {AI} Systems: Who Are the Stakeholders?},
+  booktitle = {Proceedings of the 2022 AAAI/ACM Conference on AI, Ethics, and
+               Society},
+  series    = {AIES '22},
+  pages     = {227--236},
+  year      = {2022},
+  doi       = {10.1145/3514094.3534187},
+}
+
+@inproceedings{zheng2023,
+  author    = {Zheng, Lianmin and Chiang, Wei-Lin and Sheng, Ying
+               and Zhuang, Siyuan and Wu, Zhanghao and Zhuang, Yonghao
+               and Lin, Zi and Li, Zhuohan and Li, Dacheng and Xing, Eric
+               and Zhang, Hao and Gonzalez, Joseph and Stoica, Ion},
+  title     = {Judging {LLM}-as-a-Judge with {MT-Bench} and Chatbot Arena},
+  booktitle = {Advances in Neural Information Processing Systems 36},
+  pages     = {46595--46623},
+  year      = {2023},
+  doi       = {10.52202/075280-2020},
 }

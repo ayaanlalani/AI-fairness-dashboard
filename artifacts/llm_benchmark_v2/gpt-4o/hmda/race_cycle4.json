@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "race",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact (DI) value for Black individuals is 0.9371, which indicates a moderate disparity according to the severity thresholds.",
+    "why_is_wrong": "A DI value of 0.9371 for Black individuals suggests that, although the model's decisions are somewhat equitable, there is still a disparity favoring White individuals, which could perpetuate existing disadvantages along racial lines. Furthermore, the historical bias in base rates may be contributing to this issue.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.1,
+    "input_tokens": 1657,
+    "output_tokens": 210,
+    "total_tokens": 1867,
+    "input_cost_usd": 0.004143,
+    "output_cost_usd": 0.0021,
+    "total_cost_usd": 0.006243
+  },
+  "dry_run": false
+}

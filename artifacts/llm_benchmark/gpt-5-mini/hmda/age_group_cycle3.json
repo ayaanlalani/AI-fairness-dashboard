@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_group",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "Aggregate parity metrics (Disparate Impact = 0.9791, Demographic Parity Diff = -0.0167) place age_group in the LOW severity band per the provided thresholds. Nevertheless, the per-group breakdown reveals a consistent pattern: seniors have a lower base_rate (0.6716), a lower selection_rate (0.7433) and a lower TPR (0.8764) than mid (selection_rate 0.7995, TPR 0.9151) and young (selection_rate 0.8372, TPR 0.9488). The Theil index (0.296) also indicates residual distributional inequality. In short, overall DI is near parity but seniors are systematically under-selected and have worse true-positive coverage.",
+    "why_is_wrong": "The most plausible mechanisms consistent with the reported numbers are (1) label bias / historical underwriting: seniors exhibit a lower base rate in the data (0.6716) which can encode historical decisions into the labels and suppress selection for that group; and (2) proxying by age-correlated features (e.g., employment status, retirement indicators, income patterns) that allow the model to learn age effects without using the age_group feature directly. These mechanisms produce modest but systematic gaps in selection_rate and TPR even when aggregate DI is close to 1, because DI and DP focus on selection rates while error-rate metrics (TPR/FPR) expose different harms.",
+    "how_to_fix": "Start with a preprocessing remediation: apply AIF360 Reweighing to compute group\u00d7label weights that compensate for the lower base_rate for seniors, retrain the model using those weights, and re-evaluate the specified metrics (DI, DP diff, EOD, AOD, Theil) and per-group TPRs. If feature proxies are identified, use AIF360 DisparateImpactRemover or targeted feature engineering/removal to reduce age-correlated signals. If post-training control of error rates is required (to narrow the TPR gap), apply an equalized-odds style method: either AIF360 EqOddsPostprocessing / CalibratedEqOddsPostprocessing or Fairlearn ExponentiatedGradient (or Fairlearn ThresholdOptimizer) with an EqualizedOdds constraint to directly optimize group TPR/FPR tradeoffs. Iterate: compare overall accuracy and fairness tradeoffs, run stakeholder/legal review for acceptable interventions, and add ongoing monitoring of DI and per-group TPR/FPR (and Theil) in production.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 17.37,
+    "input_tokens": 1815,
+    "output_tokens": 1441,
+    "total_tokens": 3256,
+    "input_cost_usd": 0.000454,
+    "output_cost_usd": 0.002882,
+    "total_cost_usd": 0.003336
+  },
+  "dry_run": false
+}

@@ -1,4 +1,10 @@
-# Findings — A Lending-Lifecycle Fairness Benchmark
+# Findings — A Lending Fairness Benchmark
+
+> **SUPERSEDED IN PART.** This file records the original test-split analysis.
+> The audit has since been re-run on the full cleaned population with the HMDA
+> target leak removed, and several figures below have changed or been withdrawn.
+> **Read `RESULTS.md` alongside this file** — it lists every changed number and
+> every retracted claim. Inline corrections are marked **CORRECTION:**.
 
 Three lending use cases, a deterministic AIF360 baseline, and a frozen,
 cost-capped LLM benchmark over the same computed context. This is the complete
@@ -24,9 +30,16 @@ underlying classifier is.**
 | Protected attributes | sex, age group, foreign worker | race, sex, age group | gender, income level, loan amount level |
 | Attribute type | protected class | protected class | **one protected class, two economic proxies** |
 | Favorable outcome | good credit (label 1) | approved (label 1) | **non-default (label 0)** |
-| Classifier behaviour | discriminating | discriminating | **near-degenerate: ~99.5% predicted non-default** |
+| Classifier behaviour | discriminating | discriminating | **near-degenerate: ~99.67% predicted non-default** |
 
 That last row governs how everything else reads.
+
+> **Disclosure — UC3 `gender` is synthetic.** Lending Club does not collect
+> applicant sex. `clean_lending_club.py` assigns it with
+> `np.random.random(len(df)) > 0.5`, independent of every feature and of the
+> target. UC3 therefore contains **no protected class**, and its near-parity
+> gender DI is a property of the construction rather than a finding. The
+> protected-class-versus-economic-proxy contrast drawn below does not hold.
 
 ## 2. Deterministic results
 
@@ -60,8 +73,12 @@ dominated by the n=194 side. It is reported as a data-scarcity limitation.
 exceeding both marginals and moving the conclusion from borderline to the HIGH
 range. Both adequately sized — this is a finding, not an artifact.
 
-The error profile is diagnostic. Race DI 0.8956 fails the screen while
-EOD 0.0025 and AOD 0.0117 are ≈ 0. The model is **not** making differentially
+The error profile looked diagnostic. **CORRECTION:** race DI 0.8956 does *not*
+fail the four-fifths screen — 0.8956 > 0.80, `BiasFlag` is `false`, and
+`classify_severity` returns MODERATE. The claim was wrong here and propagated to
+report.tex. Worse, the near-zero EOD/AOD it was paired with came from a model
+with target leakage (`interest_rate`, 99.3% missing on denials, AUC 0.9942).
+The label-bias inference is **withdrawn**. See RESULTS.md §1.1. The model is **not** making differentially
 worse errors by race; it is reproducing a base-rate difference already in the
 labels. That is **label/base-rate bias, not differential model error** — and
 the two call for different interventions. A post-processing equal-odds fix
@@ -84,7 +101,7 @@ near parity. A factor-of-infinity error in the headline metric, from one
 convention.
 
 The near-parity numbers are not evidence of fairness. The classifier predicts
-non-default for **~99.5% of the test set** (4 default predictions in 600), so
+non-default for **~99.67% of the test set** (2 default predictions in 600 → 99.67%), so
 every group looks equal because the model barely discriminates at all. The
 honest finding is **insufficient model discrimination to measure disparity**.
 All intersectional rates are ≥ 0.9848 for the same reason.
@@ -224,7 +241,7 @@ the real signal; these two survive that fix.
 - **Subgroup sizes.** `foreign_worker_original` privileged n=6; several HMDA
   race categories are severely sparse. Intersectional cells are reported with n
   and suppressed below n ≥ 15.
-- **UC3 is barely informative.** A classifier predicting one class ~99.5% of the
+- **UC3 is barely informative.** A classifier predicting one class ~99.67% of the
   time cannot exhibit measurable disparity. UC3 tests the *pipeline*, not the
   fairness of a working model.
 - **LLM nondeterminism.** No temperature pinning, no seed. The 4-cycle design

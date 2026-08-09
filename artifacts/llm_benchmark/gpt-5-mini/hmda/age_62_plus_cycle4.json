@@ -1,0 +1,47 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_62_plus",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_62_plus",
+    "severity": "MODERATE",
+    "what_is_wrong": "The Disparate Impact (DI) for the protected attribute 'age_62_plus' is \"0.8897\", meaning the 62_plus group experiences a lower selection rate compared to the under_62 group.",
+    "why_is_wrong": "The DI of 0.8897 aligns with a demographic parity difference of -0.0889 (selection_rate: under_62 = 0.8054 vs 62_plus = 0.7165) and an equal opportunity difference of -0.0638 (TPR: under_62 = 0.9214 vs 62_plus = 0.8576). These metrics show that applicants aged 62+ are both selected and correctly identified at lower rates than the privileged group; the 5.3x sample size imbalance (under_62 n=9232 vs 62_plus n=1746) can exacerbate learned disparities during training.",
+    "how_to_fix": "Apply Reweighing as a preprocessing step to compute group- and label-specific sample weights that address the imbalance between under_62 and 62_plus, then retrain the model and monitor Disparate Impact and demographic parity metrics to validate reduction in disparity.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining | citations=2293",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems | citations=1619",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys | citations=6164"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 5.3 in 'why_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 23.97,
+    "input_tokens": 1274,
+    "output_tokens": 2136,
+    "total_tokens": 3410,
+    "input_cost_usd": 0.000318,
+    "output_cost_usd": 0.004272,
+    "total_cost_usd": 0.00459
+  },
+  "dry_run": false
+}

@@ -1,0 +1,49 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "sex",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "sex",
+    "severity": "LOW",
+    "what_is_wrong": "Measured disparities are small but present: Disparate Impact = 0.9572 (female selection rate 0.7713 vs male 0.8057), Demographic Parity Difference = -0.0345 (females receive the favorable outcome 3.45 percentage points less), Equal Opportunity Difference = -0.0128 (female TPR 0.9046 vs male TPR 0.9174, a 1.28 percentage-point gap), Average Odds Difference = -0.0326, and Theil index = 0.296. Under the provided DI thresholds (moderate if DI<0.95, high if <0.8, critical if <0.72), the DI of 0.9572 places this disparity in the LOW severity band, but the consistent small gaps across selection rate and error-rate metrics show systematic disadvantage for females relative to the privileged group (Male).",
+    "why_is_wrong": "These differences reflect systematic, likely historically rooted sources rather than random noise: outcomes and labels used for training can encode past gendered lending decisions and socioeconomic inequalities; input features may include proxies correlated with sex (income, employment patterns, credit history artifacts) so that the model reproduces disparate treatment. In lending contexts, empirical literature documents that historical decision processes and correlated covariates produce small but persistent gaps in access and approval rates, which a predictive model can perpetuate if not corrected.",
+    "how_to_fix": "Apply a preprocessing mitigation that corrects for biased training distributions: AIF360 Reweighing \u2014 assign instance weights so that combinations of sex and outcome are represented to remove dependence between the protected attribute and the label before training. This directly targets historical label/selection bias without changing model class, is compatible with downstream validation, and preserves utility better than blunt thresholding for small DI deviations. After reweighing and retraining, monitor Disparate Impact, Demographic Parity Difference, Equal Opportunity Difference, Average Odds Difference, and Theil index; if residual error-rate parity issues persist, follow with an in-processing constrained optimizer (e.g., Fairlearn ExponentiatedGradient enforcing equalized odds) or a calibrated post-processor (CalibratedEqOddsPostprocessing) to achieve specific error-rate constraints while checking calibration and business constraints. Also audit feature provenance to remove or transform strong proxies, and maintain documentation and monitoring for distributional change.",
+    "supporting_research": [
+      "6. Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "5. Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "3. Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton",
+      "1. Trust and Credit: The Role of Appearance in Peer-to-peer Lending (2012) | J. Duarte, Stephan Siegel, Lance A. Young"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 3.45 in 'what_is_wrong' not present in provided context",
+    "metric value 1.28 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 18.2,
+    "input_tokens": 1208,
+    "output_tokens": 1870,
+    "total_tokens": 3078,
+    "input_cost_usd": 0.000302,
+    "output_cost_usd": 0.00374,
+    "total_cost_usd": 0.004042
+  },
+  "dry_run": false
+}

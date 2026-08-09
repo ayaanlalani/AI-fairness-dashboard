@@ -53,6 +53,7 @@ RAW_COLS_NEEDED = [
     "derived_sex",
     "derived_ethnicity",
     "applicant_age",
+    "applicant_age_above_62",
     "loan_amount",
     "income",
     "debt_to_income_ratio",
@@ -65,10 +66,24 @@ RAW_COLS_NEEDED = [
     "combined_loan_to_value_ratio",
 ]
 
+# ── TARGET LEAKAGE: interest_rate is deliberately NOT a feature ────────
+#
+# interest_rate is populated only where a loan was actually originated. In
+# hmda_raw.csv it is missing for 100.0% of denials (action_taken=3, n=5226) and
+# 2.4% of originations (action_taken=1, n=14774). Median-imputing it and handing
+# it to a classifier leaks the target: the model learns "is interest_rate
+# observed", which is the outcome. With it included the random forest scored
+# AUC 0.9942 -- not a plausible mortgage approval model, and the near-zero
+# EOD/AOD it produced were a property of a model that makes almost no errors in
+# any group rather than evidence about fairness.
+#
+# It stays in RAW_COLS_NEEDED so the missingness pattern remains auditable, and
+# is dropped before feature assembly. Do not re-add it to NUMERIC_FEATURES.
+LEAKED_COLUMNS = ["interest_rate"]
+
 NUMERIC_FEATURES = [
     "loan_amount",
     "income",
-    "interest_rate",
     "loan_term",
     "combined_loan_to_value_ratio",
     "dti_numeric",
@@ -79,7 +94,15 @@ CATEGORICAL_FEATURES = [
     "property_type",
     "occupancy_type",
 ]
-PROTECTED_ATTRS = ["race", "sex", "age_group"]
+
+# age_group is the banded view (young/mid/senior). age_62_plus is the cut ECOA
+# actually specifies: Regulation B Sec. 1002.2(o) defines "elderly" as 62 or
+# older. The commonly used 40+ threshold comes from the ADEA, an employment
+# statute, and does not apply to credit. Both are audited: the contrast is a
+# finding, because pooling young with senior against mid cancels the two groups
+# against each other and returns a clean result on the only age class the
+# statute protects.
+PROTECTED_ATTRS = ["race", "sex", "age_group", "age_62_plus"]
 
 TARGET = "approved"
 
@@ -151,6 +174,38 @@ def load_and_clean(input_path: Path) -> pd.DataFrame:
         df.drop(columns=["applicant_age"], inplace=True)
     else:
         log.warning("applicant_age missing; age attribute unavailable")
+
+    # ── ECOA-correct age cut ──────────────────────────────────────
+    # The public LAR age bands straddle 62 (the "55-64" band cannot be split),
+    # so the banded age_group cannot isolate the protected class. HMDA supplies
+    # applicant_age_above_62 precisely because Reg B Sec. 1002.2(o) turns on it.
+    # Rows where the flag is blank are dropped from this attribute only (set to
+    # NA), not from the dataset, so age_group and race/sex keep their full n.
+    if "applicant_age_above_62" in df.columns:
+        mapped = df["applicant_age_above_62"].astype(str).str.strip().str.lower()
+        df["age_62_plus"] = mapped.map({"yes": "62_plus", "no": "under_62"})
+        n_unknown = int(df["age_62_plus"].isna().sum())
+        if n_unknown:
+            log.info(f"age_62_plus unknown for {n_unknown} rows (flag blank in source)")
+        df.drop(columns=["applicant_age_above_62"], inplace=True)
+    else:
+        log.warning("applicant_age_above_62 missing; ECOA age cut unavailable")
+
+    # ── drop leaked columns before feature assembly ───────────────
+    # action_taken has already been converted to TARGET and dropped above, so
+    # the missingness audit groups by the target itself.
+    leaked_present = [c for c in LEAKED_COLUMNS if c in df.columns]
+    if leaked_present:
+        for col in leaked_present:
+            by_outcome = df.groupby(TARGET)[col].apply(lambda s: s.isna().mean())
+            log.info(
+                f"dropping leaked column '{col}'; missingness by {TARGET}: "
+                + ", ".join(
+                    f"{'approved' if k == 1 else 'denied'}={v:.1%}"
+                    for k, v in by_outcome.items()
+                )
+            )
+        df.drop(columns=leaked_present, inplace=True)
 
     # ── debt-to-income: convert ranges to midpoints ───────────────
     if "debt_to_income_ratio" in df.columns:

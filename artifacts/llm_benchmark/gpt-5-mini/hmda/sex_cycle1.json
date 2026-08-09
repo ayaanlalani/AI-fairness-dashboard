@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "sex",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "sex",
+    "severity": "LOW",
+    "what_is_wrong": "Overall disparity by the chosen disparate impact threshold is small (disparate impact = 0.9572 > 0.95) so severity is low, but measurable differences remain: selection rate for Male is 0.8057 vs Female 0.7713 (demographic parity diff = -0.0345), TPR is slightly higher for Male (0.9174 vs 0.9046, equal opportunity diff = -0.0128), and FPR is noticeably higher for Male (0.5072 vs 0.4547). These patterns indicate the model treats sexes similarly in overall selection probability but produces different error profiles (especially FPR) that can produce group-differentiated harms.",
+    "why_is_wrong": "The small overall DI conceals error-rate asymmetries: similar base rates (0.7277 vs 0.7035) mean raw eligibility is comparable, so remaining differences likely arise from model thresholding, learned associations between protected attribute proxies and label, label noise, or imbalance in feature distributions. The higher male FPR suggests the model more often predicts favorable for males who are actually unfavorable, which could reflect biased training labels, correlated predictive features acting as proxies for sex, or an optimization objective that prioritizes overall accuracy over balanced error rates. Theil index = 0.296 signals some inequality in predictive allocation that merits attention even if DI is near parity.",
+    "how_to_fix": "Adopt a staged remediation plan: (1) investigative steps \u2014 disaggregate performance further by intersectional subgroups, examine feature importances and proxies for sex, audit label quality and calibration; (2) preprocessing \u2014 consider reweighing or Disparate Impact Remover to reduce learned associations in training data; (3) in-processing \u2014 use fairness-aware learners (e.g., Fairlearn ExponentiatedGradient or AIF360 PrejudiceRemover) to directly trade off accuracy and error-rate parity; (4) post-processing \u2014 apply Equalized Odds post-processing or Fairlearn ThresholdOptimizer to reduce TPR/FPR gaps if preserving overall predictions is required; (5) deploy monitoring and policy controls \u2014 continuously track group-wise TPR/FPR/selection rates, document accepted trade-offs, and involve domain experts to ensure compliance with lending fairness laws. If calibration shows group-specific threshold causes, consider group-aware calibration or threshold adjustment combined with careful legal review.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 14.06,
+    "input_tokens": 1116,
+    "output_tokens": 1736,
+    "total_tokens": 2852,
+    "input_cost_usd": 0.000279,
+    "output_cost_usd": 0.003472,
+    "total_cost_usd": 0.003751
+  },
+  "dry_run": false
+}

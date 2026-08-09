@@ -1,0 +1,49 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "sex",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "sex",
+    "severity": "LOW",
+    "what_is_wrong": "Measured disparities are small but consistent and favor the privileged group (Male). Disparate Impact = 0.9572 (female selection rate 0.7713 vs male 0.8057), Demographic Parity Difference = -0.0345 (females 3.45 percentage points less likely to receive the favorable outcome), Equal Opportunity Difference = -0.0128 (female TPR 0.9046 vs male TPR 0.9174), Average Odds Difference = -0.0326, and Theil index = 0.296. Per-group breakdown also shows base rate differences (female 0.7035 vs male 0.7277) and a lower female FPR (0.4547 vs male 0.5072). Under the provided DI thresholds (moderate if DI<0.95), DI=0.9572 places this in the LOW severity band, though it is borderline to MODERATE and the coherent pattern across selection and error-rate metrics indicates a systematic, not purely random, disparity against females.",
+    "why_is_wrong": "Specific mechanisms likely explain these small but systematic gaps: (1) historical label/selection bias in lending decisions (training labels reflect past approvals that may have favored males) can embed disparate outcomes into the model; (2) input features (income, employment history, credit-record artifacts) can act as proxies correlated with sex and thus transmit gender signal into predictions; and (3) sample composition and base-rate differences (male base rate 0.7277 vs female 0.7035) can shift operating points so females have both lower TPR and lower FPR, consistent with a more conservative score distribution or threshold for females rather than random noise. These are plausible, mechanism-specific causes given the provided metrics and group breakdown.",
+    "how_to_fix": "Prioritize low-disruption preprocessing followed by targeted in- or post-processing: (a) Apply AIF360 Reweighing to remove statistical dependence between sex and label before training, then retrain and re-evaluate the core metrics; (b) If residual error-rate disparities remain, use an in-processing method such as Fairlearn ExponentiatedGradient (with an equalized-odds constraint) or GridSearch to find an accuracy/fairness tradeoff; (c) If the model cannot be retrained, apply AIF360 CalibratedEqOddsPostprocessing or EqOddsPostprocessing to adjust decision thresholds by group. Parallel actions: audit and, where appropriate, remove or transform strong proxy features, validate mitigation on held-out data to monitor utility loss, document decisions, and deploy continuous monitoring for distributional drift.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | KDD",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena et al. | ACM Computing Surveys",
+      "Trust and Credit: The Role of Appearance in Peer-to-peer Lending (2012) | J. Duarte, S. Siegel, L. A. Young"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 3.45 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 17.46,
+    "input_tokens": 1858,
+    "output_tokens": 2293,
+    "total_tokens": 4151,
+    "input_cost_usd": 0.000465,
+    "output_cost_usd": 0.004586,
+    "total_cost_usd": 0.00505
+  },
+  "dry_run": false
+}

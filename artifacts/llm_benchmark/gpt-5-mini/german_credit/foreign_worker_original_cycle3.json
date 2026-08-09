@@ -1,0 +1,49 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "foreign_worker_original",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "foreign_worker_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "Multiple fairness metrics indicate a measurable adverse impact against the unprivileged group (value \"1\"): Disparate Impact = 0.8387 (below the 0.95 moderate threshold), Demographic Parity Difference = -0.1526 (the unprivileged group has a ~15.3 percentage-point lower selection rate: 0.7934 vs 0.9459), Equal Opportunity Difference = -0.0866 and Average Odds Difference = -0.1227 (both show lower true-positive performance for group 1), and Theil Index = 0.2808 signals unequal outcome distribution. In addition, there is a severe size imbalance (n=963 for group 1 vs n=37 for group 0) which increases uncertainty in estimates for the small privileged group and complicates reliable comparison.",
+    "why_is_wrong": "Observed disparities are plausibly driven by label/base-rate differences and sample imbalance rather than only random model error. The ground-truth base rates differ markedly (base_rate 0.6926 for group 1 vs 0.8919 for group 0, a 19.9 percentage-point gap), so the model can legitimately learn and reproduce historical outcome patterns (label bias). The 26x group-size imbalance increases variance for metrics of the small privileged group and can make ratios (DI) and differences unstable. Together, these mechanisms (historical label disparities, potential measurement/selection bias, and extreme sample imbalance) explain why the model shows lower selection and lower TPR for the unprivileged group rather than pointing to a single modeling bug.",
+    "how_to_fix": "Start with a pre-processing mitigation that targets label/base-rate dependence: apply AIF360 Reweighing to adjust instance weights so sensitive attribute and label are decorrelated during training. Implement reweighing, retrain, and evaluate on held-out data reporting Disparate Impact, Demographic Parity Difference, Equal Opportunity Difference, Average Odds Difference, and Theil Index with stratified bootstrap confidence intervals. Because the privileged group is very small (n=37), use stratified cross-validation, bootstrap CIs, and consider targeted data collection or careful up/down-sampling (with domain validation) rather than naive oversampling. If residual TPR/FPR gaps remain, use in-processing constrained learning (Fairlearn ExponentiatedGradient with an equalized-odds or TPR constraint) or post-processing (AIF360 EqOddsPostprocessing or CalibratedEqOddsPostprocessing) to enforce specific error-rate parity. Throughout, document accuracy/fairness trade-offs and consult domain experts to verify whether correcting base-rate differences is appropriate for downstream decision-making.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | KDD",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 15.3 in 'what_is_wrong' not present in provided context",
+    "metric value 19.9 in 'why_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 19.96,
+    "input_tokens": 1945,
+    "output_tokens": 2003,
+    "total_tokens": 3948,
+    "input_cost_usd": 0.000486,
+    "output_cost_usd": 0.004006,
+    "total_cost_usd": 0.004492
+  },
+  "dry_run": false
+}

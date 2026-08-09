@@ -1,0 +1,124 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "model": "gpt-4o",
+  "total_results": 12,
+  "total_cost_usd": 0.0719,
+  "elapsed_s": 135.2,
+  "refusal_count": 3,
+  "hallucination_count": 2,
+  "cycle_avg_score": {
+    "1": 71.67,
+    "2": 71.67,
+    "3": 78.33,
+    "4": 63.67
+  },
+  "attributes": [
+    "AgeGroup_original",
+    "Sex_original",
+    "foreign_worker_original"
+  ],
+  "cycles": [
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "Sex_original",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "Sex_original",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "Sex_original",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "Sex_original",
+      "score": 57.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "AgeGroup_original",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "AgeGroup_original",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 2
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "AgeGroup_original",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 2
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "AgeGroup_original",
+      "score": 77.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "foreign_worker_original",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "foreign_worker_original",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "foreign_worker_original",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "foreign_worker_original",
+      "score": 57.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    }
+  ],
+  "cost_cap_usd": 15.0,
+  "cumulative_spend_usd": 0.792335,
+  "aborted_on_cost_cap": false,
+  "attributes_completed": 3,
+  "attributes_requested": 3
+}

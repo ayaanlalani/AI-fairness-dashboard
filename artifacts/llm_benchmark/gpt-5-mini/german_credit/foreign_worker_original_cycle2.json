@@ -1,0 +1,49 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "foreign_worker_original",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "foreign_worker_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The model exhibits a measurable adverse impact against the unprivileged group (value \"1\"). Disparate Impact = 0.8387 and Demographic Parity Difference = -0.1526 indicate the unprivileged group has a ~15.3 percentage-point lower selection rate (selection_rate: 0.7934 for group 1 vs 0.9459 for privileged group 0). Equal Opportunity Difference = -0.0866 and Average Odds Difference = -0.1227 show lower true positive performance for the unprivileged group. Theil Index = 0.2808 signals unequal distributional outcomes. There is also a severe size imbalance (963 vs 37) which increases uncertainty for the smaller privileged group metrics.",
+    "why_is_wrong": "Root causes appear structural/historical rather than pure model randomness: the ground-truth base rates differ substantially (base_rate 0.6926 for group 1 vs 0.8919 for group 0, a 19.9 percentage-point gap), implying the training labels reflect historical disparities in credit outcomes. The model is likely learning these historical label patterns (label bias), so observed disparities reflect entrenched systemic differences (access, treatment, or measurement) rather than only algorithmic error. The extreme group-size imbalance further destabilizes estimates and can amplify apparent disparities or mask their statistical reliability.",
+    "how_to_fix": "Apply AIF360 Reweighing as a primary mitigation: it is a pre-processing method that adjusts training-instance weights to remove dependence between the sensitive attribute and the label distribution, directly targeting historical label/base-rate bias without changing labels. Reweighing is appropriate here because the principal identified cause is label-level historical disparity. Implementation notes: (1) validate improvements on held-out data and report DI, DP diff, EODiff and Average Odds; (2) because the privileged group is very small (n=37), use careful cross-validation and consider data augmentation or stratified resampling to avoid overweighting noise; (3) if residual TPR/FPR gaps remain, follow up with constrained in-processing (e.g., Fairlearn ExponentiatedGradient) or post-processing (EqOddsPostprocessing/CalibratedEqOddsPostprocessing) to enforce specific error-rate parity.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 15.3 in 'what_is_wrong' not present in provided context",
+    "metric value 19.9 in 'why_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 20.97,
+    "input_tokens": 1308,
+    "output_tokens": 2436,
+    "total_tokens": 3744,
+    "input_cost_usd": 0.000327,
+    "output_cost_usd": 0.004872,
+    "total_cost_usd": 0.005199
+  },
+  "dry_run": false
+}

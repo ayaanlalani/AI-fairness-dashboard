@@ -1,0 +1,46 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_group",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "Overall disparities by age_group are small. Disparate Impact is 0.9791 (near 1.0) and Demographic Parity Difference is -0.0167, indicating only a slight net difference in positive prediction rates across groups. Per-group summary: mid (privileged) selection_rate=0.7995, base_rate=0.7251, TPR=0.9151, FPR=0.4947; senior selection_rate=0.7433, base_rate=0.6716, TPR=0.8764, FPR=0.4712; young selection_rate=0.8372, base_rate=0.7626, TPR=0.9488, FPR=0.4790. These numbers show modest advantages for young and mid groups over seniors (selection_rate and TPR differences on the order of a few percentage points) but do not meet thresholds for moderate/high/critical severity per the provided thresholds.",
+    "why_is_wrong": "Although overall disparities are small, the pattern suggests consistent, small advantages in selection and true positive rates for mid and young groups relative to seniors (e.g., senior selection_rate ~0.743 vs mid ~0.799 and young ~0.837). Part of this reflects differences in base rates (senior base_rate=0.6716 is lower than young and mid), which can produce unequal outcomes even when a model is well-calibrated. The nonzero Theil index (0.296) indicates some information/inequality in the prediction distribution across groups. These signals together point to modest, systematic differences rather than large, immediate harms\u2014still warranting investigation into model inputs, label generation, and deployment context to determine whether differences stem from legitimate outcome correlations (creditworthiness) or from proxy features, sampling, or label bias.",
+    "how_to_fix": "Because disparities are small, start with low-disruption interventions and diagnostics: (1) subgroup calibration and error auditing for seniors (examine calibration plots and score distributions) and check for label bias or sampling differences; (2) if unwanted disparate impact is confirmed, apply preprocessing (Reweighing, DisparateImpactRemover) or in-processing (PrejudiceRemover, Fairlearn ExponentiatedGradient or GridSearch) to reduce group-based effects while monitoring utility; (3) consider post-processing (EqualizedOddsPostprocessing or CalibratedEqOddsPostprocessing, or Fairlearn ThresholdOptimizer) to adjust decision thresholds for parity of TPR/FPR where legally or operationally appropriate; (4) collect more targeted data for seniors and perform causal/source analysis for features that disproportionately affect that group; and (5) adopt ongoing monitoring with group-level metrics (selection_rate, TPR, FPR, Theil) and policy-guided acceptance thresholds to detect regression. Prioritize minimally invasive fixes first and re-evaluate metrics after each step.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett et al. (evidence on legal/operational implications of disparate outcomes in lending)",
+      "Certifying and Removing Disparate Impact (2014) | Feldman et al. (techniques to detect and repair disparate impact)",
+      "Data preprocessing techniques for classification without discrimination (2011) | Kamiran & Calders (reweighing and preprocessing approaches)",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Mehrabi et al. (overview of fairness definitions, trade-offs, and mitigation strategies)"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 14.39,
+    "input_tokens": 1192,
+    "output_tokens": 1600,
+    "total_tokens": 2792,
+    "input_cost_usd": 0.000298,
+    "output_cost_usd": 0.0032,
+    "total_cost_usd": 0.003498
+  },
+  "dry_run": false
+}

@@ -1,0 +1,55 @@
+{
+  "floor": 15,
+  "cases": {
+    "german_credit": {
+      "label": "UC1 German Credit \u2014 AgeGroup x Sex",
+      "test_split": {
+        "n_rows": 200,
+        "cells_total": 4,
+        "cells_suppressed": 0,
+        "worst_visible_di": 0.6086956521739131,
+        "worst_visible_cell": "under_40 x female",
+        "worst_visible_n": 46,
+        "worst_actual_di": 0.6086956521739131,
+        "worst_actual_cell": "under_40 x female",
+        "suppressed_worse_than_reported": 0
+      },
+      "full_population": {
+        "n_rows": 1000,
+        "cells_total": 4,
+        "cells_suppressed": 0,
+        "worst_visible_di": 0.8200998663759758,
+        "worst_visible_cell": "under_40 x female",
+        "worst_visible_n": 241,
+        "worst_actual_di": 0.8200998663759758,
+        "worst_actual_cell": "under_40 x female",
+        "suppressed_worse_than_reported": 0
+      }
+    },
+    "hmda": {
+      "label": "UC2 HMDA \u2014 race x sex",
+      "test_split": {
+        "n_rows": 2196,
+        "cells_total": 11,
+        "cells_suppressed": 5,
+        "worst_visible_di": 0.8168822328114362,
+        "worst_visible_cell": "Black x Male",
+        "worst_visible_n": 338,
+        "worst_actual_di": 0.19174041297935102,
+        "worst_actual_cell": "American Indian x Female",
+        "suppressed_worse_than_reported": 3
+      },
+      "full_population": {
+        "n_rows": 10978,
+        "cells_total": 12,
+        "cells_suppressed": 1,
+        "worst_visible_di": 0.6734423331860363,
+        "worst_visible_cell": "American Indian x Male",
+        "worst_visible_n": 31,
+        "worst_actual_di": 0.6734423331860363,
+        "worst_actual_cell": "American Indian x Male",
+        "suppressed_worse_than_reported": 0
+      }
+    }
+  }
+}

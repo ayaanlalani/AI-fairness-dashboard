@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "race",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "Aggregate metrics show a modest but measurable disparate impact (Disparate Impact = 0.9371) and a negative Demographic Parity Difference (-0.0512) indicating that non\u2011White groups are, on average, receiving favorable predictions at a lower rate than the privileged group (White). Error\u2011rate based metrics (Equal Opportunity Difference = 0.0032, Average Odds Difference = -0.0133) are near zero, so true\u2011positive and false\u2011positive rates are approximately balanced across groups. However, the group breakdown reveals meaningful selection\u2011rate and base\u2011rate gaps (e.g., White selection_rate 0.8128 vs Black 0.7447; Asian selection_rate 0.8556; American Indian 0.6607; Multiracial 0.6383) and extreme sample size imbalance (White n=6337 vs Pacific Islander n=27). The Theil index (0.296) further signals nontrivial inequality in score/outcome distribution. Taken together, overall DI places this case below the moderate threshold (<0.95) but above high/critical thresholds, while subgroup patterns and small sample sizes create risks of disparate impact for specific minority groups.",
+    "why_is_wrong": "The most salient signal is the disparate impact and the base\u2011rate/selection\u2011rate gaps across racial groups, which likely reflect historical and structural causes rather than purely model noise. In mortgage/credit datasets like HMDA, past discriminatory lending (e.g., redlining, differential access to credit) and socioeconomic stratification produce different ground\u2011truth base rates and feature distributions across race; the model can then learn and reproduce those patterns, perpetuating disparate outcomes. Small subgroup counts (e.g., Pacific Islander) amplify uncertainty and can mask severe harms to tiny populations. This combination\u2014biased historical outcomes encoded in labels/features plus unbalanced representation\u2014explains why parity metrics are degraded even when error\u2011rates look similar.",
+    "how_to_fix": "Apply AIF360 Reweighing as a first, targeted mitigation: reweighing is a preprocessing method that assigns group\u2011and\u2011label conditional weights to training examples so the learning algorithm sees a distribution closer to demographic parity in outcomes, directly addressing label/selection\u2011rate bias derived from historical discrimination without altering labels. This is appropriate because the root cause is historical outcome bias and imbalanced representation. Operationally: (1) compute reweighing weights by race\u00d7label, (2) retrain the model using those weights, (3) evaluate fairness metrics and subgroup confidence intervals (pay special attention to very small groups), and (4) if residual tradeoffs remain, follow with a calibrated postprocessing step (e.g., CalibratedEqOddsPostprocessing or Fairlearn ThresholdOptimizer) to adjust decision thresholds for specific groups while preserving calibration. Also prioritize collecting additional data for underrepresented groups and involve domain experts/legal review before deployment.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 22.32,
+    "input_tokens": 1616,
+    "output_tokens": 2518,
+    "total_tokens": 4134,
+    "input_cost_usd": 0.000404,
+    "output_cost_usd": 0.005036,
+    "total_cost_usd": 0.00544
+  },
+  "dry_run": false
+}

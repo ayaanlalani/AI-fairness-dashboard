@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "sex",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "sex",
+    "severity": "LOW",
+    "what_is_wrong": "The measured Disparate Impact (DI) for sex is \"0.9572\". This DI reflects a slight underselection of the protected group (Female) relative to the privileged group (Male) but is above the dataset's moderate threshold (0.95), indicating only a small disparity by the provided thresholds.",
+    "why_is_wrong": "The observed disparity is driven by a modest difference in selection rates (Male: 0.8057 vs Female: 0.7713) which yields the reported DI. Related performance differences are small: TPRs (Male 0.9174 vs Female 0.9046) and FPRs (Male 0.5072 vs Female 0.4547). These metric differences explain the DI without requiring additional unobserved assumptions.",
+    "how_to_fix": "Reweighing: apply the Reweighing preprocessing algorithm to adjust instance weights by sex to align selection rates while monitoring downstream utility and the provided fairness metrics.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining | citations=2293",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems | citations=1619",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys | citations=6164"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 15.63,
+    "input_tokens": 1228,
+    "output_tokens": 1897,
+    "total_tokens": 3125,
+    "input_cost_usd": 0.000307,
+    "output_cost_usd": 0.003794,
+    "total_cost_usd": 0.004101
+  },
+  "dry_run": false
+}

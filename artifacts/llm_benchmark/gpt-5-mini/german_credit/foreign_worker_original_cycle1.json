@@ -1,0 +1,48 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "foreign_worker_original",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "foreign_worker_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The model gives substantially higher favorable decision rates to the privileged value (group \"0\", n=37) than to the other group (\"1\", n=963): selection_rate 0.9459 vs 0.7934 (disparate impact = 0.8387; demographic parity diff = -0.1526). True positive rate and average-odds gaps also favor group 0 (equal opportunity diff = -0.0866, average odds diff = -0.1227). The Theil index (0.2808) signals inequality in score/decision distribution. Interpretation is complicated by (a) a large sample-size imbalance (37 vs 963), producing wide uncertainty for group 0 metrics, and (b) an observed base-rate gap in ground truth (group 0 base rate 0.8919 vs group 1 base rate 0.6926, gap \u2248 19.9%).",
+    "why_is_wrong": "These disparities mean members of foreign_worker_original=1 receive fewer favorable outcomes and lower true-positive rates, which can perpetuate historical disadvantage and expose the system to disparate-impact concerns. Although the disparate impact (0.8387) falls in the moderate range per the provided thresholds (between 0.8 and 0.95), the small privileged-group sample and the substantial base-rate difference create ambiguity: the model may be reflecting legitimate signal in labels, amplifying historical bias, or both. From a risk perspective this combination (measurable disparity + historical base-rate gap + small-group uncertainty) warrants remediation and careful causal/data investigation before deployment.",
+    "how_to_fix": "Prioritized remediation: (1) Data & label audit: verify label-generation processes and increase representation/records for the small privileged group (or otherwise collect more data) to reduce measurement uncertainty. (2) Feature audit: identify and remove or adjust features that act as proxies for the protected attribute. (3) Preprocessing: apply reweighting or DisparateImpactRemover to reduce observed selection-rate gaps while retaining utility (AIF360 Reweighing / DisparateImpactRemover). (4) In-processing: train with fairness-constrained learners (e.g., ExponentiatedGradient, GridSearch, or PrejudiceRemover) targeting demographic parity or equal-opportunity constraints; prefer equal-opportunity constraints if base-rate differences are substantively justified. (5) Post-processing: if necessary, use calibrated EqOddsPostprocessing or ThresholdOptimizer / EqOddsPostprocessing to align TPR/FPR across groups, with caution about calibration and legal constraints. (6) Evaluation & governance: compute confidence intervals for group metrics, run counterfactual/causal analyses to separate historical bias from predictive signal, choose a mitigation that balances utility and legal/policy requirements, and document the trade-offs for stakeholder and legal review.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 19.9 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 19.8,
+    "input_tokens": 1216,
+    "output_tokens": 2159,
+    "total_tokens": 3375,
+    "input_cost_usd": 0.000304,
+    "output_cost_usd": 0.004318,
+    "total_cost_usd": 0.004622
+  },
+  "dry_run": false
+}

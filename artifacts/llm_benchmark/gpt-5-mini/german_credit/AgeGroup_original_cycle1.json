@@ -1,0 +1,48 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "AgeGroup_original",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "AgeGroup_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The model yields measurable, though not extreme, disparate outcomes by age group. Members aged 40_plus (privileged) have a higher selection rate (0.8428) than under_40 (0.7803), producing a Disparate Impact of 0.9258 (below the 0.95 moderate threshold). Equal Opportunity Difference is -0.0459 and Average Odds Difference is -0.0465, indicating under_40 experience roughly 4\u20135 percentage points lower true positive rates and a small net disadvantage in error rates. The Theil index (0.2808) signals nontrivial information inequality in predictions across groups.",
+    "why_is_wrong": "Part of the gap aligns with ground-truth differences: the favorable base rate is higher for 40_plus (0.7391) than for under_40 (0.6833), which can justify some higher selection for 40_plus. However, the model\u2019s selection rate difference (\u22480.0625) is marginally larger than the base-rate gap and the negative Equal Opportunity Difference shows the model does not fully treat equally qualified under_40 applicants. Contributing causes may include features correlated with age that act as proxies, an objective that optimizes overall accuracy rather than subgroup parity, and any unexamined label or sampling biases in the training data.",
+    "how_to_fix": "Begin with diagnostic steps: (1) inspect features correlated with age and test for proxy variables; (2) check label and sampling bias given base-rate differences; (3) evaluate subgroup calibration and per-group TPR/FPR trade-offs. For remediation, prefer minimally invasive fixes first: apply post-processing (EqOddsPostprocessing or CalibratedEqOddsPostprocessing) or threshold adjustment (Fairlearn ThresholdOptimizer) to reduce the ~4\u20135pp TPR gap while monitoring accuracy. If stronger intervention is acceptable, use in-processing methods (PrejudiceRemover, Fairlearn ExponentiatedGradient/GridSearch) or preprocessing (Reweighing, DisparateImpactRemover) to align selection rates or equalize error rates\u2014then re-evaluate Disparate Impact, Demographic Parity Difference, Equal Opportunity Difference, Average Odds Difference, and Theil index. For any chosen mitigation, report the fairness\u2013utility trade-off, validate with cross-validation, and monitor deployed behavior over time.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 0.0625 in 'why_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 16.15,
+    "input_tokens": 1125,
+    "output_tokens": 2132,
+    "total_tokens": 3257,
+    "input_cost_usd": 0.000281,
+    "output_cost_usd": 0.004264,
+    "total_cost_usd": 0.004545
+  },
+  "dry_run": false
+}

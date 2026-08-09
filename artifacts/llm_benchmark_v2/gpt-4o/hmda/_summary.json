@@ -1,0 +1,157 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "model": "gpt-4o",
+  "total_results": 16,
+  "total_cost_usd": 0.101,
+  "elapsed_s": 183.4,
+  "refusal_count": 4,
+  "hallucination_count": 2,
+  "cycle_avg_score": {
+    "1": 83.75,
+    "2": 85.0,
+    "3": 85.0,
+    "4": 76.0
+  },
+  "attributes": [
+    "age_62_plus",
+    "age_group",
+    "race",
+    "sex"
+  ],
+  "cycles": [
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "race",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "race",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "race",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "race",
+      "score": 85.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "sex",
+      "score": 90.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "sex",
+      "score": 95.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "sex",
+      "score": 75.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "sex",
+      "score": 75.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "age_group",
+      "score": 95.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "age_group",
+      "score": 95.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "age_group",
+      "score": 95.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "age_group",
+      "score": 87.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 1,
+      "prompt_format": "zero_shot",
+      "attribute": "age_62_plus",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 2,
+      "prompt_format": "chain_of_thought",
+      "attribute": "age_62_plus",
+      "score": 65.0,
+      "refusal_detected": false,
+      "hallucination_count": 1
+    },
+    {
+      "cycle": 3,
+      "prompt_format": "self_critique",
+      "attribute": "age_62_plus",
+      "score": 85.0,
+      "refusal_detected": false,
+      "hallucination_count": 0
+    },
+    {
+      "cycle": 4,
+      "prompt_format": "constrained",
+      "attribute": "age_62_plus",
+      "score": 57.0,
+      "refusal_detected": true,
+      "hallucination_count": 0
+    }
+  ],
+  "cost_cap_usd": 15.0,
+  "cumulative_spend_usd": 0.893311,
+  "aborted_on_cost_cap": false,
+  "attributes_completed": 4,
+  "attributes_requested": 4
+}

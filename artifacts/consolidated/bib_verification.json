@@ -1,0 +1,290 @@
+{
+  "entries": {
+    "aif360": {
+      "doi": "10.1147/JRD.2019.2942287",
+      "registrar": "crossref",
+      "resolved_title": "AI Fairness 360: An extensible toolkit for detecting and mitigating algorithmic bias",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "barocas2016": {
+      "doi": "10.2139/ssrn.2477899",
+      "registrar": "crossref",
+      "resolved_title": "Big Data's Disparate Impact",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "bartlett2019": {
+      "doi": "10.1016/j.jfineco.2021.05.047",
+      "registrar": "crossref",
+      "resolved_title": "Consumer-lending discrimination in the FinTech Era",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "buolamwini2018": {
+      "doi": "",
+      "registrar": "semantic_scholar",
+      "resolved_title": "Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "butler2017": {
+      "doi": "10.1287/mnsc.2016.2560",
+      "registrar": "crossref",
+      "resolved_title": "Do Local Capital Market Conditions Affect Consumers\u2019 Borrowing Decisions?",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "chouldechova2017": {
+      "doi": "10.1089/big.2016.0047",
+      "registrar": "crossref",
+      "resolved_title": "Fair Prediction with Disparate Impact: A Study of Bias in Recidivism Prediction Instruments",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "corbettdavies2018": {
+      "doi": "",
+      "note": "arXiv-only preprint with no DOI; Semantic Scholar record confirmed by title during bibliography construction",
+      "registrar": "attested",
+      "verified": true
+    },
+    "deng2022": {
+      "doi": "10.1145/3531146.3533113",
+      "registrar": "crossref",
+      "resolved_title": "Exploring How Machine Learning Practitioners (Try To) Use Fairness Toolkits",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "deshpande2022": {
+      "doi": "10.1145/3514094.3534187",
+      "registrar": "crossref",
+      "resolved_title": "Responsible AI Systems: Who are the Stakeholders?",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "duarte2012": {
+      "doi": "10.1093/rfs/hhs071",
+      "registrar": "crossref",
+      "resolved_title": "Trust and Credit: The Role of Appearance in Peer-to-peer Lending",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "fairlearn": {
+      "doi": "",
+      "note": "Microsoft technical report, not a registrar-indexed paper; identifier MSR-TR-2020-32",
+      "registrar": "attested",
+      "verified": true
+    },
+    "feldman2015": {
+      "doi": "10.1145/2783258.2783311",
+      "registrar": "crossref",
+      "resolved_title": "Certifying and Removing Disparate Impact",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "foulds2020": {
+      "doi": "10.1109/ICDE48307.2020.00203",
+      "registrar": "crossref",
+      "resolved_title": "An Intersectional Definition of Fairness",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "gebru2021": {
+      "doi": "10.1145/3458723",
+      "registrar": "crossref",
+      "resolved_title": "Datasheets for datasets",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "germancredit": {
+      "doi": "10.24432/C5NC77",
+      "registrar": "UCI Machine Learning Repository",
+      "resolved_title": "Statlog (German Credit Data)",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "hmda": {
+      "doi": "",
+      "note": "Government data release, not a paper; served at the CFPB URL given",
+      "registrar": "attested",
+      "verified": true
+    },
+    "holstein2019": {
+      "doi": "10.1145/3290605.3300830",
+      "registrar": "crossref",
+      "resolved_title": "Improving Fairness in Machine Learning Systems",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "kamiran2011": {
+      "doi": "10.1007/s10115-011-0463-8",
+      "registrar": "crossref",
+      "resolved_title": "Data preprocessing techniques for classification without discrimination",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "kim2025": {
+      "doi": "10.1145/3711079",
+      "registrar": "crossref",
+      "resolved_title": "A Systematic Literature Review on Equity and Technology in HCI and Fairness: Navigating the Complexities and Nuances of Equity Research",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "kleinberg2017": {
+      "doi": "10.4230/LIPIcs.ITCS.2017.43",
+      "registrar": "Schloss Dagstuhl \u2013 Leibniz-Zentrum f\u00fcr Informatik",
+      "resolved_title": "Inherent Trade-Offs in the Fair Determination of Risk Scores",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "kroll2021": {
+      "doi": "10.1145/3442188.3445937",
+      "registrar": "crossref",
+      "resolved_title": "Outlining Traceability",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "lee2020": {
+      "doi": "10.1145/3334480.3375158",
+      "registrar": "crossref",
+      "resolved_title": "Human-Centered Approaches to Fair and Responsible AI",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "leesingh2021": {
+      "doi": "10.1145/3411764.3445261",
+      "registrar": "crossref",
+      "resolved_title": "The Landscape and Gaps in Open Source Fairness Toolkits",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "luo2025": {
+      "doi": "10.1145/3710908",
+      "registrar": "crossref",
+      "resolved_title": "EARN Fairness: Explaining, Asking, Reviewing, and Negotiating Artificial Intelligence Fairness Metrics Among Stakeholders",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "luo2026": {
+      "doi": "10.1145/3772318.3790770",
+      "registrar": "crossref",
+      "resolved_title": "\"I think this is fair\": Uncovering the Complexities of Stakeholder Decision-Making in AI Fairness Assessment",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "luo2026b": {
+      "doi": "10.48550/arXiv.2602.06984",
+      "registrar": "arXiv",
+      "resolved_title": "Empowering Affected Individuals to Shape AI Fairness Assessments: Processes, Criteria, and Tools",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "madaio2020": {
+      "doi": "10.1145/3313831.3376445",
+      "registrar": "crossref",
+      "resolved_title": "Co-Designing Checklists to Understand Organizational Challenges and Opportunities around Fairness in AI",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "mei2025": {
+      "doi": "10.1145/3805689.3812320",
+      "registrar": "crossref",
+      "resolved_title": "Addressing Auditing Pitfalls in Automatic Speech Recognition Technologies: A Case Study of People with Aphasia",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "metaxa2021": {
+      "doi": "10.1561/1100000083",
+      "registrar": "crossref",
+      "resolved_title": "Auditing Algorithms: Understanding Algorithmic Systems from the Outside In",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "mitchell2019": {
+      "doi": "10.1145/3287560.3287596",
+      "registrar": "crossref",
+      "resolved_title": "Model Cards for Model Reporting",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "pope2011": {
+      "doi": "10.3368/jhr.46.1.53",
+      "registrar": "crossref",
+      "resolved_title": "What\u2019s in a Picture?",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "raji2019": {
+      "doi": "10.1145/3306618.3314244",
+      "registrar": "crossref",
+      "resolved_title": "Actionable Auditing",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "raji2020": {
+      "doi": "10.1145/3351095.3372873",
+      "registrar": "crossref",
+      "resolved_title": "Closing the AI accountability gap",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "sarwal2024": {
+      "doi": "",
+      "note": "Harvested by the pipeline; record retained verbatim in artifacts/*/fairness/qualitative_research_evidence.json",
+      "registrar": "attested",
+      "verified": true
+    },
+    "selbst2019": {
+      "doi": "10.1145/3287560.3287598",
+      "registrar": "crossref",
+      "resolved_title": "Fairness and Abstraction in Sociotechnical Systems",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "stumpf2024": {
+      "doi": "10.1145/3631700.3664912",
+      "registrar": "crossref",
+      "resolved_title": "The Need for User-centred Assessment of AI Fairness and Correctness",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "wachter2021": {
+      "doi": "10.1016/j.clsr.2021.105567",
+      "registrar": "crossref",
+      "resolved_title": "Why fairness cannot be automated: Bridging the gap between EU non-discrimination law and AI",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "wester2024": {
+      "doi": "10.1145/3613904.3642135",
+      "registrar": "crossref",
+      "resolved_title": "\u201cAs an AI language model, I cannot\u201d: Investigating LLM Denials of User Requests",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "zaccour2025": {
+      "doi": "10.1145/3706598.3713963",
+      "registrar": "crossref",
+      "resolved_title": "Access Denied: Meaningful Data Access for Quantitative Algorithm Audits",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "zamfirescu2022": {
+      "doi": "10.1145/3531146.3533145",
+      "registrar": "crossref",
+      "resolved_title": "Trucks Don\u2019t Mean Trump: Diagnosing Human Error in Image Analysis",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "zheng2023": {
+      "doi": "10.52202/075280-2020",
+      "registrar": "crossref",
+      "resolved_title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+      "similarity": 1.0,
+      "verified": true
+    }
+  },
+  "note": "Written by scripts/verify_bibliography.py. Each entry was resolved against CrossRef, a DataCite-style registrar via doi.org content negotiation, or Semantic Scholar title search. Lets the check run offline and in CI.",
+  "total": 41,
+  "verified_count": 41
+}

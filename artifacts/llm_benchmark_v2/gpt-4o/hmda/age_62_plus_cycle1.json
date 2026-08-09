@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_62_plus",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_62_plus",
+    "severity": "HIGH",
+    "what_is_wrong": "The 'age_62_plus' attribute shows a disparate impact figure of 0.8897, which falls below the moderate threshold of 0.95 but above the critical threshold of 0.72, indicating that individuals aged 62 and over are being selected at a less favorable rate compared to those under 62.",
+    "why_is_wrong": "This disparity suggests potential age bias where older individuals are treated less favorably regarding loan approvals, despite comparable qualifications. The demographic parity difference of -0.0889 and an equal opportunity difference of -0.0638 further indicate that older individuals have less equal access and opportunity in receiving favorable outcomes.",
+    "how_to_fix": "Employ mitigation techniques like Fairlearn's GridSearch or AIF360's Reweighing to adjust the model to treat the age groups more equitably. These approaches can help minimize the existing disparities without significantly impacting other performance metrics.",
+    "supporting_research": [
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw"
+    ]
+  },
+  "score": {
+    "total_score": 65.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 65.0/100. Completeness=40.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 4.21,
+    "input_tokens": 1183,
+    "output_tokens": 294,
+    "total_tokens": 1477,
+    "input_cost_usd": 0.002958,
+    "output_cost_usd": 0.00294,
+    "total_cost_usd": 0.005897
+  },
+  "dry_run": false
+}

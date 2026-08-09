@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "race",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The HMDA dataset shows a moderate level of disparity in race-based fairness metrics indicating some level of discrimination against Black, American Indian, Multiracial, and Pacific Islander groups in comparison to the White and Asian groups. Key metrics like disparate impact and demographic parity difference show non-negligible deviations, with the disparate impact ratio at 0.9371, close to the moderate severity threshold.",
+    "why_is_wrong": "The observed disparities, such as lower selection rates for some groups compared to their base rates, may reflect both a learned model bias and underlying systemic socio-economic inequalities present in the records. These disparities can lead to unequitable financial opportunities, particularly disadvantaging minority racial groups with smaller sample sizes where metrics are less reliable and can have significant implications on fairness.",
+    "how_to_fix": "Implement mitigation strategies like reweighing or disparate impact remover to align the model's decision-making with fairness principles. Pay special attention to groups with very few records by collecting more data to improve statistical reliability or use synthetic augmentation. Additionally, perform a detailed analysis to detect and amend systemic biases present in historical data.",
+    "supporting_research": [
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 4.1,
+    "input_tokens": 1545,
+    "output_tokens": 362,
+    "total_tokens": 1907,
+    "input_cost_usd": 0.003862,
+    "output_cost_usd": 0.00362,
+    "total_cost_usd": 0.007482
+  },
+  "dry_run": false
+}

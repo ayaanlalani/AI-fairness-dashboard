@@ -1,0 +1,47 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "foreign_worker_original",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "foreign_worker_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "Disparate Impact = 0.8387, indicating the unprivileged group ('1') receives favorable predictions at ~83.87% the rate of the privileged group ('0'), which falls below the audit's moderate threshold (0.95) and signals measurable disparate impact.",
+    "why_is_wrong": "The metric pattern shows lower selection_rate for group '1' (0.7934) versus group '0' (0.9459), and a base-rate gap in the ground truth (group '0' base_rate 0.8919 vs group '1' base_rate 0.6926). The dataset also has severe size imbalance (963 vs 37), meaning metrics for the smaller group have wide confidence intervals; together these facts suggest the model's outcomes reflect both historical base-rate differences and instability in estimates for the small group.",
+    "how_to_fix": "Apply Reweighing as a preprocessing step to adjust training sample weights to de-emphasize correlations between the protected attribute and the label, then retrain the classifier and re-evaluate Disparate Impact and related metrics; given the severe size imbalance, also treat small-group uncertainty (for example by collecting more instances for group '0') before declaring remediation complete.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller | Knowledge Discovery and Data Mining",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders | Knowledge and Information Systems",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena | ACM Computing Surveys"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 83.87 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 17.95,
+    "input_tokens": 1328,
+    "output_tokens": 2192,
+    "total_tokens": 3520,
+    "input_cost_usd": 0.000332,
+    "output_cost_usd": 0.004384,
+    "total_cost_usd": 0.004716
+  },
+  "dry_run": false
+}

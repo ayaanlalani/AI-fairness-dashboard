@@ -1,6 +1,15 @@
 % NeurIPS Datasets & Benchmarks track — first draft.
 % Compile: make paper  (latexmk -> pdflatex -> tectonic fallback chain)
 %
+% NOT THE PRIMARY PAPER. report/report_facct.tex is primary (FAccT/ACM format,
+% built with `make paper-facct`). The two are not two formats of one paper and
+% should not be merged: this document argues the benchmark is a reusable
+% artifact; report_facct.tex argues that fairness audit infrastructure encodes
+% normative commitments which surface as penalties on the correct answer, and
+% treats the benchmark as method. Both draw their numbers from
+% artifacts/consolidated/FINDINGS.md, so a results change must be applied to
+% both. They share report/refs.bib.
+%
 % The course-report version of this document is preserved verbatim at
 % report/report_course.tex for provenance.
 %
@@ -221,9 +230,9 @@ actionable.
 \subsection{UC2 HMDA: same lesson, different mechanism}
 
 \texttt{Black}\,$\times$\,\texttt{Female} ($n{=}410$) reaches DI $0.7821$
-against \texttt{Asian}\,$\times$\,\texttt{Male} ($n{=}130$), exceeding both
+against \texttt{Asian}\,$\times$\,\texttt{Male} ($n{=}130$), with a joint disparity exceeding both
 marginals; both cells are adequately sized. The error profile is diagnostic:
-race DI $0.8956$ fails the screen while $\mathrm{EOD}=0.0025$ and
+race DI $0.8956$ is the weakest marginal ratio while $\mathrm{EOD}=0.0025$ and
 $\mathrm{AOD}=0.0117$ are approximately zero. The model is \emph{not} making
 differentially worse errors by race --- it is reproducing a base-rate difference
 already present in the labels.

@@ -8,43 +8,41 @@ Deterministic drill-down across the three lending use cases (docs/RESEARCH_STAGI
 
 | Attribute | PrivilegedValue | DisparateImpact | DemographicParityDiff | EqualOpportunityDiff | AverageOddsDiff | TheilIndex | Severity |
 |---|---|---|---|---|---|---|---|
-| Sex | male | 0.8595 | -0.1152 | -0.0512 | -0.1256 | 0.3084 | MODERATE (borderline) |
-| AgeGroup | 40_plus | 0.8212 | -0.1586 | -0.0513 | -0.1649 | 0.3084 | MODERATE (borderline) |
-| foreign_worker | 0 | 0.9402 | -0.0498 | -0.0889 | 0.2013 | 0.3084 | MODERATE (borderline) |
+| Sex | male | 0.8888 | -0.0921 | -0.0650 | -0.0734 | 0.2808 | MODERATE (borderline) |
+| AgeGroup | 40_plus | 0.9258 | -0.0625 | -0.0459 | -0.0465 | 0.2808 | MODERATE (borderline) |
+| foreign_worker | 0 | 0.8387 | -0.1526 | -0.0866 | -0.1227 | 0.2808 | MODERATE (borderline) |
 
 ### Groups: `Sex_original`
 
 | Sex_original | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|
-| male | 139 | 0.8201 |  | 1.0000 |
-| female | 61 | 0.7049 |  | 0.8595 |
+| male | 690 | 0.8275 |  | 1.0000 |
+| female | 310 | 0.7355 |  | 0.8888 |
 
 ### Groups: `AgeGroup_original`
 
 | AgeGroup_original | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|
-| 40_plus | 71 | 0.8873 |  | 1.0000 |
-| under_40 | 129 | 0.7287 |  | 0.8212 |
+| 40_plus | 299 | 0.8428 |  | 1.0000 |
+| under_40 | 701 | 0.7803 |  | 0.9258 |
 
 ### Groups: `foreign_worker_original`
 
 | foreign_worker_original | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|
-| 0 | 6 | 0.8333 | yes (n<15) | 1.0636 |
-| 1 | 194 | 0.7835 |  | 1.0000 |
-
-> **Small-subgroup caveat:** 0 (n < 15) — metrics for these groups carry high variance and must not be interpreted as stable disparities.
+| 0 | 37 | 0.9459 |  | 1.0000 |
+| 1 | 963 | 0.7934 |  | 0.8387 |
 
 ### Intersectional: `AgeGroup_original` × `Sex_original`
 
 | AgeGroup_original | Sex_original | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|---|
-| 40_plus | female | 15 | 1.0000 |  | 1.0000 |
-| 40_plus | male | 56 | 0.8571 |  | 0.8571 |
-| under_40 | male | 83 | 0.7952 |  | 0.7952 |
-| under_40 | female | 46 | 0.6087 |  | 0.6087 |
+| 40_plus | female | 69 | 0.8551 |  | 1.0000 |
+| 40_plus | male | 230 | 0.8391 |  | 0.9814 |
+| under_40 | male | 460 | 0.8217 |  | 0.9610 |
+| under_40 | female | 241 | 0.7012 |  | 0.8201 |
 
-> Largest adequately-sized gap: ('40_plus', 'female') at 1.0000 vs ('under_40', 'female') at 0.6087 (gap 0.3913, intersectional DI 0.6087).
+> Largest adequately-sized gap: ('40_plus', 'female') at 0.8551 vs ('under_40', 'female') at 0.7012 (gap 0.1538, intersectional DI 0.8201).
 
 ---
 
@@ -54,55 +52,55 @@ Deterministic drill-down across the three lending use cases (docs/RESEARCH_STAGI
 
 | Attribute | PrivilegedValue | DisparateImpact | DemographicParityDiff | EqualOpportunityDiff | AverageOddsDiff | TheilIndex | Severity |
 |---|---|---|---|---|---|---|---|
-| race | White | 0.8956 | -0.0776 | 0.0025 | 0.0117 | 0.4838 | MODERATE (borderline) |
-| sex | Male | 0.9291 | -0.0518 | -0.0076 | -0.0084 | 0.4838 | MODERATE (borderline) |
-| age_group | mid | 1.0138 | 0.0097 | 0.0008 | -0.0150 | 0.4838 | LOW (fair) |
+| race | White | 0.9371 | -0.0512 | 0.0032 | -0.0133 | 0.2960 | MODERATE (borderline) |
+| sex | Male | 0.9572 | -0.0345 | -0.0128 | -0.0326 | 0.2960 | LOW (fair) |
+| age_group | mid | 0.9791 | -0.0167 | -0.0060 | -0.0134 | 0.2960 | LOW (fair) |
+| age_62_plus | under_62 | 0.8897 | -0.0889 | -0.0638 | -0.0545 | 0.2960 | MODERATE (borderline) |
 
 ### Groups: `race`
 
 | race | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|
-| Asian | 173 | 0.7861 |  | 1.0000 |
-| White | 1252 | 0.7428 |  | 0.9449 |
-| Black | 748 | 0.6444 |  | 0.8197 |
-| Pacific Islander | 5 | 0.6000 | yes (n<15) | 0.7632 |
-| American Indian | 10 | 0.4000 | yes (n<15) | 0.5088 |
-| Multiracial | 8 | 0.3750 | yes (n<15) | 0.4770 |
-
-> **Small-subgroup caveat:** Pacific Islander, American Indian, Multiracial (n < 15) — metrics for these groups carry high variance and must not be interpreted as stable disparities.
+| Asian | 810 | 0.8556 |  | 1.0000 |
+| White | 6337 | 0.8128 |  | 0.9501 |
+| Black | 3701 | 0.7447 |  | 0.8704 |
+| Pacific Islander | 27 | 0.7037 |  | 0.8225 |
+| American Indian | 56 | 0.6607 |  | 0.7723 |
+| Multiracial | 47 | 0.6383 |  | 0.7461 |
 
 ### Groups: `sex`
 
 | sex | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|
-| Male | 1276 | 0.7312 |  | 1.0000 |
-| Female | 920 | 0.6793 |  | 0.9291 |
+| Male | 6357 | 0.8057 |  | 1.0000 |
+| Female | 4621 | 0.7713 |  | 0.9572 |
 
 ### Groups: `age_group`
 
 | age_group | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|
-| young | 464 | 0.7780 |  | 1.0000 |
-| mid | 1121 | 0.7047 |  | 0.9058 |
-| senior | 611 | 0.6661 |  | 0.8562 |
+| young | 2304 | 0.8372 |  | 1.0000 |
+| mid | 5507 | 0.7995 |  | 0.9550 |
+| senior | 3167 | 0.7433 |  | 0.8878 |
 
 ### Intersectional: `race` × `sex`
 
 | race | sex | n | selection_rate | small_subgroup | disparate_impact_vs_best |
 |---|---|---|---|---|---|
-| Asian | Male | 130 | 0.8077 |  | 1.0000 |
-| White | Male | 794 | 0.7531 |  | 0.9325 |
-| White | Female | 458 | 0.7249 |  | 0.8975 |
-| Asian | Female | 43 | 0.7209 |  | 0.8926 |
-| Black | Male | 338 | 0.6598 |  | 0.8168 |
-| Black | Female | 410 | 0.6317 |  | 0.7821 |
-| Pacific Islander | Male | 5 | 0.6000 | yes (n<15) | 0.7429 |
-| American Indian | Male | 4 | 0.5000 | yes (n<15) | 0.6190 |
-| Multiracial | Male | 5 | 0.4000 | yes (n<15) | 0.4952 |
-| American Indian | Female | 6 | 0.3333 | yes (n<15) | 0.4127 |
-| Multiracial | Female | 3 | 0.3333 | yes (n<15) | 0.4127 |
+| Asian | Female | 254 | 0.8622 |  | 1.0000 |
+| Asian | Male | 556 | 0.8525 |  | 0.9888 |
+| White | Male | 4019 | 0.8281 |  | 0.9604 |
+| White | Female | 2318 | 0.7865 |  | 0.9121 |
+| American Indian | Female | 25 | 0.7600 |  | 0.8815 |
+| Black | Male | 1707 | 0.7452 |  | 0.8643 |
+| Black | Female | 1994 | 0.7442 |  | 0.8632 |
+| Pacific Islander | Male | 15 | 0.7333 |  | 0.8505 |
+| Pacific Islander | Female | 12 | 0.6667 | yes (n<15) | 0.7732 |
+| Multiracial | Male | 29 | 0.6552 |  | 0.7599 |
+| Multiracial | Female | 18 | 0.6111 |  | 0.7088 |
+| American Indian | Male | 31 | 0.5806 |  | 0.6734 |
 
-> Largest adequately-sized gap: ('Asian', 'Male') at 0.8077 vs ('Black', 'Female') at 0.6317 (gap 0.1760, intersectional DI 0.7821).
+> Largest adequately-sized gap: ('Asian', 'Female') at 0.8622 vs ('American Indian', 'Male') at 0.5806 (gap 0.2816, intersectional DI 0.6734).
 
 ---
 
@@ -112,9 +110,9 @@ Deterministic drill-down across the three lending use cases (docs/RESEARCH_STAGI
 
 | Attribute | PrivilegedValue | DisparateImpact | DemographicParityDiff | EqualOpportunityDiff | AverageOddsDiff | TheilIndex | Severity |
 |---|---|---|---|---|---|---|---|
-| gender | male | 0.0000 | -0.0069 | -0.0714 | -0.0357 | -- | CRITICAL |
-| income_level | medium | -- | 0.0072 | 0.0645 | 0.0323 | -- | UNKNOWN |
-| loan_amount_level | medium | -- | 0.0063 | 0.0541 | 0.0270 | -- | UNKNOWN |
+| gender | male | 0.9931 | -0.0069 | 0.0000 | -0.0357 | -- | LOW (fair) |
+| income_level | medium | 1.0072 | 0.0072 | 0.0000 | 0.0323 | -- | LOW (fair) |
+| loan_amount_level | medium | 1.0063 | 0.0062 | 0.0000 | 0.0270 | -- | LOW (fair) |
 
 ### Groups: `gender`
 

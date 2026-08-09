@@ -1,7 +1,6 @@
 [
   "loan_amount",
   "income",
-  "interest_rate",
   "loan_term",
   "dti_numeric",
   "loan_type_2",

@@ -1,0 +1,46 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "AgeGroup_original",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "AgeGroup_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The model grants the privileged group (40_plus) a higher positive selection rate (0.8428) than the unprivileged group (under_40, 0.7803), yielding Disparate Impact = 0.9258 and Demographic Parity Difference = -0.0625. According to the provided DI thresholds (moderate if DI < 0.95), this constitutes a moderate adverse impact against under_40. Other fairness metrics (Equal Opportunity Difference = -0.0459, Average Odds Difference = -0.0465) are small but consistent with the direction of advantage for 40_plus.",
+    "why_is_wrong": "The immediate statistical driver is that the privileged group (40_plus) has a higher base rate of the favorable outcome (0.7391 vs 0.6833) and the model produces even higher selection rates for that group, amplifying the historical difference. This pattern is consistent with historical/structural causes: prior lending outcomes and data-generation processes that favored older applicants (leading to label bias and feature correlations with age), and potential proxies in features that correlate with age. The dataset composition (70% under_40, 30% 40_plus) can also interact with learned decision boundaries to preserve or amplify the advantage for the privileged group.",
+    "how_to_fix": "Primary recommendation: apply AIF360 Reweighing (pre-processing) to remove the statistical association between AgeGroup_original and the outcome by reweighting training examples so that groups and labels are independent, then retrain the classifier using the computed instance weights and re-evaluate DI and other metrics. Reweighing specifically addresses biased historical labels and label\u2013protected-attribute association. If feature-level proxies are suspected to encode age information, consider DisparateImpactRemover (AIF360) to repair feature values before training. If parity on error rates is required instead (e.g., equal TPR/FPR), consider a post-processing approach such as EqOddsPostprocessing or Fairlearn's ThresholdOptimizer as a complementary step. After mitigation, report DI, Demographic Parity Difference, Equal Opportunity Difference, Average Odds Difference, and Theil Index to confirm improvement and check utility trade-offs.",
+    "supporting_research": [
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 19.91,
+    "input_tokens": 1217,
+    "output_tokens": 2083,
+    "total_tokens": 3300,
+    "input_cost_usd": 0.000304,
+    "output_cost_usd": 0.004166,
+    "total_cost_usd": 0.00447
+  },
+  "dry_run": false
+}

@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_62_plus",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_62_plus",
+    "severity": "HIGH",
+    "what_is_wrong": "The Disparate Impact (DI) value is 0.8897.",
+    "why_is_wrong": "A Disparate Impact value of 0.8897 indicates that the '62_plus' group is selected at a lower rate compared to the 'under_62' group, suggesting potential age bias against older applicants in the HMDA dataset. This DI falls below the moderate threshold of 0.95 and above the critical threshold of 0.72, thus classifying the issue as having high severity.",
+    "how_to_fix": "DisparateImpactRemover",
+    "supporting_research": [
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw"
+    ]
+  },
+  "score": {
+    "total_score": 57.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 0.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 57.0/100. Completeness=32.0, Severity agreement=0.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 1.98,
+    "input_tokens": 1295,
+    "output_tokens": 225,
+    "total_tokens": 1520,
+    "input_cost_usd": 0.003237,
+    "output_cost_usd": 0.00225,
+    "total_cost_usd": 0.005487
+  },
+  "dry_run": false
+}

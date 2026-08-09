@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "race",
+  "cycle": 3,
+  "prompt_format": "self_critique",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "race",
+    "severity": "MODERATE",
+    "what_is_wrong": "The primary disparity is reflected in the disparate impact (DI), which is measured at 0.9371, indicating a moderate disparity between minority groups and the privileged 'White' group.",
+    "why_is_wrong": "The disparity is partially caused by historical biases and the severe size imbalance among racial groups in the dataset. Particularly, the category of Pacific Islander has only 27 records compared to 6337 records for Whites, leading to unstable metric evaluations. Additionally, there is a significant base-rate disparity, which may contribute to this observed discrimination.",
+    "how_to_fix": "Utilize the AIF360 'Reweighing' algorithm to adjust weights for different racial groups, especially those with smaller sizes, to mitigate the effects of size imbalance and historical bias. This algorithm attempts to make the training data more balanced with respect to the sensitive attribute 'race'.",
+    "supporting_research": [
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 4.64,
+    "input_tokens": 1937,
+    "output_tokens": 316,
+    "total_tokens": 2253,
+    "input_cost_usd": 0.004842,
+    "output_cost_usd": 0.00316,
+    "total_cost_usd": 0.008002
+  },
+  "dry_run": false
+}

@@ -1,0 +1,47 @@
+{
+  "dataset": "german_credit",
+  "dataset_name": "German Credit",
+  "attribute": "Sex_original",
+  "cycle": 2,
+  "prompt_format": "chain_of_thought",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "Sex_original",
+    "severity": "MODERATE",
+    "what_is_wrong": "The protected group (female) experiences a measurable adverse impact: Disparate Impact = 0.8888 (below the 0.95 moderate threshold), Demographic Parity Difference = -0.0921 (females selected ~9.2 percentage points less), selection rates male=0.8275 vs female=0.7355, and Equal Opportunity Difference = -0.065 (female TPR 0.8408 vs male TPR 0.9058). Average Odds Difference = -0.0734 and Theil Index = 0.2808 corroborate nontrivial group-level inequality. These numbers indicate a consistent, moderate-level disadvantage for females in approvals/positive outcomes.",
+    "why_is_wrong": "The pattern points to structural and data-origin causes: (1) differing base rates in labels (male base_rate 0.7232 vs female 0.6484) and strong class/representation imbalance (69% male vs 31% female) mean the model learns from historically skewed outcomes; (2) features in the dataset likely act as proxies for sex (capturing socio-economic or historical lending differences), encoding past discrimination into predictions. Together, sampling bias, historical socio-economic disparities, and proxy features produce the observed gaps in selection rates and TPRs.",
+    "how_to_fix": "Apply AIF360 Reweighing as a first-line mitigation: reweigh training instances by protected group and label to remove statistical dependence between Sex and outcome in the training data, thereby addressing sampling imbalance and historical label bias before model training. Retrain the classifier on reweighted data and re-evaluate selection rate, DI, and TPR gaps. If TPR/FPR gaps remain clinically relevant, follow with a fairness-constrained in-processing approach (e.g., Fairlearn ExponentiatedGradient with equalized-odds constraints) or a calibrated post-processing (CalibratedEqOddsPostprocessing/ThresholdOptimizer) to enforce parity in error rates while preserving utility. This staged approach targets the structural causes (biased training data and proxy features) and then enforces error-rate constraints if needed.",
+    "supporting_research": [
+      "5. Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "6. Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "4. A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 9.2 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 19.22,
+    "input_tokens": 1208,
+    "output_tokens": 1916,
+    "total_tokens": 3124,
+    "input_cost_usd": 0.000302,
+    "output_cost_usd": 0.003832,
+    "total_cost_usd": 0.004134
+  },
+  "dry_run": false
+}

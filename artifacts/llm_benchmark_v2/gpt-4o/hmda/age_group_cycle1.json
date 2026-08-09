@@ -1,0 +1,45 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_group",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The age_group attribute shows slight disparities in metrics like disparate impact, demographic parity difference, equal opportunity difference, and average odds difference, but these values do not meet the threshold for moderate severity.",
+    "why_is_wrong": "While there are some differences in how age groups are treated, these disparities are not severe enough to suggest systemic unfairness. The Theil Index, which measures inequality, is relatively balanced at 0.296, indicating that the distribution of outcomes is fairly equitable across age groups.",
+    "how_to_fix": "Given the low severity of issues, continuous monitoring is advisable rather than immediate intervention. It would be beneficial to apply fairness toolkits like DisparateImpactRemover or ThresholdOptimizer sparingly, ensuring that no unintentional biases are reinforced while maintaining vigilance for any worsening trends.",
+    "supporting_research": [
+      "[1] Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane",
+      "[2] Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw",
+      "[6] A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 95.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 95.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 3.13,
+    "input_tokens": 1213,
+    "output_tokens": 306,
+    "total_tokens": 1519,
+    "input_cost_usd": 0.003033,
+    "output_cost_usd": 0.00306,
+    "total_cost_usd": 0.006093
+  },
+  "dry_run": false
+}

@@ -1,0 +1,44 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_group",
+  "cycle": 4,
+  "prompt_format": "constrained",
+  "model": "gpt-4o",
+  "result": {
+    "attribute": "age_group",
+    "severity": "LOW",
+    "what_is_wrong": "The Disparate Impact value for the age_group attribute is 0.9791.",
+    "why_is_wrong": "Although the disparate impact is slightly below the perfect equity (1.0), it exceeds the moderate and high severity thresholds (0.95 and 0.8, respectively). This indicates that the age_group attribute may have a minimal bias, but it is not severe enough to require immediate intervention as it is categorized as a low-severity issue.",
+    "how_to_fix": "ThresholdOptimizer",
+    "supporting_research": [
+      "Ethical Considerations and Bias Detection in Artificial Intelligence/Machine Learning Applications (2025) | Jayesh Rane, Reshma Amol Chaudhari, N. Rane | Unknown venue",
+      "Bias Detection and Mitigation in AI: A Framework for fair and inclusive Machine Learning Models (2025) | S. Sucharita, P. Shaw | INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH IN ENGINEERING AND MANAGEMENT"
+    ]
+  },
+  "score": {
+    "total_score": 87.0,
+    "subscores": {
+      "completeness": 32.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 10.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 87.0/100. Completeness=32.0, Severity agreement=20.0, Cause alignment=10.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": true,
+  "hallucination_flags": [],
+  "usage": {
+    "model": "gpt-4o",
+    "attempts": 1,
+    "wall_clock_s": 2.04,
+    "input_tokens": 1325,
+    "output_tokens": 228,
+    "total_tokens": 1553,
+    "input_cost_usd": 0.003312,
+    "output_cost_usd": 0.00228,
+    "total_cost_usd": 0.005593
+  },
+  "dry_run": false
+}

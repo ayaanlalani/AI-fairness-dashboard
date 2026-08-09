@@ -1,0 +1,48 @@
+{
+  "dataset": "hmda",
+  "dataset_name": "HMDA",
+  "attribute": "age_62_plus",
+  "cycle": 1,
+  "prompt_format": "zero_shot",
+  "model": "gpt-5-mini",
+  "result": {
+    "attribute": "age_62_plus",
+    "severity": "MODERATE",
+    "what_is_wrong": "Members of the 62_plus group are being selected at a lower rate than the privileged under_62 group (selection_rate 0.7165 vs 0.8054; demographic parity difference = -0.0889; disparate impact = 0.8897). True positive rate for 62_plus is also lower (TPR 0.8576 vs 0.9214; equal opportunity difference = -0.0638), while false positive rate is slightly lower for 62_plus (0.4476 vs 0.4928). Average odds difference (-0.0545) and a Theil index of 0.296 indicate measurable, though not extreme, group-level inequality. The protected group is also much smaller (15.9% of data, 5.3x imbalance), increasing uncertainty in estimates.",
+    "why_is_wrong": "The model produces systematically fewer favorable outcomes and fewer true positives for older applicants, which can translate into reduced access to credit for that group. The negative parity and TPR gaps suggest the decision process (features, thresholds, or learned model weights) treats age_62_plus less favorably or fails to generalize to that subgroup. Potential root causes consistent with these metrics include underrepresentation of 62_plus in training data, proxy features correlated with age, label or sampling bias in historical decisions, and decision thresholds optimized for overall utility rather than group parity. The slightly lower FPR for 62_plus indicates the tradeoff is not simply more false positives but a net loss of beneficial outcomes; this pattern risks legal and ethical exposure in lending contexts where disparate impact matters.",
+    "how_to_fix": "Follow a staged remediation plan: (1) Diagnostic: examine score distributions and calibration by age group, compute confidence intervals given group size, and run subgroup cross-validation. (2) Preprocessing: consider Reweighing or DisparateImpactRemover to reduce training-data bias while preserving fidelity (per Kamiran & Calders; Feldman et al.). (3) In-processing: train with fairness-aware objectives or constraints (e.g., PrejudiceRemover, ExponentiatedGradient or GridSearch with parity or equal-opportunity constraints) to directly reduce TPR gaps. (4) Post-processing: if model scores are reliable, apply ThresholdOptimizer or EqOdds/CalibratedEqOddsPostprocessing to close TPR differences while monitoring FPR impacts. (5) Operational: collect more representative data for 62_plus, perform cost-benefit and legal review of tradeoffs, and deploy monitoring (including Theil and group-level TPR/FPR) to detect regressions. Report and document the fairness-utility tradeoffs and ensure any intervention does not introduce larger harms to other protected groups.",
+    "supporting_research": [
+      "Consumer-lending discrimination in the FinTech Era (2019) | Robert P. Bartlett, Adair Morse, Richard Stanton | Journal of Financial Economics",
+      "Certifying and Removing Disparate Impact (2014) | Michael Feldman, Sorelle A. Friedler, John Moeller",
+      "Data preprocessing techniques for classification without discrimination (2011) | F. Kamiran, T. Calders",
+      "A Survey on Bias and Fairness in Machine Learning (2019) | Ninareh Mehrabi, Fred Morstatter, N. Saxena"
+    ]
+  },
+  "score": {
+    "total_score": 85.0,
+    "subscores": {
+      "completeness": 40.0,
+      "severity_agreement": 20.0,
+      "cause_alignment": 0.0,
+      "mitigation_specificity": 15.0,
+      "research_grounding": 10.0
+    },
+    "summary": "Total score: 85.0/100. Completeness=40.0, Severity agreement=20.0, Cause alignment=0.0, Mitigation specificity=15.0, Research grounding=10.0."
+  },
+  "refusal_detected": false,
+  "hallucination_flags": [
+    "metric value 5.3 in 'what_is_wrong' not present in provided context"
+  ],
+  "usage": {
+    "model": "gpt-5-mini",
+    "attempts": 1,
+    "wall_clock_s": 20.93,
+    "input_tokens": 1162,
+    "output_tokens": 1811,
+    "total_tokens": 2973,
+    "input_cost_usd": 0.000291,
+    "output_cost_usd": 0.003622,
+    "total_cost_usd": 0.003913
+  },
+  "dry_run": false
+}
