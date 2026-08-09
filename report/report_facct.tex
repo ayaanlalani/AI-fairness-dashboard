@@ -43,9 +43,11 @@ Where the Standard Toolchain Leaves You}
 
 \begin{abstract}
 Lenders are deploying models into two decisions that shape household wealth:
-consumer installment credit and residential mortgage origination. Both fall under
-the Equal Credit Opportunity Act and Regulation B; mortgage adds the Fair Housing
-Act and, through HMDA, public reporting. The question this paper asks is
+consumer installment credit and residential mortgage origination. In the US the
+Equal Credit Opportunity Act and Regulation B govern both, and mortgage adds the
+Fair Housing Act and, through HMDA, public reporting. (Our consumer-credit data
+are German and fall under no US statute; we use them as a modelling stand-in and
+draw no ECOA conclusion from them.) The question this paper asks is
 operational rather than definitional: what does a team actually have to do to
 keep bias out of a model in these sectors, and how far does the standard
 toolchain carry them?
@@ -171,19 +173,19 @@ transcribed.}
 \toprule
 \textbf{Finding} & \textbf{Evidence} & \textbf{Proof}\\
 \midrule
-Small samples inverted a disparity
-& On a held-out split, \texttt{American Indian $\times$ Male} reads $1.1504$ ---
-above parity, the best cell --- on four applicants. At full population the same
-group is $\mathbf{0.6734}$, the worst cell in the data. Small samples invert
-disparities, not merely hide them.
+Intersectional cells stay unidentified even at full population
+& Six of twelve HMDA \texttt{race}$\times$\texttt{sex} cells have no determinate
+severity band: \texttt{American Indian $\times$ Male} is $0.6734$ with a $95\%$
+interval of $[0.45, 0.90]$ at $n{=}31$. The defensible disparities are the large
+cells --- Black women and men at $0.863$/$0.864$, intervals wholly below parity.
 & \texttt{scripts/compare\_populations.py}; \texttt{population\_comparison.json}\\
 \addlinespace
-The age audit used the wrong statute
+A banded age attribute hides the statutory line
 & $40{+}$ is the ADEA (employment). ECOA protects $62{+}$ (Reg.\ B
 \S1002.2(o)). Pooling young against senior applicants cancels them: banded
 \texttt{age\_group} reads $0.9791$ (\textsc{low}); the statutory cut reads
 $\mathbf{0.8897}$, the largest age disparity in the data.
-& \texttt{hmda/fairness/fairness\_summary.json}; \texttt{clean\_hmda.py}\\
+& \texttt{hmda\_dataset/metrics/fairness/}; \texttt{clean\_hmda.py}\\
 \addlinespace
 A label convention inverted a headline metric
 & Selection rates computed on the unfavorable label of a target named
@@ -395,7 +397,12 @@ rows.
 
 None of the three models would pass a real fair lending review, for reasons
 orthogonal to our claims, and we state this rather than let it be discovered:
-the German Credit model takes applicant sex and age as input features; the
+the German Credit model takes applicant sex and age as input features, which in
+a US setting would be facially disparate \emph{treatment} under
+15 U.S.C. \S1691(a)(1) and 12 C.F.R. \S1002.6(b)(9) --- per se unlawful, with no
+business-necessity defence --- and our pipeline ran that specification end to end
+and emitted a clean $\mathrm{DI}=0.8888$ without comment, which is this paper's
+thesis operating at a higher severity than any finding it reports; the
 Lending Club \texttt{gender} attribute is synthetic, assigned by an independent
 coin flip, so that setting contains no protected class; and HMDA's public data
 carry no credit score, the primary underwriting variable. We audit these systems
@@ -468,7 +475,36 @@ Worst cell \emph{reported} & 0.8169 (\textsc{mod.}) & \textbf{0.6734} (\textsc{c
 \end{tabular}
 \end{table}
 
-The failure is sharper than suppression. On the split,
+\paragraph{No ranking of small cells is supported.} Before drawing any
+conclusion from the ordering, we compute Wilson score intervals on each
+selection rate and propagate them to the ratio
+(\texttt{scripts/interval\_estimates.py}). Six of twelve cells have no
+determinate severity band: their intervals straddle a band boundary, so the audit
+does not know which band they belong to. \texttt{American Indian $\times$ Male}
+has the lowest point estimate at $0.6734$ and an interval of $[0.453, 0.904]$ ---
+consistent with a critical violation and with clearing the screen. It cannot be
+called the worst-treated group.
+
+What survives is narrower and firmer. Three cells have intervals lying entirely
+below parity: \texttt{Black $\times$ Female} ($0.8632$, $[0.806, 0.937]$,
+$n{=}1{,}994$), \texttt{Black $\times$ Male} ($0.8643$, $[0.805, 0.940]$,
+$n{=}1{,}707$) and \texttt{White $\times$ Female} ($0.9121$, $[0.856, 0.986]$).
+The defensible reading of this dataset is a real, precisely estimated disparity
+against Black applicants of roughly $0.86$ --- and a point-estimate ranking
+pushes it to sixth place behind five cells whose ordering is noise. Reporting a
+ratio to four decimals without an interval is what makes that inversion possible.
+
+\paragraph{The reference group is an unrecorded choice.} Every ratio above is
+measured against the most-favoured adequately-sized cell, which is the
+convention our pipeline implements and which no metric signature records.
+Measured instead against a designated control group --- \texttt{White $\times$
+Male}, the comparison conventional in US fair lending analysis --- the same cells
+read differently: \texttt{American Indian $\times$ Male} $0.7012$ rather than
+$0.6734$, \texttt{Black $\times$ Female} $0.8988$ rather than $0.8632$. The
+convention moves every number in the table by three to four points.
+
+\medskip\noindent The instability across sample sizes is still real, and it is
+what the intervals quantify. On the split,
 \texttt{American Indian $\times$ Male} appears at $\mathrm{DI} = 1.1504$ ---
 \emph{above} parity, the best-treated cell in the table. Four applicants, four
 approvals. At full population that same group is at $0.6734$ with $n{=}31$: the
@@ -530,15 +566,25 @@ audit output lists what passed, not what was withheld. Our own codebase carried
 two different floors, $n \geq 15$ and $n \geq 30$, in adjacent modules, so the
 same cell was reportable or not depending on which one read it.
 
-\subsection{The age audit used the wrong statute}
+\subsection{A banded age attribute cannot see the line the regulation turns on}
 \label{sec:ecoa}
 
-Fairness work on credit routinely audits age at $40{+}$, and ours did. That
-threshold is from the Age Discrimination in Employment Act, which governs
-employment. Credit is governed by the Equal Credit Opportunity Act, whose
-Regulation B \S1002.2(o) defines the protected class as \textbf{62 or older}. A
-comment in our own cleaning code asserted that $40{+}$ ``aligns with US ECOA''.
-It does not.
+Fairness work on credit routinely audits age at $40{+}$, and our pipeline did,
+on the strength of a code comment asserting that $40{+}$ ``aligns with US ECOA''.
+It does not: $40{+}$ is the Age Discrimination in Employment Act, which governs
+employment.
+
+The correct statement of the credit rule is more specific than simply swapping
+the number, and the distinction matters. Under Regulation B, age is a prohibited
+basis \emph{at any age} for an applicant with the capacity to contract
+(\S1002.2(z)); ECOA does not protect only the old. The $62{+}$ definition of
+``elderly'' in \S1002.2(o) exists to scope the carve-outs in \S1002.6(b)(2),
+which govern when a demonstrably and statistically sound scoring system may use
+age at all and forbid assigning a negative factor to the age of an elderly
+applicant. So $62{+}$ is not ``the protected class'' --- it is the threshold at
+which a specific, asymmetric protection attaches. A binary audit at either
+threshold is a simplification; the difference is that $62{+}$ corresponds to
+something in the governing statute and $40{+}$ corresponds to nothing.
 
 The substitution is not cosmetic. Our banded age attribute pools young and senior
 applicants against the middle band; the two move in opposite directions, so
@@ -768,6 +814,17 @@ These follow directly from the results and are cheap to adopt.
         verdict across the four-fifths line, and nothing in the metric signature
         recorded which convention was in force.
 \end{enumerate}
+
+\paragraph{These steps are necessary, not sufficient.} The list is six failure
+modes we were able to detect, not an enumeration of the ways an audit can be
+wrong, and completing it does not make a model fair or a lender compliant. A full
+fair lending review additionally requires significance testing, controls for
+legitimate underwriting factors, shortfall analysis, comparative file review,
+proxy methodology where the attribute is not collected, pricing and redlining
+analysis, and a documented search for less discriminatory alternatives --- the
+second and third stages of the burden-shifting structure, neither of which a
+disparity ratio addresses. We perform the screening step only. Anyone citing this
+protocol as evidence of compliance is misusing it.
 
 \section{What this does not show}
 

@@ -82,9 +82,13 @@ outcome; Fairlearn exposes no favorable-label parameter at all. Neither library
 has \emph{any} concept of minimum subgroup size --- no floor, no warning, no
 guidance. Neither binds a protected class to a statute.
 
-\textbf{Sample size inverts disparities, not just hides them.} At $n{=}4$ a
-subgroup reads $\mathrm{DI}=1.1504$, the best-treated cell in the audit; the same
-group at $n{=}31$ reads $\mathbf{0.6734}$, the worst in the data.
+\textbf{Intersectional cells stay unidentified even at full population.} Six of
+twelve HMDA race$\times$sex cells have no determinate severity band:
+\texttt{American Indian $\times$ Male} is $0.6734$ with a $95\%$ interval of
+$[0.45, 0.90]$ at $n{=}31$ --- consistent with a critical violation and with
+passing. Growing the audit fivefold did not resolve them. The defensible
+disparities are the large cells: Black women and men at $0.863$/$0.864$, intervals
+wholly below parity, which a point-estimate ranking demotes to sixth and seventh.
 
 \textbf{The statute matters more than the metric.} Auditing age at $40{+}$
 (ADEA, employment law) returns $0.9791$ --- clean. At $62{+}$, the cut ECOA
@@ -121,7 +125,7 @@ it cannot move.
 \textbf{Claim} & \textbf{Where to check it}\\
 \midrule
 AIF360 default inverts a risk target & Minimal repro: default $1.2072$ vs.\ correct $0.9862$; \path{RESULTS.md}\\
-$n{=}4 \rightarrow 1.1504$, $n{=}31 \rightarrow 0.6734$ & \path{scripts/compare_populations.py}\\
+6/12 cells band-indeterminate & \path{scripts/interval_estimates.py}\\
 ECOA $0.8897$ vs.\ banded $0.9791$ & \path{hmda/fairness/fairness_summary.json}\\
 Agreement $33/92/100$; grounding $16{\rightarrow}2$ & \path{consolidated/track_q_analysis.json}\\
 Cross-model spread $14.7$ vs.\ $0.0$ & \path{llm_benchmark/gpt-5-mini/}\\

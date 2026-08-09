@@ -1,0 +1,148 @@
+{
+  "hmda": {
+    "reference_cell": "Asian x Female",
+    "reference_n": 254,
+    "floor": 15,
+    "cells": [
+      {
+        "cell": "American Indian x Male",
+        "n": 31,
+        "selection_rate": 0.5806,
+        "di": 0.6734,
+        "di_ci_low": 0.4533,
+        "di_ci_high": 0.9036,
+        "band_determinate": false,
+        "interval_spans_four_fifths": true,
+        "below_floor": false
+      },
+      {
+        "cell": "Multiracial x Female",
+        "n": 18,
+        "selection_rate": 0.6111,
+        "di": 0.7088,
+        "di_ci_low": 0.4295,
+        "di_ci_high": 0.9786,
+        "band_determinate": false,
+        "interval_spans_four_fifths": true,
+        "below_floor": false
+      },
+      {
+        "cell": "Multiracial x Male",
+        "n": 29,
+        "selection_rate": 0.6552,
+        "di": 0.7599,
+        "di_ci_low": 0.5265,
+        "di_ci_high": 0.9831,
+        "band_determinate": false,
+        "interval_spans_four_fifths": true,
+        "below_floor": false
+      },
+      {
+        "cell": "Pacific Islander x Female",
+        "n": 12,
+        "selection_rate": 0.6667,
+        "di": 0.7732,
+        "di_ci_low": 0.4344,
+        "di_ci_high": 1.0583,
+        "band_determinate": false,
+        "interval_spans_four_fifths": true,
+        "below_floor": true
+      },
+      {
+        "cell": "Pacific Islander x Male",
+        "n": 15,
+        "selection_rate": 0.7333,
+        "di": 0.8505,
+        "di_ci_low": 0.5343,
+        "di_ci_high": 1.0941,
+        "band_determinate": false,
+        "interval_spans_four_fifths": true,
+        "below_floor": false
+      },
+      {
+        "cell": "Black x Female",
+        "n": 1994,
+        "selection_rate": 0.7442,
+        "di": 0.8632,
+        "di_ci_low": 0.8058,
+        "di_ci_high": 0.9368,
+        "band_determinate": true,
+        "interval_spans_four_fifths": false,
+        "below_floor": false
+      },
+      {
+        "cell": "Black x Male",
+        "n": 1707,
+        "selection_rate": 0.7452,
+        "di": 0.8643,
+        "di_ci_low": 0.8051,
+        "di_ci_high": 0.9397,
+        "band_determinate": true,
+        "interval_spans_four_fifths": false,
+        "below_floor": false
+      },
+      {
+        "cell": "American Indian x Female",
+        "n": 25,
+        "selection_rate": 0.76,
+        "di": 0.8815,
+        "di_ci_low": 0.6291,
+        "di_ci_high": 1.0867,
+        "band_determinate": false,
+        "interval_spans_four_fifths": true,
+        "below_floor": false
+      },
+      {
+        "cell": "White x Female",
+        "n": 2318,
+        "selection_rate": 0.7865,
+        "di": 0.9121,
+        "di_ci_low": 0.8555,
+        "di_ci_high": 0.9856,
+        "band_determinate": true,
+        "interval_spans_four_fifths": false,
+        "below_floor": false
+      },
+      {
+        "cell": "White x Male",
+        "n": 4019,
+        "selection_rate": 0.8281,
+        "di": 0.9604,
+        "di_ci_low": 0.9075,
+        "di_ci_high": 1.0307,
+        "band_determinate": true,
+        "interval_spans_four_fifths": false,
+        "below_floor": false
+      },
+      {
+        "cell": "Asian x Male",
+        "n": 556,
+        "selection_rate": 0.8525,
+        "di": 0.9888,
+        "di_ci_low": 0.9126,
+        "di_ci_high": 1.08,
+        "band_determinate": true,
+        "interval_spans_four_fifths": false,
+        "below_floor": false
+      },
+      {
+        "cell": "Asian x Female",
+        "n": 254,
+        "selection_rate": 0.8622,
+        "di": 1.0,
+        "di_ci_low": 0.9057,
+        "di_ci_high": 1.1042,
+        "band_determinate": true,
+        "interval_spans_four_fifths": false,
+        "below_floor": false
+      }
+    ],
+    "n_cells": 12,
+    "n_band_determinate": 6,
+    "defensible_disparities": [
+      "Black x Female",
+      "Black x Male",
+      "White x Female"
+    ]
+  }
+}

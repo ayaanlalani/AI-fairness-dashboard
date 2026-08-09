@@ -1,17 +1,22 @@
 {
   "race": {
-    "DisparateImpact": 0.8956,
-    "TheilIndex": 0.4838,
+    "DisparateImpact": 0.9371,
+    "TheilIndex": 0.296,
     "BiasFlag": false
   },
   "sex": {
-    "DisparateImpact": 0.9291,
-    "TheilIndex": 0.4838,
+    "DisparateImpact": 0.9572,
+    "TheilIndex": 0.296,
     "BiasFlag": false
   },
   "age_group": {
-    "DisparateImpact": 1.0138,
-    "TheilIndex": 0.4838,
+    "DisparateImpact": 0.9791,
+    "TheilIndex": 0.296,
+    "BiasFlag": false
+  },
+  "age_62_plus": {
+    "DisparateImpact": 0.8897,
+    "TheilIndex": 0.296,
     "BiasFlag": false
   }
 }

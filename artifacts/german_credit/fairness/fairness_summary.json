@@ -1,17 +1,17 @@
 {
   "Sex": {
-    "DisparateImpact": 0.8595,
-    "TheilIndex": 0.3084,
+    "DisparateImpact": 0.8888,
+    "TheilIndex": 0.2808,
     "BiasFlag": false
   },
   "AgeGroup": {
-    "DisparateImpact": 0.8212,
-    "TheilIndex": 0.3084,
+    "DisparateImpact": 0.9258,
+    "TheilIndex": 0.2808,
     "BiasFlag": false
   },
   "foreign_worker": {
-    "DisparateImpact": 0.9402,
-    "TheilIndex": 0.3084,
+    "DisparateImpact": 0.8387,
+    "TheilIndex": 0.2808,
     "BiasFlag": false
   }
 }
