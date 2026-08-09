@@ -19,17 +19,18 @@
 %     Mitchell et al. to 2018 and Chouldechova to 2016. Where CrossRef truncates
 %     a subtitle (holstein2019, raji2019, kroll2021) the fuller S2 title is kept.
 %
-% Deliberately ABSENT, having failed verification — do not add without a
-% resolvable record:
-%   - Crenshaw 1989. The only CrossRef hit for the title is a 2024 German
-%     chapter *about* Crenshaw by a different author, which would have read as
-%     a genuine citation. Intersectionality is instead grounded in
-%     buolamwini2018 (the canonical empirical intersectional audit) and
-%     foulds2020 (the formal definition).
-%   - Hardt et al. 2016 (equality of opportunity) and Kearns et al. 2018
-%     (fairness gerrymandering): neither resolved by title, arXiv DOI, or
-%     arXiv-native identifier. The equal-odds argument in §6 is made from the
-%     computed EOD/AOD values instead of by citation.
+% History of the "measurement and construct validity" group at the end of
+% this file: an earlier revision of this bibliography REJECTED Crenshaw 1989,
+% Hardt et al. 2016 and Kearns et al. 2018 because the automated resolution
+% gate could not find them — CrossRef's only hit for Crenshaw's title was a
+% 2024 German chapter *about* Crenshaw by a different author, and the arXiv
+% identifiers were not consulted. Three of the field's foundational papers
+% were thereby excluded by a mechanical proxy for verification, which the
+% paper reports as an instance of its own thesis. They are now included:
+% Hardt, Kearns, Chen and Sclar resolve through their DataCite arXiv DOIs;
+% Crenshaw and Gillis are law-review publications outside the DOI registrars
+% and carry verifynote attestations checked by hand against the journals'
+% own archives.
 
 % ---------------------------------------------------------------- exemplar
 @inproceedings{lee2020,
@@ -486,4 +487,126 @@
   pages     = {46595--46623},
   year      = {2023},
   doi       = {10.52202/075280-2020},
+}
+
+% -------------------------------------- measurement and construct validity
+% Added for the construct-validity rewrite. Resolution notes in the header.
+@inproceedings{jacobswallach2021,
+  author    = {Jacobs, Abigail Z. and Wallach, Hanna},
+  title     = {Measurement and Fairness},
+  booktitle = {Proceedings of the 2021 ACM Conference on Fairness,
+               Accountability, and Transparency},
+  series    = {FAccT '21},
+  pages     = {375--385},
+  year      = {2021},
+  doi       = {10.1145/3442188.3445901},
+}
+
+@inproceedings{chen2018,
+  author    = {Chen, Irene Y. and Johansson, Fredrik D. and Sontag, David},
+  title     = {Why Is My Classifier Discriminatory?},
+  booktitle = {Advances in Neural Information Processing Systems 31},
+  year      = {2018},
+  doi       = {10.48550/arXiv.1805.12002},
+}
+
+@article{obermeyer2019,
+  author    = {Obermeyer, Ziad and Powers, Brian and Vogeli, Christine
+               and Mullainathan, Sendhil},
+  title     = {Dissecting racial bias in an algorithm used to manage the
+               health of populations},
+  journal   = {Science},
+  volume    = {366},
+  number    = {6464},
+  pages     = {447--453},
+  year      = {2019},
+  doi       = {10.1126/science.aax2342},
+}
+
+@inproceedings{passi2019,
+  author    = {Passi, Samir and Barocas, Solon},
+  title     = {Problem Formulation and Fairness},
+  booktitle = {Proceedings of the Conference on Fairness, Accountability,
+               and Transparency},
+  series    = {FAT* '19},
+  pages     = {39--48},
+  year      = {2019},
+  doi       = {10.1145/3287560.3287567},
+}
+
+@inproceedings{barocas2021,
+  author    = {Barocas, Solon and Guo, Anhong and Kamar, Ece and Krones,
+               Jacquelyn and Morris, Meredith Ringel and Vaughan, Jennifer
+               Wortman and Wadsworth, W. Duncan and Wallach, Hanna},
+  title     = {Designing Disaggregated Evaluations of {AI} Systems: Choices,
+               Considerations, and Tradeoffs},
+  booktitle = {Proceedings of the 2021 AAAI/ACM Conference on AI, Ethics,
+               and Society},
+  series    = {AIES '21},
+  pages     = {368--378},
+  year      = {2021},
+  doi       = {10.1145/3461702.3462610},
+}
+
+@article{gillis2022,
+  author     = {Gillis, Talia B.},
+  title      = {The Input Fallacy},
+  journal    = {Minnesota Law Review},
+  volume     = {106},
+  pages      = {1175--1263},
+  year       = {2022},
+  verifynote = {Law review outside the DOI registrars; checked by hand
+                against the University of Minnesota repository record
+                (scholarship.law.umn.edu/minnlrev/vol106/iss3/2)},
+}
+
+@inproceedings{sclar2024,
+  author    = {Sclar, Melanie and Choi, Yejin and Tsvetkov, Yulia and
+               Suhr, Alane},
+  title     = {Quantifying Language Models' Sensitivity to Spurious Features
+               in Prompt Design or: How {I} learned to start worrying about
+               prompt formatting},
+  booktitle = {The Twelfth International Conference on Learning
+               Representations},
+  series    = {ICLR '24},
+  year      = {2024},
+  doi       = {10.48550/arXiv.2310.11324},
+}
+
+@article{crenshaw1989,
+  author     = {Crenshaw, Kimberl{\'e}},
+  title      = {Demarginalizing the Intersection of Race and Sex: A Black
+                Feminist Critique of Antidiscrimination Doctrine, Feminist
+                Theory and Antiracist Politics},
+  journal    = {University of Chicago Legal Forum},
+  volume     = {1989},
+  number     = {1},
+  pages      = {139--167},
+  year       = {1989},
+  verifynote = {Pre-digital law review outside the DOI registrars; checked by
+                hand against the University of Chicago Legal Forum archive
+                (chicagounbound.uchicago.edu/uclf/vol1989/iss1/8). An earlier
+                automated pass rejected this record; see file header},
+}
+
+@inproceedings{hardt2016,
+  author    = {Hardt, Moritz and Price, Eric and Srebro, Nathan},
+  title     = {Equality of Opportunity in Supervised Learning},
+  booktitle = {Advances in Neural Information Processing Systems 29},
+  pages     = {3315--3323},
+  year      = {2016},
+  doi       = {10.48550/arXiv.1610.02413},
+}
+
+@inproceedings{kearns2018,
+  author    = {Kearns, Michael and Neel, Seth and Roth, Aaron and Wu,
+               Zhiwei Steven},
+  title     = {Preventing Fairness Gerrymandering: Auditing and Learning for
+               Subgroup Fairness},
+  booktitle = {Proceedings of the 35th International Conference on Machine
+               Learning},
+  series    = {PMLR 80},
+  pages     = {2564--2572},
+  year      = {2018},
+  doi       = {10.48550/arXiv.1711.05144},
 }

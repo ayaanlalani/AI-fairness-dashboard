@@ -165,8 +165,9 @@ def emit_tex(name: str, convention: str, res: dict) -> Path:
     rows = []
     for c in res["cells"]:
         det = "yes" if c["band_determinate"] else "--"
+        cell = c["cell"].replace("_", "\\_")
         rows.append(
-            f"  {c['cell']} & {c['n']:,} & {c['selection_rate']:.4f} & "
+            f"  {cell} & {c['n']:,} & {c['selection_rate']:.4f} & "
             f"{c['di']:.4f} & [{c['di_ci_low']:.3f}, {c['di_ci_high']:.3f}] & {det} \\\\"
         )
     body = "\n".join(rows)

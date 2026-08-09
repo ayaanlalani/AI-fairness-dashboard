@@ -1,0 +1,145 @@
+#!/usr/bin/env python3.11
+"""Appendix G's claim -> artifact -> command map, as data.
+
+Single source of truth: the LaTeX table is emitted from MAP (run this file),
+and tests/test_artifact_map.py asserts every artifact path exists. Two
+headline numbers were once published with no artifact behind them and both
+were wrong; this file is the control that prevents a third.
+
+Each row: (claim, artifact path relative to repo root, regenerating command).
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+OUT = REPO_ROOT / "report" / "generated" / "artifact_map.tex"
+
+MAP: list[tuple[str, str, str]] = [
+    (
+        "AIF360 default DI 1.2072 vs oriented 0.9862; Fairlearn 0.8284 on the column as encoded",
+        "artifacts/consolidated/aif360_default_repro.txt",
+        "python3.11 scripts/aif360_default_repro.py",
+    ),
+    (
+        "In-vivo orientation artifact: DI 0.0 (CRITICAL) vs 0.9931 on Lending Club gender",
+        "artifacts/lending_club/fairness/fairness_summary.json",
+        "python3.11 run_pipeline.py german_credit hmda lending_club",
+    ),
+    (
+        "Marginal DI per attribute (Table 2), incl. banded age 0.9791 vs age-62+ 0.8897",
+        "artifacts/hmda/fairness/fairness_summary.json",
+        "python3.11 run_pipeline.py german_credit hmda lending_club",
+    ),
+    (
+        "Full-population race x sex cells with Wilson CIs; 6/12 indeterminate; defensible set",
+        "artifacts/consolidated/interval_estimates.json",
+        "python3.11 scripts/interval_estimates.py --emit-tex",
+    ),
+    (
+        "Reference-convention shift: 0.6734 to 0.7012, 0.8632 to 0.8988 vs White x Male",
+        "artifacts/consolidated/interval_estimates.json",
+        "python3.11 scripts/interval_estimates.py --emit-tex",
+    ),
+    (
+        "Split vs population: 5/11 cells suppressed; 1.1504 (n=4) to 0.6734 (n=31); 0.1917 to 0.8815",
+        "artifacts/consolidated/population_comparison.json",
+        "python3.11 scripts/compare_populations.py",
+    ),
+    (
+        "Subsampling rates (Fig. 1, Table 4, App. D): false clearance 83.8% point / 95.2% EB; floors 100% wrong worst cell; Wilson abstains 90.3% (m=2196)",
+        "artifacts/consolidated/subsample_study.json",
+        "python3.11 scripts/subsample_study.py",
+    ),
+    (
+        "Population construction: 20,000 to 10,978; Race Not Available 4,140 rows (20.7%); raw-approval DI with dropped categories retained",
+        "artifacts/consolidated/population_attrition.json",
+        "python3.11 scripts/hmda_attrition.py",
+    ),
+    (
+        "Refusal detector: 6 of 9 constrained-cycle responses flagged, zero refusals",
+        "artifacts/llm_benchmark/gpt-4o",
+        "python3.11 scripts/report_track_q.py",
+    ),
+    (
+        "Gemini means 19.79 (all) / 47.50 (excl. zero scores) / 72.50 (content-bearing); 18 empty results; 4 empty-but-scored",
+        "artifacts/consolidated/prompt_sensitivity_check.json",
+        "python3.11 scripts/recheck_prompt_sensitivity.py",
+    ),
+    (
+        "Provider block recorded on the invalid measurement",
+        "configs/research_guardrails.json",
+        "cat configs/research_guardrails.json",
+    ),
+    (
+        "Fabrication flags 17 vs 4 on identical packs; 14 of 21 derivable from context",
+        "artifacts/consolidated/RESULTS.md",
+        "python3.11 scripts/llm_benchmark.py --replay (see RESULTS.md S4.1)",
+    ),
+    (
+        "Track Q agreement 75.0% decomposing to 33.3/91.7/100.0; 7 over- vs 2 under-escalations",
+        "artifacts/consolidated/track_q_analysis.json",
+        "python3.11 scripts/report_track_q.py",
+    ),
+    (
+        "Prompt-sensitivity spreads 14.67/9.0 vs 0.0/1.88; spread excl. constrained cycle 6.67/1.25; dip decomposition",
+        "artifacts/consolidated/prompt_sensitivity_check.json",
+        "python3.11 scripts/recheck_prompt_sensitivity.py",
+    ),
+    (
+        "Track H: 27/27 citations verified against the retrieved pool",
+        "artifacts/consolidated/track_h_evaluation.json",
+        "python3.11 scripts/evaluate_track_h.py",
+    ),
+    (
+        "Spend: $0.8933 over 98 calls against a $15 cap",
+        "artifacts/llm_benchmark/spend_ledger.json",
+        "cat artifacts/llm_benchmark/spend_ledger.json",
+    ),
+    (
+        "German Credit AgeGroup x Sex cell table; under-40 female 0.8201",
+        "artifacts/consolidated/interval_estimates.json",
+        "python3.11 scripts/interval_estimates.py --emit-tex",
+    ),
+    (
+        "Out-of-fold scoring: RF acc 0.8002 / AUC 0.8018 over 10,978 rows, 5-fold, seed 42",
+        "hmda_dataset/metrics/out_of_fold_metrics.json",
+        "python3.11 hmda_dataset/scripts/train_models.py --full-population",
+    ),
+]
+
+
+def _escape(s: str) -> str:
+    return (
+        s.replace("&", "\\&").replace("%", "\\%").replace("$", "\\$")
+        .replace("#", "\\#").replace("_", "\\_")
+    )
+
+
+def render() -> str:
+    rows = [
+        f"  {_escape(claim)} & \\texttt{{{_escape(path)}}} & \\texttt{{{_escape(cmd)}}} \\\\\n  \\addlinespace"
+        for claim, path, cmd in MAP
+    ]
+    body = "\n".join(rows)
+    return (
+        "% Generated by scripts/artifact_map.py -- do not edit.\n"
+        "\\begin{tabular}{@{}p{5.2cm}p{5.4cm}p{5.6cm}@{}}\n"
+        "  \\toprule\n"
+        "  claim & artifact & regenerate with \\\\\n"
+        "  \\midrule\n"
+        f"{body}\n"
+        "  \\bottomrule\n"
+        "\\end{tabular}\n"
+    )
+
+
+def main() -> int:
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(render())
+    print(f"wrote {OUT.relative_to(REPO_ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -86,17 +86,32 @@ def test_attested_entries_state_their_provenance(entries):
             assert len(note) > 25, f"{key}: verifynote too vague to check: {note!r}"
 
 
-def test_dropped_citations_stay_dropped(entries):
-    """Guards the three that failed verification during construction.
-
-    Crenshaw 1989 is the important one: the only CrossRef hit for that title is
-    a 2024 German chapter *about* Crenshaw by a different author, which would
-    read as a genuine citation in a reference list.
+def test_previously_rejected_classics_carry_verification(entries):
+    """An earlier revision excluded Crenshaw 1989, Hardt 2016 and Kearns 2018
+    because the automated gate could not resolve them — CrossRef's only hit
+    for Crenshaw's title was a 2024 German chapter *about* Crenshaw by a
+    different author, and the arXiv identifiers were not consulted. They are
+    now included, and this test enforces the terms of their inclusion: each
+    must carry either a registrar-resolvable DOI or a hand-checked
+    attestation naming the archive it was verified against. See the header of
+    report/refs.bib; the paper reports the earlier rejection as an instance
+    of its thesis.
     """
     for key in ("crenshaw1989", "hardt2016", "kearns2018"):
-        assert key not in entries, (
-            f"{key} was added back without a resolvable record; see the header "
-            "of report/refs.bib before re-adding"
+        assert key in entries, f"{key} disappeared from refs.bib"
+        fields = entries[key]["fields"]
+        has_doi = bool(fields.get("doi"))
+        note = fields.get("verifynote", "")
+        has_checkable_attestation = "checked by hand" in note and (
+            ".edu" in note or ".org" in note or "/" in note
+        )
+        assert has_doi or has_checkable_attestation, (
+            f"{key} carries neither a DOI nor a checkable attestation"
+        )
+    # The two arXiv-era papers must actually resolve, not merely claim a DOI.
+    for key in ("hardt2016", "kearns2018"):
+        assert entries[key]["fields"]["doi"].startswith("10.48550/arXiv."), (
+            f"{key}: expected the DataCite arXiv DOI the gate verified"
         )
 
 

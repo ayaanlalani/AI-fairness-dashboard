@@ -58,14 +58,14 @@ dpr_oriented = demographic_parity_ratio(
     sensitive_features=df["group"],
 )
 
-print(f"aif360=={aif360.__version__} fairlearn=={fairlearn.__version__} "
-      f"numpy=={np.__version__} pandas=={pd.__version__}")
-print(f"default favorable_label=1.0 on 'loan_default':  DI = {di_default:.4f}")
-print(f"oriented favorable_label=0.0:                   DI = {di_oriented:.4f}")
-print(f"fairlearn demographic_parity_ratio on the column as encoded: "
-      f"{dpr_as_encoded:.4f} (a min/max ratio of default rates)")
-print(f"fairlearn demographic_parity_ratio, column re-encoded by hand: "
-      f"{dpr_oriented:.4f} (no favorable-label parameter exists to say which)")
+print(f"aif360=={aif360.__version__} fairlearn=={fairlearn.__version__}")
+print(f"numpy=={np.__version__} pandas=={pd.__version__}")
+print(f"default favorable_label=1.0 on 'loan_default': DI = {di_default:.4f}")
+print(f"oriented favorable_label=0.0:                  DI = {di_oriented:.4f}")
+print("fairlearn demographic_parity_ratio, column as encoded:")
+print(f"  {dpr_as_encoded:.4f} (a min/max ratio of default rates)")
+print("fairlearn demographic_parity_ratio, column re-encoded by hand:")
+print(f"  {dpr_oriented:.4f} (no favorable-label parameter exists)")
 
 assert round(di_default, 4) == 1.2072
 assert round(di_oriented, 4) == 0.9862

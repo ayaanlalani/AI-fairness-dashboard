@@ -14,6 +14,13 @@
       "similarity": 1.0,
       "verified": true
     },
+    "barocas2021": {
+      "doi": "10.1145/3461702.3462610",
+      "registrar": "crossref",
+      "resolved_title": "Designing Disaggregated Evaluations of AI Systems: Choices, Considerations, and Tradeoffs",
+      "similarity": 1.0,
+      "verified": true
+    },
     "bartlett2019": {
       "doi": "10.1016/j.jfineco.2021.05.047",
       "registrar": "crossref",
@@ -35,6 +42,13 @@
       "similarity": 1.0,
       "verified": true
     },
+    "chen2018": {
+      "doi": "10.48550/arXiv.1805.12002",
+      "registrar": "arXiv",
+      "resolved_title": "Why Is My Classifier Discriminatory?",
+      "similarity": 1.0,
+      "verified": true
+    },
     "chouldechova2017": {
       "doi": "10.1089/big.2016.0047",
       "registrar": "crossref",
@@ -45,6 +59,12 @@
     "corbettdavies2018": {
       "doi": "",
       "note": "arXiv-only preprint with no DOI; Semantic Scholar record confirmed by title during bibliography construction",
+      "registrar": "attested",
+      "verified": true
+    },
+    "crenshaw1989": {
+      "doi": "",
+      "note": "Pre-digital law review outside the DOI registrars; checked by hand against the University of Chicago Legal Forum archive (chicagounbound.uchicago.edu/uclf/vol1989/iss1/8). An earlier automated pass rejected this record; see file header",
       "registrar": "attested",
       "verified": true
     },
@@ -103,6 +123,19 @@
       "similarity": 1.0,
       "verified": true
     },
+    "gillis2022": {
+      "doi": "",
+      "note": "Law review outside the DOI registrars; checked by hand against the Minnesota Law Review archive (minnesotalawreview.org, vol. 106, no. 3)",
+      "registrar": "attested",
+      "verified": true
+    },
+    "hardt2016": {
+      "doi": "10.48550/arXiv.1610.02413",
+      "registrar": "arXiv",
+      "resolved_title": "Equality of Opportunity in Supervised Learning",
+      "similarity": 1.0,
+      "verified": true
+    },
     "hmda": {
       "doi": "",
       "note": "Government data release, not a paper; served at the CFPB URL given",
@@ -116,10 +149,24 @@
       "similarity": 1.0,
       "verified": true
     },
+    "jacobswallach2021": {
+      "doi": "10.1145/3442188.3445901",
+      "registrar": "crossref",
+      "resolved_title": "Measurement and Fairness",
+      "similarity": 1.0,
+      "verified": true
+    },
     "kamiran2011": {
       "doi": "10.1007/s10115-011-0463-8",
       "registrar": "crossref",
       "resolved_title": "Data preprocessing techniques for classification without discrimination",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "kearns2018": {
+      "doi": "10.48550/arXiv.1711.05144",
+      "registrar": "arXiv",
+      "resolved_title": "Preventing Fairness Gerrymandering: Auditing and Learning for Subgroup Fairness",
       "similarity": 1.0,
       "verified": true
     },
@@ -207,6 +254,20 @@
       "similarity": 1.0,
       "verified": true
     },
+    "obermeyer2019": {
+      "doi": "10.1126/science.aax2342",
+      "registrar": "crossref",
+      "resolved_title": "Dissecting racial bias in an algorithm used to manage the health of populations",
+      "similarity": 1.0,
+      "verified": true
+    },
+    "passi2019": {
+      "doi": "10.1145/3287560.3287567",
+      "registrar": "crossref",
+      "resolved_title": "Problem Formulation and Fairness",
+      "similarity": 1.0,
+      "verified": true
+    },
     "pope2011": {
       "doi": "10.3368/jhr.46.1.53",
       "registrar": "crossref",
@@ -232,6 +293,13 @@
       "doi": "",
       "note": "Harvested by the pipeline; record retained verbatim in artifacts/*/fairness/qualitative_research_evidence.json",
       "registrar": "attested",
+      "verified": true
+    },
+    "sclar2024": {
+      "doi": "10.48550/arXiv.2310.11324",
+      "registrar": "arXiv",
+      "resolved_title": "Quantifying Language Models' Sensitivity to Spurious Features in Prompt Design or: How I learned to start worrying about prompt formatting",
+      "similarity": 1.0,
       "verified": true
     },
     "selbst2019": {
@@ -285,6 +353,6 @@
     }
   },
   "note": "Written by scripts/verify_bibliography.py. Each entry was resolved against CrossRef, a DataCite-style registrar via doi.org content negotiation, or Semantic Scholar title search. Lets the check run offline and in CI.",
-  "total": 41,
-  "verified_count": 41
+  "total": 51,
+  "verified_count": 51
 }
