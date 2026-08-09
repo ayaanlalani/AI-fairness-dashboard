@@ -196,7 +196,7 @@ correct value is $0.9931$.
 A refusal detector measured brevity, then set policy
 & 6 flagged responses, 0 genuine refusals: a 22-character correct answer fell
 under a 40-character threshold, under a prompt demanding terseness. Applied to a
-second provider it zeroed 14 of 24 cycles, moving its mean from $70.0$ to
+second provider it zeroed 14 of 24 cycles, driving its mean from $47.50$ to
 $19.79$; that provider is permanently blocked in our config on that evidence.
 & \texttt{section\_f/gemini\_hallucination\_summary.json}; \texttt{research\_guardrails.json}\\
 \addlinespace
@@ -646,7 +646,7 @@ constrained prompting inducing evasion, entirely an artifact of our instrument.
 \paragraph{And then it set policy.} Applied to a second provider, the same
 detector flagged 19 of 24 cycles and mechanically zeroed 14 of them. Every
 zero-score cycle is a flagged cycle; excluding them moves that provider's mean
-score from $19.79$ to $\mathbf{70.0}$. At least five flagged cycles are not
+score from $19.79$ to $47.50$. At least five flagged cycles are not
 refusals --- one scored $85/100$. On the strength of the $19.79$ figure, that
 provider was recorded as permanently blocked in our guardrail configuration,
 where the block persists. An invalid measurement did not merely mislead a table;
@@ -696,11 +696,16 @@ therefore not a well-defined quantity. Errors are asymmetric in the safe
 direction --- seven over-escalations against two under-escalations --- which
 matters because under-escalation is the consequential failure for an audit tool.
 
-\paragraph{Grounding beats prompt engineering.} Embedding retrieved literature in
-the prompt, holding model and attributes fixed, cut fabricated citations from
-$16$ to $2$ and raised mean quality from $69.08$ to $76.67$. This is the largest
-single effect in the benchmark, and it is a design result rather than a model
-result: it is available to anyone building such a system.
+\paragraph{Grounding: a contrast, not an ablation.} Comparing an earlier
+ungrounded run against the frozen run, fabricated-citation flags fall from $16$
+to $2$ and mean quality rises from $69.08$ to $76.67$. We report this as a
+\emph{legacy contrast} rather than as a grounding ablation, because the two runs
+straddle a pipeline revision --- leak removal, full-population re-run, an added
+attribute --- so the metric inputs changed alongside the grounding. A clean
+ablation holding the pipeline fixed and toggling only retrieval has not been
+run, and the effect size should not be quoted until it has. The flag counts also
+inherit the detector limitation of \S\ref{sec:fabrication}: a citation outside
+the small retrieved pool is counted as fabricated whether or not it is real.
 
 \paragraph{Narrative audits clear a mechanical quality bar.} Track H audits
 verified $27/27$ citations against the retrieved evidence pool, with weighted

@@ -261,7 +261,7 @@ costs are upper bounds rather than billed amounts.
 |---|---|
 | Metric orientation inverted the headline number (DI 0.0 vs 0.9931) | **Holds.** Independent of population size. Magnitude remains a property of the degenerate classifier. |
 | Refusal detector measures brevity (6 flags, 0 refusals) | **Holds.** |
-| Refusal detector produced a governance decision (Gemini blocked) | **Holds.** Excluding detector-zeroed cycles moves the mean from 19.79 to 70.0. |
+| Refusal detector produced a governance decision (Gemini blocked) | **Holds.** Excluding detector-zeroed cycles moves the mean from 19.79 to 47.50. |
 | Small samples invert disparities | **Corrected and strengthened.** The earlier framing (floor hides the worst cell) was itself a small-sample artifact; the real result is that a group ranked best-treated at n=4 is worst-treated at n=31. |
 | ECOA age asymmetry and pooling | **Newly measured.** `age_62_plus` 0.8897 vs pooled `age_group` 0.9791. |
 | Fabrication detector penalises arithmetic | **New.** 67% of flags derivable from context. |
