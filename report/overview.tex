@@ -1,8 +1,13 @@
-% overview.tex — one page: why we did it, what we found, why it matters, how to use it.
+% overview.tex — one page: the question, what we did, what we found, what to do.
 % Companion to report_facct.tex. Build: make overview
 %
 % CONSTRAINT: exactly one page. It is full. To add anything, cut something else.
-% Every figure regenerates from the pipeline; see artifacts/consolidated/RESULTS.md.
+%
+% FRAMING NOTE: our own pipeline is NOT the status quo and must never be used as
+% a stand-in for it. Claims about standard practice are restricted to what we
+% verified in AIF360 0.6 and Fairlearn 0.13 directly. Defects in our own harness
+% are reported as what they are: evidence about building one, not evidence about
+% the field.
 
 \documentclass[sigconf,nonacm]{acmart}
 
@@ -16,8 +21,8 @@
 
 \begin{document}
 
-\title{The Audit Said the Model Was Fine}
-\subtitle{It was auditing 2{,}196 people. There were 10{,}978.}
+\title{Keeping Bias Out of Lending AI}
+\subtitle{What it actually takes, in consumer credit and mortgage origination}
 
 \author{Siddhant Jain}
 \affiliation{\institution{Simon Fraser University}\country{}}
@@ -31,109 +36,94 @@
 \maketitle
 \thispagestyle{empty}
 
-\section{Why we did this}
+\section{The question}
 
-We set out to answer a practical question: \emph{can a language model be trusted
-to interpret fairness metrics?} Companies are already wiring LLMs into compliance
-tooling, and nobody had built ground truth that wasn't itself a model's opinion.
-So we built it --- a deterministic pipeline that computes every fairness number
-and assigns every severity label by fixed rule, with the model allowed to
-interpret and nothing else.
+Lenders are deploying models into two decisions that shape household wealth:
+\textbf{consumer installment credit} and \textbf{residential mortgage
+origination}. Both are regulated --- ECOA and Regulation B govern both, the Fair
+Housing Act adds to mortgage. The question is not whether bias matters here but
+what a team must actually \emph{do} to keep it out, and whether the standard
+toolchain gets them there.
 
-Then we noticed we were validating a model against an audit pipeline that nobody
-had validated. So we audited the audit. That is this paper.
+We built a full audit for both sectors on real data (1{,}000 consumer credit and
+10{,}978 Georgia mortgage applications) and measured what it took to make that
+audit correct. Most of what we learned came from the ways it was wrong first.
 
-\section{The result that reframed the project}
+\section{What the standard toolchain does and does not give you}
 
-Our mortgage audit ranked \textbf{American Indian men as the \emph{best}-treated
-group} --- disparate impact $1.15$, above parity, nothing to see. It was looking
-at four of them. All four happened to be approved.
+We checked AIF360 0.6 and Fairlearn 0.13 directly rather than assuming.
 
-Auditing all $10{,}978$ applicants instead of a $2{,}196$-row sample, the same
-model on the same data puts that group at $\mathbf{0.6734}$: \textbf{the worst
-group in the dataset}, in the \textsc{critical} band, $31$ people.
+\textbf{Which outcome is ``favorable''?} AIF360 defaults to
+\texttt{favorable\_label=1.0}. On a target named \texttt{loan\_default} that
+means \emph{defaulting is the good outcome}. We reproduce it: the default returns
+$\mathrm{DI}=1.2072$ where the correct orientation returns $0.9862$. Fairlearn has
+no favorable-label parameter at all. Credit-risk targets are almost always
+adverse-coded, so the default is almost always wrong.
 
-The audit did not merely miss a disparity. It \textbf{inverted} it, and reported
-the inversion with a clean severity label. Nothing was broken --- the metrics
-were right, the code was right, the reporting floor that hid the small groups was
-statistically correct to hide them. The sample was simply too small for the
-affected groups to be visible at all, and nothing in the output said so.
+\textbf{How much data per subgroup?} Neither toolkit has \emph{any} concept of
+minimum subgroup size --- no floor, no warning, no guidance. Every team invents
+its own.
 
-\section{What else the audit's own defaults decided}
+\textbf{Who counts as protected?} Neither binds a protected class to a statute.
+You pass a column; nothing checks it against ECOA. Nor does either record which
+reference group produced a ratio.
 
-\begin{table}[h]
-\small
-\caption{Each is a reasonable engineering decision. Each silently answers a
-normative question.}
-\begin{tabular}{@{}p{2.65cm}p{4.95cm}@{}}
-\toprule
-\textbf{Default} & \textbf{What it decided}\\
-\midrule
-Which age counts as protected & The pipeline used $40{+}$ --- that is
-\emph{employment} law. Credit law (ECOA) protects $62{+}$. On the right cut the
-model shows the largest age disparity in the data ($0.8897$); on the wrong one it
-looks clean ($0.9791$).\\
-\addlinespace
-Which outcome is ``good'' & Computed on the adverse label of a column named
-\texttt{loan\_default}, disparate impact read $\mathbf{0.0}$ --- maximum alarm.
-The true value: $\mathbf{0.9931}$, near parity.\\
-\addlinespace
-What counts as an answer & A 40-character minimum marked 6 correct answers as
-refusals. It then zeroed 14 evaluations of a second AI provider, dropping its
-score $70.0 \rightarrow 19.79$ --- and we \textbf{permanently blocked that
-vendor} on the strength of it.\\
-\addlinespace
-What counts as evidence & A fabrication check flagged the newer model $5\times$
-more often. $67\%$ of those flags were the model doing arithmetic it was asked to
-do ($88.88\%$ is just $0.8888$). It penalised showing your work.\\
-\bottomrule
-\end{tabular}
-\end{table}
+\medskip\noindent The toolkits compute correctly. They do not stop you answering
+four regulatory questions by accident.
 
-\section{Why this matters}
+\section{What we got wrong, and what it cost}
 
-\textbf{Audits are becoming gates.} Bias-audit requirements are entering
-regulation, procurement, and model sign-off. Increasingly a system ships because
-an audit says so. Every failure above produced a \emph{clean} result --- the
-direction nobody double-checks. A false alarm costs a reviewer an afternoon; a
-false clearance closes the question permanently.
+Because nothing supplied them, we invented our own floor ($n \geq 15$), severity
+bands, and output checks. Each changed a conclusion.
 
-\textbf{Nobody audits the auditor.} These were not bugs and nobody was careless.
-They are defaults --- chosen once, applied everywhere, visible only in source
-code. When an audit was a human report, its assumptions were arguable. When an
-audit is a pipeline, its assumptions are invisible.
+\textbf{Sample size inverted a disparity.} Auditing a 2{,}196-row sample, our
+mortgage audit ranked \textbf{American Indian men as the best-treated group}
+($\mathrm{DI}=1.1504$) --- on four applicants who all happened to be approved.
+Over all 10{,}978 they are the \textbf{worst} group in the data ($0.6734$). The
+floor was not the error: the cell it suppressed, at $0.1917$, was itself noise
+($0.8815$ at full population). At small $n$ the estimates are wrong in
+\emph{both} directions, and no floor can tell the cases apart.
 
-\textbf{This is not just fairness.} Our headline model score was $75\%$; it
-decomposes to $33\%/92\%/100\%$, where the $100\%$ is the case so easy that
-agreeing costs nothing. Any benchmark averaging over uneven tasks can report
-difficulty as if it were capability.
+\textbf{We audited age under the wrong statute.} We used $40{+}$ --- that is the
+ADEA, employment law. Credit is ECOA, and Regulation B \S1002.2(o) protects
+$62{+}$. On our threshold the model looked clean ($0.9791$); on the statutory one
+it shows the largest age disparity in the data ($\mathbf{0.8897}$). The flag we
+needed was in the raw HMDA file, unused.
 
-\section{How to use this}
+\textbf{Our automated checks punished correct answers.} A 40-character minimum
+marked 6 correct answers as refusals, then zeroed 14 evaluations of a second AI
+provider ($70.0 \rightarrow 19.79$) --- on which we blocked that vendor. A
+fabrication check flagged a newer model $5\times$ more often, but $67\%$ of those
+flags were arithmetic it was asked to do ($88.88\%$ is $0.8888$).
 
-\textbf{If you run audits:} audit your whole population, not a convenience
-sample. Print what your size floor \emph{withheld}, with $n$ --- ours printed only
-what passed. Put the statute citation next to the threshold in code. State the
-favorable outcome explicitly; never infer it from label values.
+\section{What it takes: a protocol for these two sectors}
 
-\textbf{If you build audit tooling:} treat every mechanical gate as a hypothesis
-and test it on the cases where the right answer is unusual --- the terse answer,
-the six-person subgroup, the model that shows its work. All three of ours failed
-exactly there.
+\textbf{1.\ State the favorable outcome explicitly}, every time; never accept the
+default. \textbf{2.\ Audit the book, not a test split} --- in mortgage, HMDA
+already requires you to file it. \textbf{3.\ Bind the protected class to the
+governing statute in code}, citation beside the threshold: ECOA $62{+}$, not ADEA
+$40{+}$. Note the asymmetry a parity metric cannot express --- \S1002.6(b)(2)
+permits \emph{favouring} elderly applicants, so a ratio above 1 is lawful.
+\textbf{4.\ Publish what you suppressed}, with $n$ and the unreported ratio; a
+silent floor is indistinguishable from a clean result. \textbf{5.\ Record the
+reference group} beside every ratio --- most-favoured-cell versus designated
+control moves verdicts across the four-fifths line. \textbf{6.\ Test every
+automated gate where the right answer is unusual}: the terse answer, the small
+subgroup, the model that shows its work. All three of ours failed exactly there.
 
-\textbf{If you buy or regulate audits:} ask what sample the audit ran on and what
-it suppressed. An audit that cannot answer those two questions cannot support the
-clearance it is being used to give.
-
-\textbf{If you want to reuse it:} the pipeline, the frozen prompts and every
-number here are released and regenerate offline, no API key, for \$0.89 of
-compute.
+\medskip\noindent\textbf{Why it matters.} Every failure above produced a
+\emph{clean} result --- the dangerous direction in lending. A false alarm costs a
+reviewer an afternoon; a false clearance closes the question and the applicant
+never learns why. An audit that cannot say what sample it ran on and what it
+withheld cannot support the clearance it is used to give.
 
 \section{Artifacts}
 
 \begin{sloppypar}
-Full results \path{artifacts/consolidated/RESULTS.md} \textperiodcentered\ paper
-\path{report/report_facct.tex} \textperiodcentered\ sample-size analysis
-\path{scripts/compare_populations.py}. 60 tests, CI green.
+\path{artifacts/consolidated/RESULTS.md} \textperiodcentered\
+\path{report/report_facct.tex} \textperiodcentered\
+\path{scripts/compare_populations.py}. Regenerates offline, no API key, \$0.89
+of compute; 60 tests green.
 \end{sloppypar}
 
 \end{document}

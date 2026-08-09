@@ -20,9 +20,9 @@
 
 \begin{document}
 
-\title{Who Audits the Audit?}
-\subtitle{Fairness Audit Infrastructure Encodes Normative Commitments, and They
-Surface as Penalties on the Right Answer}
+\title{Keeping Bias Out of Lending AI}
+\subtitle{What It Takes to Audit Consumer Credit and Mortgage Origination, and
+Where the Standard Toolchain Leaves You}
 
 \author{Siddhant Jain}
 \affiliation{%
@@ -43,40 +43,43 @@ Surface as Penalties on the Right Answer}
 \renewcommand{\shortauthors}{Jain, Lalani, and Vincent}
 
 \begin{abstract}
-Fairness audits are becoming gates. They appear in procurement requirements,
-regulatory bias-audit mandates, and internal model sign-off, and increasingly a
-system ships or does not ship on the basis of what an audit reports. An audit,
-however, is software, and software has defaults. We ask what those defaults
-decide on our behalf.
+Lenders are deploying models into two decisions that shape household wealth:
+consumer installment credit and residential mortgage origination. Both fall under
+the Equal Credit Opportunity Act and Regulation B; mortgage adds the Fair Housing
+Act and, through HMDA, public reporting. The question this paper asks is
+operational rather than definitional: what does a team actually have to do to
+keep bias out of a model in these sectors, and how far does the standard
+toolchain carry them?
 
-We built a fairness audit over three lending decisions --- consumer credit,
-mortgage origination, and peer-to-peer default risk --- in which a deterministic
-pipeline computes every metric and assigns every severity label, and a language
-model supplies only interpretation. Auditing the full cleaned population rather
-than a held-out split, we find that ordinary, defensible components of the audit
-stack change its conclusions. Auditing a $2{,}196$-row sample, the pipeline
-ranked American Indian men as the \emph{best}-treated group in the mortgage data
---- disparate impact $1.1504$, above parity --- on the evidence of four
-applicants who happened all to be approved. Over all $10{,}978$ applicants the
-same model puts that group at $\mathbf{0.6734}$, the worst in the dataset. Small
-samples do not merely hide disparities; they invert them, and a reporting floor
-cannot tell the two cases apart. Auditing age at the $40{+}$ threshold
-borrowed from employment law returns near parity ($0.9791$) where the threshold
-credit law actually specifies, $62{+}$, returns the largest age disparity in the
-data ($0.8897$). A favorable-label convention inverted a headline ratio from
-$0.9931$ to $0.0$. And two detectors we wrote to hold the model to account
-penalised correct behaviour: one scored terse-but-correct answers as refusals and
-then zeroed a second provider's evaluation, on the strength of which that
-provider was permanently blocked in our configuration; the other flagged a newer
-model five times as often as its predecessor, though $67\%$ of those flags are
-values derivable from the context the model was given.
+We built a complete audit for both sectors on real data --- $1{,}000$ consumer
+credit applications and $10{,}978$ Georgia mortgage applications --- with a
+deterministic pipeline computing every metric and a language model restricted to
+interpretation. We then measured what it took to make that audit correct.
 
-None of these components is a bug. Each is a reasonable engineering decision that
-silently resolves a normative question --- which groups are large enough to
-count, which statute defines a protected class, which outcome is favorable, what
-counts as an answer. We argue that this is the general condition of automated
-evaluation rather than a property of our pipeline, and we set out what audit
-tooling should expose to make these commitments contestable.
+Two results concern the standard toolchain, and we verify them directly against
+AIF360 and Fairlearn rather than inferring them. AIF360 ships
+\texttt{favorable\_label=1.0} as a default, so on a target named
+\texttt{loan\_default} it treats defaulting as the favorable outcome: the default
+returns a disparate impact of $1.2072$ where correct orientation returns
+$0.9862$. Fairlearn exposes no favorable-label parameter at all. And neither
+library has any concept of minimum subgroup size --- no floor, no warning, no
+guidance --- so every team invents its own.
+
+The remaining results concern choices we had to make because nothing supplied
+them, and we report them as evidence about building such an audit rather than as
+properties of the field. Auditing a $2{,}196$-row sample, our pipeline ranked
+American Indian men as the \emph{best}-treated group in the mortgage data
+($\mathrm{DI} = 1.1504$) on the evidence of four applicants who all happened to
+be approved; over all $10{,}978$ they are the worst group in the data
+($\mathbf{0.6734}$). Small samples invert disparities rather than merely hiding
+them, and a size floor cannot distinguish the two cases. We audited age at
+$40{+}$, a threshold from employment law, and the model looked clean ($0.9791$);
+on the cut credit law specifies, $62{+}$, it shows the largest age disparity in
+the data ($\mathbf{0.8897}$).
+
+We close with a six-step protocol for these two sectors, and with the
+observation that every failure above produced a \emph{clean} result --- the
+direction least likely to prompt a second look.
 \end{abstract}
 
 \begin{CCSXML}
@@ -110,22 +113,24 @@ intersectionality, lending, ECOA, large language models}
 
 \section{Introduction}
 
-Two things are happening at once. Fairness audits are being written into
-consequential processes --- vendor procurement, regulatory bias-audit
-requirements, internal model risk sign-off --- so that an audit result
-increasingly determines whether a system is deployed. And the audits themselves
-are being automated, with metric libraries, severity thresholds, quality
-checklists and, lately, language models standing in for the judgement a human
-auditor once supplied.
+Credit decisions are among the most consequential automated decisions people
+encounter, and two of them dominate household outcomes: consumer installment
+credit, which governs access to short-term liquidity, and residential mortgage
+origination, which governs access to the principal asset most households will
+ever own. Both are directly regulated. The Equal Credit Opportunity Act and
+Regulation B govern both; the Fair Housing Act adds to mortgage; and the Home
+Mortgage Disclosure Act makes mortgage lending publicly auditable in a way almost
+no other consumer decision is.
 
-The combination deserves attention. When an audit was a report written by a
-person, its assumptions were arguable in the ordinary way. When an audit is a
-pipeline, its assumptions are defaults: chosen once, applied everywhere, and
-visible only to whoever reads the source. \citet{lee2020} make the organising
-commitment of human-centered fair AI that fairness is defined relative to a human
-decision context rather than in metric space. We take that seriously as a claim
-about \emph{apparatus}: if a fairness claim depends on its decision context, so
-does every component that produces it.
+Models are being deployed into both. The question we take up is not whether bias
+matters in these settings --- that is settled, legally and empirically
+\citep{bartlett2019,duarte2012,pope2011} --- but what a practitioner concretely
+has to \emph{do} to keep it out, and how much of that work the standard fairness
+toolchain performs for them. \citet{lee2020} make the organising commitment of
+human-centered fair AI that fairness is defined relative to a human decision
+context rather than in metric space. In lending, that decision context is written
+down: it is a statute. So the question becomes tractable in a way it is not in
+most domains --- we can ask whether the tooling's defaults agree with the law.
 
 This is not speculative. \citet{deng2022} find practitioners using fairness
 toolkits in ways their designers did not anticipate; \citet{leesingh2021} map
@@ -136,8 +141,16 @@ pitfalls that change conclusions, and \citet{zaccour2025} show that quantitative
 audits are more often blocked by data access than by method. The common thread is
 that the instrument is part of the finding.
 
-\paragraph{What we did.} We built a complete fairness audit over three lending
-decisions and then examined the audit rather than only its output. The
+\paragraph{Scope.} We work in two regulated micro-sectors and one adjacent
+setting. German Credit \citep{germancredit} stands in for consumer installment
+credit, HMDA Georgia \citep{hmda} is residential mortgage origination, and a
+Lending Club peer-to-peer default task provides a contrasting case where the
+protected attribute is unavailable. The first two carry the regulatory regime
+this paper is about; the third is retained because it exhibits a metric failure
+independent of any protected class.
+
+\paragraph{What we did.} We built a complete fairness audit for these settings
+and then examined the audit rather than only its output. The
 deterministic layer computes every metric with AIF360 \citep{aif360} and assigns
 every severity label by fixed rule; a language model supplies interpretation and
 is scored against that fixed ground truth, so no model grades another model's
@@ -255,6 +268,44 @@ of it: ground truth is a deterministic rule over computed metrics, never another
 model's opinion. \citet{wester2024} study when and how LLMs deny user requests,
 which is precisely the phenomenon our refusal detector was built to catch and, as
 \S\ref{sec:instruments} shows, failed to measure.
+
+\section{What the standard toolchain decides for you}
+\label{sec:statusquo}
+
+Before reporting our own results we establish what the two most widely used
+fairness libraries do by default, since the rest of this paper depends on the
+distinction between their behaviour and our choices. We inspected AIF360 0.6
+\citep{aif360} and Fairlearn 0.13 \citep{fairlearn} directly.
+
+\paragraph{Which outcome counts as favorable.} AIF360's
+\texttt{BinaryLabelDataset} takes \texttt{favorable\_label} with a default of
+$1.0$. Credit risk targets are conventionally coded with the adverse event as
+$1$ --- default, delinquency, charge-off, fraud --- so on a column named
+\texttt{loan\_default} the default asserts that defaulting is the good outcome. A
+minimal reproduction on synthetic data where women default slightly more often
+returns $\mathrm{DI} = 1.2072$ under the library default and $0.9862$ under
+correct orientation: the default reports the disadvantaged group as
+\emph{favoured}. Fairlearn's \texttt{demographic\_parity\_ratio} exposes no
+favorable-label parameter at all and computes on the positive class implicitly.
+Nothing in either API requires the practitioner to state which outcome is good,
+and nothing warns when the choice is left implicit.
+
+\paragraph{How much data a subgroup needs.} Neither library has any concept of
+minimum subgroup size. There is no floor, no warning, and no guidance;
+Fairlearn offers \texttt{count} as an opt-in metric a user may choose to request.
+This is the gap \S\ref{sec:floor} concerns, and it matters because the decision is
+therefore made privately by every team that performs an intersectional audit.
+
+\paragraph{Who counts as protected.} Neither library binds a protected attribute
+to a statutory definition. The practitioner passes a column; nothing checks it
+against ECOA, and nothing records which reference group produced a ratio.
+
+\medskip\noindent
+These libraries compute what they are asked to compute, correctly, and we are not
+reporting bugs. The observation is narrower: four questions that determine whether
+a lending audit is legally meaningful --- which outcome is favorable, how much
+data a subgroup needs, who counts as protected, and against whom --- are resolved
+either by a silent default or not at all.
 
 \section{What we built}
 \label{sec:method}
@@ -552,15 +603,21 @@ confound.
 
 \section{Why this matters}
 
-\subsection{Audits are becoming gates, and nobody audits the auditor}
+\subsection{The gap is between what the tooling checks and what the law requires}
 
-The findings above would be curiosities if audits were advisory. They are not.
-Bias-audit requirements are entering regulation, procurement, and internal model
-governance, which means an audit result increasingly decides deployment. Our
-audit, run competently on clean data with a standard toolkit, reported the wrong
-most-harmed group on a mortgage dataset and issued a clean bill of health on the
-one age class US credit law protects. Both outputs would have passed review,
-because both are what the pipeline says.
+The two findings in \S\ref{sec:statusquo} are about widely used libraries and
+hold for anyone who uses them. The rest of our results are about choices we made
+because those libraries make no choice --- and that is precisely the point. A
+lending audit is legally meaningful only if it answers four questions correctly:
+which outcome is favorable, who counts as protected, how much data supports each
+subgroup estimate, and against whom the comparison runs. The toolchain answers
+the first by default and the remaining three not at all, so each is settled
+privately, by whoever writes the harness, without a record.
+
+We are that team, and we got two of them wrong: a threshold from employment law
+and a sample too small for the affected groups. Both errors produced clean
+results that would have passed review, because both are what the pipeline
+said.
 
 The asymmetry that matters is directional. A false alarm costs reviewer time. A
 false clearance closes an open question, and \S\ref{sec:floor} and
@@ -599,6 +656,7 @@ consequence, and it is the reason we can state which of our own results are
 artifacts --- the ground truth did not move when the model did.
 
 \section{What to do about it}
+\label{sec:protocol}
 
 These follow directly from the results and are cheap to adopt.
 
@@ -655,21 +713,26 @@ cycle differences mix prompt strategy with sampling noise.
 
 \section{Conclusion}
 
-We set out to measure whether a language model can audit fairness. The more
-durable result concerns the measuring apparatus. A sample too small decided that the
-worst-treated racial group in a mortgage dataset was the best-treated one. A threshold borrowed
-from employment law decided that the age class credit law protects was fine. A
-column name decided whether a disparity ratio read $0.9931$ or $0.0$. A character
-count decided that a correct answer was a refusal, and then decided that a vendor
-should be blocked.
+We asked what a team must do to keep bias out of a model in consumer credit and
+mortgage origination. The honest answer is that the standard toolchain computes
+the metrics correctly and leaves the decisions that make those metrics legally
+meaningful to the practitioner --- silently, in the case of the favorable-label
+default, and entirely, in the case of subgroup size, statutory definition, and
+reference group.
 
-None of these was a bug, and none was the work of anyone careless. They are what
-it looks like when normative questions are answered by defaults. As fairness
-audits become gates, the defaults become policy --- and unlike policy, they are
-not written down anywhere a reviewer would think to look. The remedy we can offer
-is unglamorous: make the commitments explicit, print what was withheld, and test
-the instruments on the cases where the right answer is unusual, because that is
-where they fail.
+We know because we made two of those decisions badly. A sample too small decided
+that the worst-treated racial group in a mortgage dataset was the best-treated
+one. A threshold borrowed from employment law decided that the age class credit
+law actually protects was fine. Neither was a bug and neither required
+carelessness; both produced clean results, which in lending is the direction
+nobody re-examines.
+
+The protocol in \S\ref{sec:protocol} is what we would have wanted before
+starting: state the favorable outcome, audit the book rather than a sample, put
+the statute next to the threshold, publish what you suppressed, record the
+reference group, and test each automated gate where the right answer is unusual.
+None of it is technically difficult. All of it is currently optional, which is
+the problem.
 
 \begin{acks}
 We thank the maintainers of AIF360 and Fairlearn. Retrieved literature was
