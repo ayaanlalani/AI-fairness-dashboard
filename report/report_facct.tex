@@ -1,17 +1,15 @@
-% report_facct.tex — FAccT/ACM first draft. PRIMARY paper for this project.
+% report_facct.tex — FAccT/ACM draft. PRIMARY paper for this project.
 %
 % The NeurIPS Datasets & Benchmarks variant is report/report.tex. The two make
-% different claims and are not two formats of one paper: report.tex argues that
-% the benchmark is a reusable artifact; this paper argues that fairness audit
-% infrastructure encodes normative commitments which surface as penalties on the
-% correct answer, and uses the benchmark as method.
+% different claims and are not two formats of one paper: report.tex argues the
+% benchmark is a reusable artifact; this paper argues that fairness audit
+% infrastructure encodes normative commitments, and uses the benchmark as method.
 %
 % Build:  make paper-facct   (tectonic; it runs BibTeX itself)
 %
-% For double-blind submission, switch the documentclass line to:
+% For double-blind submission switch to:
 %   \documentclass[sigconf,anonymous,review]{acmart}
-% and remove \author blocks' affiliation detail. `nonacm` is set because this is
-% a draft with no assigned DOI/ISBN; drop it once the venue supplies them.
+% `nonacm` is set because this draft has no assigned DOI/ISBN.
 
 \documentclass[sigconf,nonacm]{acmart}
 
@@ -22,60 +20,60 @@
 
 \begin{document}
 
-\title{Penalising the Right Answer}
-\subtitle{How Fairness Audit Infrastructure Encodes Normative Commitments,
-and What Three Lending Audits Revealed}
+\title{Who Audits the Audit?}
+\subtitle{Fairness Audit Infrastructure Encodes Normative Commitments, and They
+Surface as Penalties on the Right Answer}
 
 \author{Siddhant Jain}
 \affiliation{%
   \institution{Simon Fraser University}
-  \city{Burnaby}
-  \state{British Columbia}
-  \country{Canada}}
+  \city{Burnaby}\state{British Columbia}\country{Canada}}
 \email{sja178@sfu.ca}
 
 \author{Ayaan Lalani}
 \affiliation{%
   \institution{Simon Fraser University}
-  \city{Burnaby}
-  \state{British Columbia}
-  \country{Canada}}
+  \city{Burnaby}\state{British Columbia}\country{Canada}}
+
+\author{Nicholas Vincent}
+\affiliation{%
+  \institution{Simon Fraser University}
+  \city{Burnaby}\state{British Columbia}\country{Canada}}
+
+\renewcommand{\shortauthors}{Jain, Lalani, and Vincent}
 
 \begin{abstract}
-A fairness audit is a claim about a decision that affects people. The
-infrastructure that produces such claims --- metric libraries, reporting floors,
-scoring harnesses, quality checklists --- is usually treated as neutral
-apparatus. It is not: it infers normative categories from syntactic features,
-and the inference fails hardest on the inputs where judgement was most needed.
-We demonstrate this four times over a lending audit, twice against instruments we
-built ourselves.
+Fairness audits are becoming gates. They appear in procurement requirements,
+regulatory bias-audit mandates, and internal model sign-off, and increasingly a
+system ships or does not ship on the basis of what an audit reports. An audit,
+however, is software, and software has defaults. We ask what those defaults
+decide on our behalf.
 
-A subgroup reporting floor of $n \geq 15$, a standard and defensible statistical
-commitment, suppressed five of eleven cells in a mortgage audit. Three of them
-were worse than anything the audit reported, so it named the wrong group as most
-disadvantaged and understated severity by two bands: it returned
-\textsc{moderate} at $0.8169$ while the worst real disparity was $0.1917$.
-Auditing the full population instead of a test split makes those groups visible
-and moves the worst reported cell to $0.6734$. A refusal detector flagged six
-correct answers as refusals because they fell below a character threshold under a
-prompt demanding terseness; applied to a second provider it mechanically zeroed
-fourteen cycles, moving that model's mean score from $70.0$ to $19.79$, and a
-permanent block was written into our configuration on that evidence. A
-fabricated-metric detector flagged a newer model five times as often as its
-predecessor --- but $67\%$ of those flags are values derivable from the provided
-context, mostly ratios restated as percentages, so the better-reasoning model is
-penalised for showing its work. And auditing age on the $40+$ threshold borrowed
-from employment law returns near parity ($0.9791$) where the cut the credit
-statute specifies, $62+$, returns the largest age disparity in the data
-($0.8897$).
+We built a fairness audit over three lending decisions --- consumer credit,
+mortgage origination, and peer-to-peer default risk --- in which a deterministic
+pipeline computes every metric and assigns every severity label, and a language
+model supplies only interpretation. Auditing the full cleaned population rather
+than a held-out split, we find that ordinary, defensible components of the audit
+stack change its conclusions. A subgroup reporting floor of $n \geq 15$
+suppressed five of eleven cells in the mortgage audit; three were worse than
+anything the audit reported, so it named the wrong group as most disadvantaged
+and understated severity by two bands. Auditing age at the $40{+}$ threshold
+borrowed from employment law returns near parity ($0.9791$) where the threshold
+credit law actually specifies, $62{+}$, returns the largest age disparity in the
+data ($0.8897$). A favorable-label convention inverted a headline ratio from
+$0.9931$ to $0.0$. And two detectors we wrote to hold the model to account
+penalised correct behaviour: one scored terse-but-correct answers as refusals and
+then zeroed a second provider's evaluation, on the strength of which that
+provider was permanently blocked in our configuration; the other flagged a newer
+model five times as often as its predecessor, though $67\%$ of those flags are
+values derivable from the context the model was given.
 
-We also report what this cost us. Three previously published findings of ours do
-not survive: a $\textsc{critical}$ intersectional ratio of $0.6087$ that becomes
-$0.8201$ and clears the four-fifths screen once its fifteen-person comparator
-grows; an inference about label bias drawn from a classifier with target leakage
-(AUC $0.9942 \to 0.7915$ once repaired); and an arithmetic claim that $0.8956$
-failed a $0.80$ screen. We report the retractions because the retracted versions
-were the more quotable ones.
+None of these components is a bug. Each is a reasonable engineering decision that
+silently resolves a normative question --- which groups are large enough to
+count, which statute defines a protected class, which outcome is favorable, what
+counts as an answer. We argue that this is the general condition of automated
+evaluation rather than a property of our pipeline, and we set out what audit
+tooling should expose to make these commitments contestable.
 \end{abstract}
 
 \begin{CCSXML}
@@ -83,12 +81,12 @@ were the more quotable ones.
 <concept>
 <concept_id>10003456.10003462.10003480</concept_id>
 <concept_desc>Social and professional topics~Governmental regulations</concept_desc>
-<concept_significance>300</concept_significance>
+<concept_significance>500</concept_significance>
 </concept>
 <concept>
 <concept_id>10010147.10010257</concept_id>
 <concept_desc>Computing methodologies~Machine learning</concept_desc>
-<concept_significance>500</concept_significance>
+<concept_significance>300</concept_significance>
 </concept>
 <concept>
 <concept_id>10003120.10003121</concept_id>
@@ -98,810 +96,564 @@ were the more quotable ones.
 </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Computing methodologies~Machine learning}
-\ccsdesc[300]{Social and professional topics~Governmental regulations}
+\ccsdesc[500]{Social and professional topics~Governmental regulations}
+\ccsdesc[300]{Computing methodologies~Machine learning}
 \ccsdesc[300]{Human-centered computing~Human computer interaction (HCI)}
 
-\keywords{algorithmic fairness, audit, disparate impact, intersectionality,
-lending, large language models, measurement}
+\keywords{algorithmic auditing, fairness measurement, disparate impact,
+intersectionality, lending, ECOA, large language models}
 
 \maketitle
 
 \section{Introduction}
 
-A disparate impact ratio of $0.86$ is not a finding. It becomes one when attached
-to who was denied credit, what recourse they had, and what the lender is obliged
-to check. \citet{lee2020} make this the organising commitment of human-centered
-fair AI: fairness is defined relative to a human decision context, not in metric
-space. We adopt that commitment and follow it one step further than is usual. If
-a fairness claim depends on its decision context, then so does the apparatus that
-produces the claim --- and that apparatus can be wrong in ways that are invisible
-from inside it.
+Two things are happening at once. Fairness audits are being written into
+consequential processes --- vendor procurement, regulatory bias-audit
+requirements, internal model risk sign-off --- so that an audit result
+increasingly determines whether a system is deployed. And the audits themselves
+are being automated, with metric libraries, severity thresholds, quality
+checklists and, lately, language models standing in for the judgement a human
+auditor once supplied.
 
-This is not a hypothetical. \citet{deng2022} find practitioners using fairness
-toolkits in ways their designers did not anticipate, and \citet{leesingh2021} map
-systematic gaps in what open-source toolkits actually support.
-\citet{holstein2019} report that practitioners' needs diverge sharply from what
-the research literature supplies. \citet{mei2025} show, in a speech setting, that
-audit \emph{pipelines} introduce pitfalls that change conclusions.
-\citet{zaccour2025} show that quantitative audits are more often blocked by data
-access than by method. The common thread is that the instrument is part of the
-finding.
+The combination deserves attention. When an audit was a report written by a
+person, its assumptions were arguable in the ordinary way. When an audit is a
+pipeline, its assumptions are defaults: chosen once, applied everywhere, and
+visible only to whoever reads the source. \citet{lee2020} make the organising
+commitment of human-centered fair AI that fairness is defined relative to a human
+decision context rather than in metric space. We take that seriously as a claim
+about \emph{apparatus}: if a fairness claim depends on its decision context, so
+does every component that produces it.
 
-We built a fairness audit across three lending decisions --- consumer credit
-approval, mortgage origination, and peer-to-peer default risk --- with a
-deterministic metric layer and a language model supplying the interpretive
-narrative. The intent was a benchmark. What the exercise produced, and what we
-report here, is a set of findings about audit infrastructure, three of which
-implicate our own instruments.
+This is not speculative. \citet{deng2022} find practitioners using fairness
+toolkits in ways their designers did not anticipate; \citet{leesingh2021} map
+systematic gaps in what open-source toolkits support; \citet{holstein2019} report
+that practitioner needs diverge sharply from what the literature supplies.
+\citet{mei2025} show, in a speech setting, that audit \emph{pipelines} introduce
+pitfalls that change conclusions, and \citet{zaccour2025} show that quantitative
+audits are more often blocked by data access than by method. The common thread is
+that the instrument is part of the finding.
 
-\paragraph{Claim.} Fairness audit infrastructure infers normative categories from
-syntactic features --- a label value, a character count, a row count, a threshold
-borrowed from another statute --- and the inference fails hardest on the inputs
-where judgement was most needed. We support this with four demonstrations:
+\paragraph{What we did.} We built a complete fairness audit over three lending
+decisions and then examined the audit rather than only its output. The
+deterministic layer computes every metric with AIF360 \citep{aif360} and assigns
+every severity label by fixed rule; a language model supplies interpretation and
+is scored against that fixed ground truth, so no model grades another model's
+opinion. Audits run over the full cleaned population --- 1{,}000 and 10{,}978
+rows --- with every row scored out-of-fold by a model that never saw it, rather
+than over a held-out split.
 
-\begin{enumerate}
-  \item \textbf{Metric orientation} (\S\ref{sec:orientation}). Correct toolkit,
-        clean data, sound metric, and a maximally wrong conclusion --- disparate
-        impact $0.0$ where the true value is $0.9931$ --- produced by one
-        convention about which label counts as favorable.
-  \item \textbf{Reporting floors} (\S\ref{sec:floor}). An $n \geq 15$ floor
-        suppressed five of eleven cells, three of them worse than anything the
-        audit reported. The cost of a prudent statistical threshold falls
-        entirely on the smallest groups.
-  \item \textbf{The wrong statute} (\S\ref{sec:ecoa}). Auditing age at $40+$, a
-        threshold from employment law, returns a clean result on the one age
-        class credit law actually protects.
-  \item \textbf{Mechanical proxies for judgement} (\S\ref{sec:instruments}).
-        Three instruments we wrote in good faith systematically punished the
-        correct response. We did not repair them, because repairing them would
-        have hidden the finding.
-\end{enumerate}
+\paragraph{What we found.} Six components of an ordinary audit stack changed its
+conclusions (Table~\ref{tab:results}). Each is defensible in isolation. Each
+resolves a normative question without recording that it did so.
 
-\noindent We further report (\S\ref{sec:interpretive}) that the interpretive
-layer is contestable, and that its instability is model-generation-specific:
-prompt phrasing moves severity verdicts on \texttt{gpt-4o} by up to $14.7$ points
-and by $0.0$ on \texttt{gpt-5-mini}, on identical input.
+\begin{table*}[t]
+\caption{Results and the evidence for each. Every artifact path is in the
+released repository; every figure is regenerated by the pipeline rather than
+transcribed.}
+\label{tab:results}
+\small
+\begin{tabular}{@{}p{4.4cm}p{7.6cm}p{4.6cm}@{}}
+\toprule
+\textbf{Finding} & \textbf{Evidence} & \textbf{Proof}\\
+\midrule
+A reporting floor erased the largest disparities
+& $n \geq 15$ suppressed 5 of 11 HMDA \texttt{race}$\times$\texttt{sex} cells on a
+held-out split. The audit reported \textsc{moderate} at $0.8169$; the worst real
+disparity was $0.1917$. All five suppressed cells were racial minorities. At full
+population, 1 of 12 is suppressed and the worst cell ($0.6734$) is visible.
+& \texttt{scripts/compare\_populations.py}; \texttt{population\_comparison.json}\\
+\addlinespace
+The age audit used the wrong statute
+& $40{+}$ is the ADEA (employment). ECOA protects $62{+}$ (Reg.\ B
+\S1002.2(o)). Pooling young against senior applicants cancels them: banded
+\texttt{age\_group} reads $0.9791$ (\textsc{low}); the statutory cut reads
+$\mathbf{0.8897}$, the largest age disparity in the data.
+& \texttt{hmda/fairness/fairness\_summary.json}; \texttt{clean\_hmda.py}\\
+\addlinespace
+A label convention inverted a headline metric
+& Selection rates computed on the unfavorable label of a target named
+\texttt{loan\_default} gave $\mathrm{DI}=0.0$ (\textsc{critical}) where the
+correct value is $0.9931$.
+& \texttt{tests/test\_lending\_club\_fairness.py}\\
+\addlinespace
+A refusal detector measured brevity, then set policy
+& 6 flagged responses, 0 genuine refusals: a 22-character correct answer fell
+under a 40-character threshold, under a prompt demanding terseness. Applied to a
+second provider it zeroed 14 of 24 cycles, moving its mean from $70.0$ to
+$19.79$; that provider is permanently blocked in our config on that evidence.
+& \texttt{section\_f/gemini\_hallucination\_summary.json}; \texttt{research\_guardrails.json}\\
+\addlinespace
+A fabrication detector penalised arithmetic
+& \texttt{gpt-5-mini} tripped $5\times$ more flags than \texttt{gpt-4o} on
+identical input, but 14 of 21 (67\%) flagged values are derivable from the
+provided context ($88.88$ is $0.8888$ as a percentage).
+& \texttt{llm\_benchmark/gpt-5-mini/}; \texttt{RESULTS.md} \S4.1\\
+\addlinespace
+Prompt sensitivity is model-generation-specific
+& Cycle-mean spread across four prompt strategies: $14.7$ and $9.0$ points for
+\texttt{gpt-4o}; $0.0$ and $1.9$ for \texttt{gpt-5-mini}, same packs.
+& \texttt{llm\_benchmark\_v2/gpt-4o/}; \texttt{RESULTS.md} \S4\\
+\bottomrule
+\end{tabular}
+\end{table*}
 
-\paragraph{What we retract.} Three findings we previously published do not
-survive this re-analysis, and we set them out in place rather than quietly
-dropping them (\S\ref{sec:floor}, \S\ref{sec:intersectional}). Audit
-infrastructure that cannot be corrected in public is the problem this paper is
-about.
-
-\paragraph{Position.} We are not arguing that fairness metrics are useless or
-that audit tooling should be distrusted wholesale. We are arguing something
-narrower and more actionable: the failure modes documented here are not user
-error, and they are not exotic. Each arises from a defensible design decision
-made by someone who understood the domain. That is what makes them worth
-reporting at this venue.
+\paragraph{Contributions.} (i) An empirical demonstration, on real lending data,
+that four standard components of an audit stack --- a reporting floor, a
+protected-class threshold, a label convention, and two output detectors --- each
+change what the audit concludes. (ii) A quantification of the reporting floor's
+cost that separates it from every other variable by holding the model fixed and
+varying only the audited population. (iii) A cross-model result showing that the
+prompt-sensitivity finding widely reported for LLM evaluators is specific to a
+model generation. (iv) A released, cost-capped, offline-reproducible audit
+pipeline in which every claim above is regenerable.
 
 \section{Related work}
 
-\paragraph{Human-centered framing.} \citet{lee2020} is our framing exemplar: a
-fairness claim is meaningful only relative to a human decision context. The line
-of work extending it has moved steadily toward stakeholder involvement in the
-choice of fairness criteria rather than in the interpretation of a fixed metric.
-\citet{luo2025} develop a protocol for explaining, negotiating and agreeing
-fairness metrics with stakeholders; \citet{luo2026} document how much
-disagreement stakeholders exhibit even when shown identical evidence;
-\citet{luo2026b} extend this to affected individuals rather than institutional
-stakeholders. \citet{deshpande2022} ask who the stakeholders of a responsible AI
-system even are. \citet{stumpf2024} argue that fairness and correctness need
-user-centred assessment rather than metric reporting. \citet{kim2025} survey how
-equity is operationalised across HCI and fairness research and find the construct
-fragmenting under practical demand.
-
-Our contribution is adjacent rather than competing. This literature asks who
-should choose the criteria. We ask what the apparatus does once a criterion has
-been chosen, and show that the apparatus can invert the answer without anyone
-choosing anything.
-
-\paragraph{Audit practice and its instruments.} \citet{metaxa2021} survey
-algorithm auditing as a method. \citet{raji2019} demonstrate that external audits
-change vendor behaviour, and \citet{raji2020} give an internal end-to-end audit
-framework. \citet{kroll2021} argues for traceability as the operational principle
-behind accountability, which is the design stance our frozen-artifact approach
-takes. Documentation interventions --- model cards \citep{mitchell2019},
-datasheets \citep{gebru2021} --- and process interventions such as co-designed
-checklists \citep{madaio2020} share our premise that fairness work needs
-infrastructure, and share the risk we report: a checklist is a mechanical proxy
-for judgement, and \S\ref{sec:instruments} is a case study in what that costs.
-
-\citet{mei2025} is the nearest prior work: audit pitfalls in an ASR setting that
-change the conclusion. \citet{zamfirescu2022} diagnose human error inside an
-image-analysis pipeline. We add a lending case in which the pitfall is a metric
-convention and the affected quantity is the headline number.
+\paragraph{Auditing, and auditing the auditors.} \citet{metaxa2021} survey
+algorithm auditing as method; \citet{raji2019} show external audits change vendor
+behaviour, and \citet{raji2020} give an internal end-to-end framework.
+\citet{kroll2021} argues traceability is what makes accountability operational
+--- the stance our frozen-artifact design takes. Documentation interventions
+\citep{mitchell2019,gebru2021} and process interventions \citep{madaio2020} share
+our premise that fairness work needs infrastructure, and share the exposure we
+report: a checklist is a mechanical proxy for judgement, and
+\S\ref{sec:instruments} is a case study in what that costs. \citet{mei2025} is
+the nearest prior work; \citet{zamfirescu2022} diagnose human error inside an
+image-analysis pipeline. We add a lending case where the pitfalls are a size
+threshold and a statutory misattribution, and where the affected quantity is
+which group the audit names as most harmed.
 
 \paragraph{Measurement.} That fairness criteria conflict is settled
-\citep{chouldechova2017,kleinberg2017}, and that the choice among them is not a
-technical matter is argued forcefully by \citet{selbst2019}, whose abstraction
-traps describe our setting well. \citet{corbettdavies2018} catalogue how fairness
-measures mislead when detached from decision context. \citet{barocas2016} and
-\citet{wachter2021} establish that the legal notion of discrimination does not
-reduce to a metric threshold --- which is why we treat the four-fifths screen as
-a screening signal throughout and make no legal claim. On intersectionality,
-\citet{buolamwini2018} provide the canonical empirical demonstration that
-marginal accuracy hides joint-group failure, and \citet{foulds2020} give a formal
-definition. \S\ref{sec:intersectional} contributes a lending instance where the
-marginal audit passes cleanly and the joint audit does not.
+\citep{chouldechova2017,kleinberg2017}, and that choosing among them is not a
+technical act is argued by \citet{selbst2019}, whose abstraction traps describe
+our setting. \citet{corbettdavies2018} catalogue how fairness measures mislead
+detached from decision context. \citet{barocas2016} and \citet{wachter2021}
+establish that legal discrimination does not reduce to a metric threshold, which
+is why we treat the four-fifths screen as a screening signal and make no legal
+claim. On intersectionality, \citet{buolamwini2018} give the canonical empirical
+demonstration that marginal accuracy hides joint-group failure and
+\citet{foulds2020} the formal definition; \S\ref{sec:floor} contributes the
+observation that a routine size floor removes exactly those joint groups from the
+report.
 
-\paragraph{Language models as auditors and judges.} Using an LLM to interpret
-metrics invites the LLM-as-judge critique \citep{zheng2023}: model-graded
-evaluation inherits the grader's biases. Track Q avoids the worst of this: its
-ground truth is a deterministic rule over computed metrics, never another
-model's opinion (\S\ref{sec:method}). The one cross-model grade we report is
-flagged as secondary evidence (\S\ref{sec:interpretive}). Most directly,
-\citet{wester2024} study when and how LLMs deny user requests, which is the exact
-phenomenon our refusal detector was built to catch and, as
-\S\ref{sec:instruments} reports, systematically failed to measure.
+\paragraph{Whose criteria.} A growing line asks who should choose fairness
+criteria rather than how to compute them: \citet{luo2025} develop a protocol for
+negotiating metrics with stakeholders, \citet{luo2026} document how much
+stakeholders disagree on identical evidence, \citet{luo2026b} extend this to
+affected individuals, and \citet{deshpande2022} ask who the stakeholders are at
+all. \citet{stumpf2024} argue fairness assessment needs user-centred evaluation;
+\citet{kim2025} find the construct of equity fragmenting under practical demand.
+Our contribution is adjacent: this literature asks who sets the criteria, and we
+show that the apparatus resolves several such questions before anyone is asked.
 
-\section{Setting and method}
+\paragraph{Language models as evaluators.} Using an LLM to interpret metrics
+invites the LLM-as-judge critique \citep{zheng2023}. Our design avoids the worst
+of it: ground truth is a deterministic rule over computed metrics, never another
+model's opinion. \citet{wester2024} study when and how LLMs deny user requests,
+which is precisely the phenomenon our refusal detector was built to catch and, as
+\S\ref{sec:instruments} shows, failed to measure.
+
+\section{What we built}
 \label{sec:method}
-
-The benchmark is method here, not contribution; the artifact claim is made
-elsewhere. What matters for this paper is that every number an LLM saw was
-computed by deterministic code, and that the model was never permitted to
-recompute one.
 
 \subsection{Three lending decisions}
 
-The three use cases are deliberately not three instances of one setting
-(Table~\ref{tab:usecases}). They differ in the two properties that most change
-what an audit can conclude: whether the protected attribute is a protected class
-or an economic proxy, and whether the classifier discriminates enough for
-disparity to be measurable at all. Lending discrimination is documented
-empirically across this span --- appearance and gender effects in peer-to-peer
-markets \citep{duarte2012,pope2011}, FinTech-era consumer lending
+The three settings differ along the two axes that most change what an audit can
+conclude: whether the protected attribute is a protected class or an economic
+characteristic, and whether the classifier discriminates enough for disparity to
+be measurable. We use German Credit \citep{germancredit}, HMDA Georgia
+\citep{hmda}, and a Lending Club default task. Lending discrimination is
+documented empirically across this span --- appearance and gender effects in
+peer-to-peer markets \citep{duarte2012,pope2011}, FinTech-era consumer lending
 \citep{bartlett2019}, local credit-market conditions \citep{butler2017}, and
 historical records used as training data \citep{sarwal2024}.
 
+\subsection{Deterministic ground truth}
+
+For each protected attribute we compute disparate impact, demographic parity
+difference, equal opportunity difference, average odds difference and the Theil
+index with AIF360 \citep{aif360}, cross-checked against Fairlearn
+\citep{fairlearn}. A fixed rule maps disparate impact to a severity band, with
+the \textsc{critical} boundary at $0.72$ and the four-fifths screen at $0.80$.
+The model never recomputes a number; asserting an unprovided value is recorded as
+fabrication, not as a result.
+
+\subsection{Auditing the population, not a sample}
+
+Audits here run over every cleaned row, with predictions generated by stratified
+five-fold cross-validation so each applicant is scored by a model that never saw
+them. This matters more than it sounds: at held-out-split size the HMDA
+\texttt{race}$\times$\texttt{sex} cells for American Indian, Multiracial and
+Pacific Islander applicants hold three to six people each. Those groups do not
+become measurable through a better estimator; they become measurable through more
+rows.
+
+\subsection{Disclosure}
+
+None of the three models would pass a real fair lending review, for reasons
+orthogonal to our claims, and we state this rather than let it be discovered:
+the German Credit model takes applicant sex and age as input features; the
+Lending Club \texttt{gender} attribute is synthetic, assigned by an independent
+coin flip, so that setting contains no protected class; and HMDA's public data
+carry no credit score, the primary underwriting variable. We audit these systems
+as instruments for studying audit infrastructure, not as candidate lending
+models.
+
+\section{Results}
+
+We report marginal disparate impact for every protected attribute in
+Table~\ref{tab:marginals} as the baseline against which the rest of this section
+should be read. On these numbers alone, the audit is unremarkable: every
+attribute in every setting clears or nearly clears the four-fifths screen, and
+nothing demands attention. Each subsection below concerns a component of the
+audit that determined one of these numbers, or determined which numbers appeared
+at all.
+
 \begin{table}[t]
-\caption{The three use cases. The last row governs how every downstream result
-reads.}
-\label{tab:usecases}
+\caption{Marginal disparate impact, full population. Read alone, this table
+reports an unremarkable audit. $^{\dagger}$The ECOA cut; \texttt{age\_group} is
+the banded view of the same applicants. $^{\ddagger}$Synthetic attribute
+(\S\ref{sec:method}).}
+\label{tab:marginals}
 \small
-\begin{tabular}{@{}p{1.35cm}p{1.75cm}p{1.75cm}p{1.9cm}@{}}
+\begin{tabular}{@{}llr@{}}
 \toprule
-& \textbf{UC1 German Credit} & \textbf{UC2 HMDA (GA)} & \textbf{UC3 Lending Club}\\
+Setting & Attribute & DI\\
 \midrule
-Decision & consumer credit & mortgage origination & P2P default risk\\
-Attributes & sex, age, foreign worker & race, sex, age & gender, income, loan size\\
-Type & protected class & protected class & 1 class + 2 proxies\\
-Favorable & good credit (1) & approved (1) & non-default (\textbf{0})\\
-Classifier & discriminating & discriminating & \textbf{$\sim$99.5\% one class}\\
+\multirow{3}{*}{German Credit}
+ & \texttt{Sex} & 0.8888\\
+ & \texttt{AgeGroup} & 0.9258\\
+ & \texttt{foreign\_worker} & 0.8387\\
+\addlinespace
+\multirow{4}{*}{HMDA (Georgia)}
+ & \texttt{race} & 0.9371\\
+ & \texttt{sex} & 0.9572\\
+ & \texttt{age\_group} (banded) & 0.9791\\
+ & \texttt{age\_62\_plus}$^{\dagger}$ & \textbf{0.8897}\\
+\addlinespace
+\multirow{3}{*}{Lending Club}
+ & \texttt{gender}$^{\ddagger}$ & 0.9931\\
+ & \texttt{income\_level} & 1.0072\\
+ & \texttt{loan\_amount\_level} & 1.0063\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Deterministic layer}
-
-For each protected attribute we compute disparate impact (DI), demographic parity
-difference (DPD), equal-opportunity difference (EOD), average odds difference
-(AOD) and the Theil index with AIF360 \citep{aif360}, cross-checked against
-Fairlearn \citep{fairlearn}. A fixed rule maps metric values to a severity label
-(\textsc{low}, \textsc{moderate}, \textsc{high}, \textsc{critical}); the
-\textsc{critical} boundary for DI is $0.72$. Subgroup cells below $n = 15$ are
-reported with their $n$ and excluded from conclusions. Data are German Credit
-\citep{germancredit}, HMDA Georgia \citep{hmda}, and a Lending Club
-peer-to-peer default task.
-
-Two conventions are pinned by regression tests because both bit us: which label
-counts as favorable (\S\ref{sec:orientation}), and the sign of AOD.
-
-\subsection{Two tracks, kept separate}
-
-The interpretive layer is evaluated along two axes that we never score against
-each other, because they answer different questions.
-
-\textbf{Track Q} asks whether the model interprets fixed metrics reliably. For
-each of nine (use case $\times$ attribute) pairs we issue four prompts ---
-\texttt{zero\_shot}, \texttt{chain\_of\_thought}, \texttt{self\_critique},
-\texttt{constrained} --- yielding 36 \texttt{gpt-4o} calls, each scored against
-the deterministic severity label. All 36 prompts are frozen and released, and a
-replay path reproduces the entire scoring pipeline with no API key.
-
-\textbf{Track H} asks whether the narrative form raises the ceiling on audit
-quality. Three \texttt{o3} audits, one per use case, judged only against a
-five-criterion checklist, a guardrail baseline, and a quality rubric --- never
-against the deterministic severity numbers, which would merely re-run Track Q.
-
-Two detectors run over every response: a fabricated-citation check (n-gram match
-against the titles actually retrieved) and a fabricated-metric check (any numeric
-claim absent from the provided context). Spend is capped cumulatively at \$15 with a
-pre-call abort and a persisted ledger. The ledger records \textbf{98 calls
-totalling \$0.8933}; an additional \$0.1125 was spent on a pre-freeze run whose
-calls predate the ledger. We state calls and dollars separately because an
-earlier version of this paper conflated them.
-
-\section{Finding 1: metric orientation inverts the headline number}
-\label{sec:orientation}
-
-In UC3, \texttt{gender} initially returned $\mathrm{DI} = 0.0$ and a
-\textsc{critical} severity label --- the most severe output the pipeline can
-produce, and on its face evidence of near-total exclusion.
-
-It was an artifact. The prediction target is \texttt{loan\_default}, so label $1$
-is the \emph{unfavorable} outcome. Computing selection rates on predicted default
-gives $0.0000$ for men and $0.0069$ for women, and
-$\mathrm{DI} = 0.0000/0.0069 = 0.0$. Oriented on the favorable outcome ---
-predicted non-default --- the rates are $1.0000$ and $0.9931$, so
-$\mathrm{DI} = 0.9931$: near parity (Table~\ref{tab:uc3}).
-
-\begin{table}[t]
-\caption{UC3 Lending Club, oriented on the favorable outcome (predicted
-non-default, label $0$). \texttt{gender} previously read $\mathrm{DI}=0.0$,
-\textsc{critical}.}
-\label{tab:uc3}
-\small
-\begin{tabular}{@{}lrrrr@{}}
-\toprule
-Attribute & DI & DPD & EOD & AOD\\
-\midrule
-\texttt{gender} (priv.\ male) & \textbf{0.9931} & $-0.0069$ & $0.0$ & $-0.0357$\\
-\texttt{income\_level} (priv.\ med.) & 1.0072 & 0.0072 & $0.0$ & 0.0323\\
-\texttt{loan\_amount\_level} (priv.\ med.) & 1.0063 & 0.0062 & $0.0$ & 0.0270\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Three things make this worth a section rather than a footnote.
-
-\textbf{Nothing was misused.} AIF360 computes exactly what it is asked to. The
-data were clean. Disparate impact is the appropriate screen for this question.
-The error lives entirely in the mapping from a column name to a normative
-category, and that mapping is a convention rather than a computation. A target
-named \texttt{approved} makes label $1$ favorable; a target named
-\texttt{loan\_default} inverts it. Nothing in the metric signature records which
-situation holds.
-
-\textbf{The failure is maximally severe and silent.} The reported value was wrong
-by a factor limited only by floating point, and it was wrong in the alarming
-direction, which is the direction least likely to prompt a second look: a
-\textsc{critical} disparity on a protected attribute reads as the audit working.
-Had the error run the other way it would have produced a false clean bill of
-health, which is the same defect with worse consequences.
-
-\textbf{It generalises.} Default, delinquency, charge-off, fraud and churn are
-all conventionally coded with the adverse event as $1$. Any fairness audit of a
-risk model --- which is to say most fairness audits in lending --- meets this
-condition. \citet{deng2022} and \citet{leesingh2021} document toolkit-practice
-gaps of exactly this kind, and \citet{selbst2019} name the general form: the
-formalism omits the part of the problem that determines the answer.
-
-\paragraph{Implication.} Favorable-outcome orientation should be an explicit,
-required argument in fairness tooling, not inferred from label values or left to
-the analyst. It is now pinned by regression tests in our pipeline, which converts
-a silent inversion into a build failure. That is a small change with a large
-blast radius, and it is available to any toolkit maintainer today.
-
-\section{Finding 2: the reporting floor erases the largest disparities}
+\subsection{A reporting floor erases the largest disparities}
 \label{sec:floor}
 
-Subgroup reporting floors are standard practice and defensible: a ratio computed
-on six people is not evidence. Ours suppresses cells below $n = 15$. What that
-commitment does, in our data, is remove the most disadvantaged groups from the
-conclusion.
-
-We hold the model fixed and vary only the audited population --- a held-out test
-split, versus every row of the cleaned dataset scored out-of-fold by a model that
-never saw it. This isolates sample size from every other change
+Subgroup reporting floors are standard and defensible: a ratio computed on six
+people is not evidence. Ours suppresses cells below $n = 15$. To isolate what
+that costs, we hold the model fixed and vary only the audited population
 (Table~\ref{tab:floor}).
 
 \begin{table}[t]
 \caption{HMDA \texttt{race} $\times$ \texttt{sex} under an $n \geq 15$ floor.
-Identical leak-free model; only the audited population differs.}
+Identical model; only the audited population differs.}
 \label{tab:floor}
 \small
 \begin{tabular}{@{}lrr@{}}
 \toprule
-& Test split & Full population\\
+& Held-out split & Full population\\
 & ($n{=}2{,}196$) & ($n{=}10{,}978$)\\
 \midrule
 Cells suppressed & \textbf{5 of 11} & 1 of 12\\
 Worst cell \emph{reported} & 0.8169 (\textsc{mod.}) & 0.6734 (\textsc{crit.})\\
 Worst cell that \emph{exists} & \textbf{0.1917} (\textsc{crit.}) & 0.6734 (\textsc{crit.})\\
-Suppressed cells worse & \textbf{3} & 0\\
-\quad than any reported & & \\
+Suppressed cells worse than & \textbf{3} & 0\\
+\quad anything reported & & \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-On the test split the audit returns \textsc{moderate} for
+On the split, the audit returns \textsc{moderate} for
 \texttt{Black $\times$ Male} at $0.8169$ while \texttt{American Indian $\times$
 Female} sits at $0.1917$, unreported. The audit is wrong about which group is
-most disadvantaged and wrong by two severity bands about how bad it is. Every
-suppressed cell in that run belongs to a racial minority.
+most disadvantaged and wrong by two severity bands about how severe the worst
+case is. Every suppressed cell belonged to a racial minority --- which is the
+mechanism, not a coincidence: a floor on group size is a floor on group
+population.
 
-At full population the same floor suppresses one cell of twelve, and the worst
-disparity --- \texttt{American Indian $\times$ Male}, $0.6734$, $n=31$ ---
-becomes visible. Nothing about the population changed; the audit simply stopped
-being run on a sample too small to see it.
-
-The floor is not a bug, and we do not propose removing it. The point is narrower
-and harder to design around: a threshold chosen for statistical prudence
-distributes its cost entirely onto the smallest groups, which in a lending
-context are the groups least able to absorb it. Two further details make it worse
-in practice. Our own codebase carries \emph{two} floors, $n \geq 15$ in the
-drilldown and $n \geq 30$ in the qualitative layer, so the same cell is reportable
-or not depending on which module reads it. And the floor is applied silently: the
-audit output lists what passed, not what was withheld.
-
-\subsection{The marginal-versus-intersectional gap, corrected}
-\label{sec:intersectional}
-
-Every marginal attribute in German Credit clears the four-fifths screen
-(Table~\ref{tab:uc1}). An audit reporting per-attribute disparate impact would
-return three passes and stop.
+At full population the same floor suppresses one cell of twelve and the worst
+disparity, \texttt{American Indian $\times$ Male} at $0.6734$ ($n{=}31$), becomes
+visible. Table~\ref{tab:cells} gives the complete cell table, which we print in
+full because the argument of this paper is precisely that partial tables mislead.
+The three worst cells hold 31, 18 and 29 applicants and would be invisible under
+the split-sized audit; the two cells an audit typically discusses,
+\texttt{Black $\times$ Female} and \texttt{Black $\times$ Male}, sit sixth and
+seventh.
 
 \begin{table}[t]
-\caption{UC1 German Credit marginals. All three clear the four-fifths screen.}
-\label{tab:uc1}
-\small
-\begin{tabular}{@{}lrrrr@{}}
-\toprule
-Attribute & DI & DPD & EOD & AOD\\
-\midrule
-\texttt{Sex} (priv.\ male) & 0.8888 & --- & --- & ---\\
-\texttt{AgeGroup} (priv.\ 40+) & 0.9258 & --- & --- & ---\\
-\texttt{foreign\_worker} (priv.\ 0) & 0.8387 & --- & --- & ---\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The intersection is the worst cell: \texttt{under\_40 $\times$ female} has
-$\mathrm{DI} = 0.8201$ ($0.7012$ against $0.8551$ for
-\texttt{40\_plus $\times$ female}), lower than any marginal attribute.
-
-\paragraph{What we previously reported here, and why it was wrong.} On the
-200-row test split this cell read $\mathrm{DI} = 0.6087$, which we published as
-\textsc{critical}. Its comparator was \texttt{40\_plus $\times$ female} at
-$n = 15$ with a selection rate of exactly $1.0000$ --- fifteen people, all
-approved. A ratio against a saturated fifteen-person cell is not a severity
-grade. At full population that comparator holds 69 people at $0.8551$ and the
-ratio rises to $0.8201$, which \emph{clears} the four-fifths screen.
-
-The direction survives and the magnitude does not. We had also written that the
-disadvantaged group ``is not identified by either single-attribute audit'';
-that was too strong, since \texttt{under\_40 $\times$ male} at $0.7952$ failed
-the screen on the same split, so the age effect was visible marginally. The
-honest claim is that marginal auditing understated a disparity it did point at.
-
-This is the same defect as \S\ref{sec:floor} seen from the other side: there, a
-small cell was suppressed and the disparity vanished; here, a small cell was
-retained as a \emph{reference} and the disparity inflated. A floor governs which
-cells are reported. Nothing in the pipeline governs which cell becomes the
-comparator, and that choice moved a published verdict across two severity bands.
-
-\subsection{UC2: the joint disparity exceeds both marginals}
-
-HMDA shows the same structure (Table~\ref{tab:uc2}). At full population
-\texttt{Black $\times$ Female} ($n = 1{,}994$) sits at $\mathrm{DI} = 0.8632$,
-below both contributing marginals --- the joint \emph{disparity} exceeds the
-marginal ones, though the ratio is numerically lower, a phrasing we previously
-inverted.
-
-Two caveats we did not previously state. First, the reference cell is chosen as
-the most-favoured adequately-sized subgroup, which is a winner's-curse
-estimator: measured instead against \texttt{White $\times$ Male}, the control
-group conventional in US fair lending analysis, the same cell reads $0.8388$ on
-the test split and clears the screen. Reference-group choice alone moves the
-verdict across the four-fifths line, and nothing in the metric signature records
-which convention is in force. Second, and following \S\ref{sec:floor}, this cell
-is not the worst one; it is merely the worst \emph{large} one.
-
-\begin{table}[t]
-\caption{UC2 HMDA (Georgia) marginals, leak-free model, full population
-($n{=}10{,}978$). The banded \texttt{age\_group} reads near parity while
-\texttt{age\_62\_plus} --- the cut ECOA actually specifies --- is the lowest of
-the four.}
-\label{tab:uc2}
-\small
-\begin{tabular}{@{}lrrrr@{}}
-\toprule
-Attribute & DI & DPD & EOD & AOD\\
-\midrule
-\texttt{race} (priv.\ White) & 0.9371 & --- & --- & ---\\
-\texttt{sex} (priv.\ Male) & 0.9572 & --- & --- & ---\\
-\texttt{age\_group} (priv.\ mid, banded) & 0.9791 & --- & --- & ---\\
-\texttt{age\_62\_plus} (priv.\ under 62) & \textbf{0.8897} & --- & --- & ---\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Two readings a threshold gate destroys}
-
-The same tables carry two conclusions that survive only if the metrics are read
-together rather than screened individually.
-
-\textbf{A withdrawn inference.} We previously read UC2's near-zero
-$\mathrm{EOD}$ and $\mathrm{AOD}$ alongside a low $\mathrm{DI}$ as evidence of
-label bias rather than differential model error. That reading is withdrawn. It
-rested on a classifier trained with \texttt{interest\_rate} among its features, a
-column populated for 100.0\% of originations and 0.7\% of denials: the model was
-substantially detecting whether an interest rate existed, which is the outcome.
-Its errors were near zero in every group because it made almost no errors at
-all. Removing the leak drops AUC from $0.9942$ to $0.7915$. We report the
-retraction rather than the inference, because the inference was the more
-quotable of the two.
-
-\textbf{A non-finding is not a pass.} UC1 \texttt{foreign\_worker} has
-$\mathrm{DI} = 0.9402$, comfortably clear. The privileged group has \emph{six
-records}, against $n = 194$ on the other side and a reporting floor of
-$n \geq 15$. The ratio is dominated by the larger group and is not evidence of
-anything. Reported as a pass, it is worse than no result, because it closes an
-open question.
-
-\paragraph{Implication.} Intersectional analysis should be the default rather
-than an optional deepening, and per-attribute screening should be understood as
-the weakest available audit rather than the standard one. This is
-\citet{buolamwini2018}'s finding in a lending setting where the marginal audit
-does not merely understate the problem --- it returns a clean result. As
-\citet{foulds2020} note, the number of subgroups grows combinatorially and
-statistical power falls with it, which is precisely why $n$ must be reported
-beside every intersectional ratio rather than after it.
-
-\section{Finding 3: the age audit used the wrong statute}
-\label{sec:ecoa}
-
-Fairness work on credit routinely audits age at a $40+$ threshold; our pipeline
-did. That number comes from the Age Discrimination in Employment Act, which
-governs employment. Credit is governed by the Equal Credit Opportunity Act, and
-Regulation B \S1002.2(o) defines the protected class as \textbf{62 or older}.
-A comment in our own cleaning script asserted that $40+$ ``aligns with US ECOA''.
-It does not.
-
-The substitution is not cosmetic. Our banded \texttt{age\_group} attribute pools
-young and senior applicants against the middle band. The two move in opposite
-directions --- young applicants are approved at a higher rate than the middle
-band, senior applicants at a lower one --- so pooling cancels them. The banded
-attribute returns $\mathrm{DI} = 0.9791$, severity \textsc{low}: a clean bill of
-health. Audited on the statutory cut, the same model on the same rows returns
-$\mathbf{0.8897}$, the largest age disparity in the dataset and the lowest of its
-four protected attributes (Table~\ref{tab:uc2}).
-
-The flag needed to do this, \texttt{applicant\_age\_above\_62}, was present and
-unused in the raw HMDA file. It is published precisely because \S1002.2(o) turns
-on it, and it is necessary because the public age bands straddle $62$ --- the
-\texttt{55-64} band cannot be split, so no banded attribute can isolate the
-protected class. The information was there; the pipeline discarded it in favour
-of a threshold imported from the wrong body of law.
-
-One further asymmetry this exposes and cannot resolve: \S1002.6(b)(2) expressly
-permits \emph{favouring} an elderly applicant. Disparate impact is symmetric, so
-a ratio above $1$ on this attribute is lawful and is not a reverse-disparity
-finding, yet the metric reports it identically. The instrument cannot express the
-rule it is being used to check, which is the general form of this paper's claim
-stated in statute rather than in code.
-
-\section{Finding 4: our own instruments penalised the right answer}
-\label{sec:instruments}
-
-The two findings above concern conventions we inherited. This one concerns code
-we wrote. Both instruments below were built deliberately, by authors who
-understood the domain, to hold the language model to account. Both systematically
-punished correct behaviour. We report them unrepaired.
-
-\subsection{The refusal detector measured brevity}
-\label{sec:refusal}
-
-Our refusal detector flagged six of nine responses under the
-\texttt{constrained} prompt strategy. \emph{None was a refusal.} No flagged
-record contained a refusal phrase, a missing field, or an invalid severity value.
-
-The detector treats any narrative field under 40 characters as effectively empty.
-The \texttt{constrained} strategy explicitly instructs the model to answer
-tersely. So \texttt{how\_to\_fix: "DisparateImpactRemover"} --- a precise,
-correct, on-spec answer naming the applicable AIF360 post-processor in 22
-characters --- was recorded as a refusal. Compliance with the instruction was the
-trigger.
-
-Reporting the raw output would have yielded a $66.7\%$ refusal rate for
-\texttt{constrained} and a tidy narrative about constrained prompting inducing
-model evasion. That narrative would have been entirely an artifact of our
-measuring instrument. \citet{wester2024} study genuine LLM denials, and their
-work is the reason we built the detector; our detector does not measure the
-phenomenon they describe.
-
-We did not change it. It is part of a frozen scoring harness, and altering it
-would invalidate the pre-freeze comparison in \S\ref{sec:interpretive}. Instead
-the analysis separates genuine refusals from brevity flags and reports both
-columns.
-
-\subsection{The guardrail punished ``collect more data''}
-
-Our guardrail baseline requires every proposed mitigation to name a canonical
-algorithm --- reweighing \citep{kamiran2011}, disparate impact removal
-\citep{feldman2015}, calibrated equalised odds, and so on. It is a reasonable
-gate: it discriminates between a concrete remediation and vague advice, and the
-named methods are exactly the ones a practitioner would reach for.
-
-Exactly two of nine attributes failed it. They are
-\texttt{foreign\_worker\_original} ($n = 6$ in the privileged group) and
-\texttt{loan\_amount\_level} ($3.2\times$ tier imbalance). In both cases the
-model proposed acquiring records to a stated floor, Bayesian hierarchical
-shrinkage, bootstrapped confidence intervals, and manual review until $n$ is
-adequate --- and in both cases that is the correct answer. No post-processor
-repairs an $n = 6$ subgroup. Applying one would manufacture false confidence in a
-quantity that cannot be estimated.
-
-The gate encodes an assumption: that every fairness problem has an algorithmic
-mitigation. Where the problem is data scarcity, the assumption is false, and the
-gate penalises the only defensible response. The two failures are not noise ---
-they are the two attributes where the assumption does not hold, which is the
-strongest form this finding could take.
-
-We first suspected vocabulary matching and normalised the keyword list for
-hyphenation, since \texttt{o3} writes ``Calibrated-Equalized-Odds'' and
-``Kamiran-Calders Re-weighing''. That fix was necessary and revealed the real
-signal rather than removing it: these two survive it. We did not widen the
-keyword list further, because doing so would convert a substantive finding into a
-passing score.
-
-\subsection{The fabrication detector penalises arithmetic}
-\label{sec:fabrication}
-
-Our second detector flags any numeric value in a response that does not appear
-in the provided metric context, on the reasonable theory that an auditor should
-not invent numbers. Replaying the same packs against two models a generation
-apart shows what it actually measures.
-
-\texttt{gpt-5-mini} trips $17$ fabrication flags across $28$ calls;
-\texttt{gpt-4o}, on identical input, trips $4$. Read naively, the newer model
-fabricates five times as often. Checking each flagged value against the context,
-\textbf{$14$ of $21$ ($67\%$) are derivable from it}: $88.88$ is the \texttt{Sex}
-disparate impact of $0.8888$ restated as a percentage, $83.87$ is
-\texttt{foreign\_worker}'s $0.8387$, and most of the remainder are gaps between
-two context values expressed in percentage points. The detector matches raw
-float literals, so converting a ratio to a percentage or subtracting two
-provided numbers registers as fabrication.
-
-\texttt{gpt-5-mini} does more of this arithmetic because it reasons more
-explicitly. The instrument therefore ranks the more capable model as the less
-trustworthy one, and it does so specifically because that model shows its work.
-Seven values ($19.9$ and $5.3$, each repeated across cycles) were not derivable
-by this test and remain candidates for genuine fabrication; their repetition
-suggests a systematic derivation we have not identified rather than invention.
-
-This is the same failure as \S\ref{sec:refusal}, found independently in a second
-instrument written by the same authors on the same day: a mechanical proxy
-scoring a correct behaviour as a fault, in the direction that flatters the
-weaker system.
-
-\subsection{Why this belongs in the paper}
-
-Checklists, gates and detectors are the standard response to the problem that
-fairness work is hard to verify --- the motivation behind model cards
-\citep{mitchell2019}, datasheets \citep{gebru2021} and co-designed checklists
-\citep{madaio2020}, and the operational content of internal audit frameworks
-\citep{raji2020}. \citet{kroll2021} argues that traceability is what makes
-accountability actionable, and we agree.
-
-The cost is that a mechanical proxy stands in for a judgement, and it will be
-wrong in the cases where judgement was most needed. Both of our instruments
-failed on the hardest inputs: the terse-but-correct answer, and the subgroup too
-small to analyse. Neither failure would have been visible from aggregate scores.
-Anyone reusing this harness inherits both proxies, which is why we document them
-rather than quietly fixing them.
-
-\section{The interpretive layer is contestable}
-\label{sec:interpretive}
-
-Having argued that the deterministic apparatus carries commitments, we turn to
-the LLM layer built on top of it. The results support a narrow claim: the
-interpretive step is real work, it is unreliable in specific measurable ways, and
-its aggregate summary statistics should be distrusted.
-
-\subsection{Aggregate agreement is not a meaningful quantity}
-
-Overall severity agreement between \texttt{gpt-4o} and the deterministic labels
-is $27/36 = 75.0\%$. That number should not be quoted alone
-(Table~\ref{tab:agreement}).
-
-\begin{table}[t]
-\caption{Track Q severity agreement. The ordering tracks classifier
-discriminativeness, not model capability.}
-\label{tab:agreement}
-\small
-\begin{tabular}{@{}lrr@{}}
-\toprule
-Use case & Agreed & Rate\\
-\midrule
-german\_credit & 4/12 & 33.3\%\\
-hmda & 11/12 & 91.7\%\\
-lending\_club & 12/12 & 100.0\%\\
-\midrule
-\textbf{Overall} & \textbf{27/36} & \textbf{75.0\%}\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The ordering is not a competence ranking. UC3's $100\%$ is the easiest possible
-case: the classifier predicts non-default for roughly $99.5\%$ of the test set
-(four default predictions in 600), so every attribute is a trivial near-parity
-\textsc{low} and agreeing costs nothing. UC1's $33.3\%$ is the hardest: three
-\textsc{moderate} baselines sitting near threshold boundaries, where a small
-interpretive difference flips the label. Aggregate agreement is therefore a
-function of how discriminating the underlying classifiers are --- a property of
-the benchmark, not of the model. A single headline agreement number for an LLM
-fairness auditor is not a meaningful quantity, and we would have reported one had
-we not decomposed it.
-
-Errors are asymmetric in the safe direction: seven over-escalations against two
-under-escalations. Under-escalation is the consequential failure for an audit
-tool; over-escalation costs reviewer time.
-
-\subsection{Prompt phrasing moves the verdict}
-
-Three of nine attribute pairs changed severity label across the four prompt
-strategies on \emph{identical} input context.
-\texttt{german\_credit/Sex\_original} went
-\textsc{high} $\to$ \textsc{high} $\to$ \textsc{moderate} $\to$ \textsc{high};
-\texttt{hmda/race} went \textsc{low} $\to$ \textsc{moderate} $\to$
-\textsc{moderate} $\to$ \textsc{moderate}. Same model, same numbers, different
-wording, different answer. For an audit artifact that may be cited in a
-compliance conversation, this is the central reliability result.
-
-\begin{table}[t]
-\caption{Track Q by prompt strategy. \texttt{self\_critique} leads on both axes;
-\texttt{zero\_shot} carries five of eight hallucination flags.}
-\label{tab:strategies}
+\caption{HMDA \texttt{race} $\times$ \texttt{sex}, full population. The floor
+suppresses the starred row. On a held-out split it suppressed the top five.}
+\label{tab:cells}
 \small
 \begin{tabular}{@{}llrrr@{}}
 \toprule
-Cycle & Strategy & Mean & Agreement & Halluc.\\
+race & sex & $n$ & sel.\ rate & DI\\
 \midrule
-1 & \texttt{zero\_shot} & 76.67 & 55.6\% & 5\\
-2 & \texttt{chain\_of\_thought} & 80.00 & 77.8\% & 1\\
-3 & \texttt{self\_critique} & \textbf{83.89} & \textbf{88.9\%} & 1\\
-4 & \texttt{constrained} & 76.56 & 77.8\% & 1\\
+American Indian & Male & 31 & 0.5806 & \textbf{0.6734}\\
+Multiracial & Female & 18 & 0.6111 & 0.7088\\
+Multiracial & Male & 29 & 0.6552 & 0.7599\\
+Pacific Islander & Female & 12$^{*}$ & 0.6667 & 0.7732\\
+Pacific Islander & Male & 15 & 0.7333 & 0.8505\\
+Black & Female & 1{,}994 & 0.7442 & 0.8632\\
+Black & Male & 1{,}707 & 0.7452 & 0.8643\\
+American Indian & Female & 25 & 0.7600 & 0.8815\\
+White & Female & 2{,}318 & 0.7865 & 0.9121\\
+White & Male & 4{,}019 & 0.8281 & 0.9604\\
+Asian & Male & 556 & 0.8525 & 0.9888\\
+Asian & Female & 254 & 0.8622 & 1.0000\\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table} The floor is not a bug and we do not propose removing it. The point is
+narrower and harder to design around: a threshold chosen for statistical prudence
+distributes its entire cost onto the smallest groups, which in lending are
+generally the groups least able to absorb it, and it does so silently --- the
+audit output lists what passed, not what was withheld. Our own codebase carried
+two different floors, $n \geq 15$ and $n \geq 30$, in adjacent modules, so the
+same cell was reportable or not depending on which one read it.
 
-\subsection{Grounding suppresses fabrication}
+\subsection{The age audit used the wrong statute}
+\label{sec:ecoa}
 
-Comparing like-for-like against an earlier run over the same two use cases with
-the same model, where the only difference is whether retrieved literature was
-embedded in the prompt: fabricated-citation flags fall from $16$ to $2$, and mean
-score rises from $69.08$ to $76.67$. This is a design result rather than a model
-result, and it is the most actionable finding in the LLM half of the study:
-grounding the prompt in real retrieved evidence cuts fabrication roughly
-eight-fold.
+Fairness work on credit routinely audits age at $40{+}$, and ours did. That
+threshold is from the Age Discrimination in Employment Act, which governs
+employment. Credit is governed by the Equal Credit Opportunity Act, whose
+Regulation B \S1002.2(o) defines the protected class as \textbf{62 or older}. A
+comment in our own cleaning code asserted that $40{+}$ ``aligns with US ECOA''.
+It does not.
 
-\subsection{The provider dominates the prompt}
+The substitution is not cosmetic. Our banded age attribute pools young and senior
+applicants against the middle band; the two move in opposite directions, so
+pooling cancels them. The banded attribute returns $\mathrm{DI} = 0.9791$,
+severity \textsc{low} --- a clean bill of health. Audited on the statutory cut,
+the same model over the same rows returns $\mathbf{0.8897}$, the largest age
+disparity in the dataset and the lowest of its four protected attributes. The
+flag required, \texttt{applicant\_age\_above\_62}, was present and unused in the
+raw HMDA file; it is published precisely because \S1002.2(o) turns on it, and it
+is necessary because the public age bands straddle $62$, so no banded attribute
+can isolate the protected class.
 
-Running the identical harness against \texttt{gemini-2.5-flash} produced refusals
-in $19$ of $24$ cycles, a mean score of $19.79$, and $14$ zero-score cycles. No
-prompt strategy compensates for that. Any benchmark of this shape measures
-provider capability at least as much as it measures method --- a caveat that
-applies to our own numbers, and one reason we release the frozen prompts rather
-than only the scores.
+One asymmetry this exposes and cannot resolve: \S1002.6(b)(2) expressly permits
+\emph{favouring} an elderly applicant. Disparate impact is symmetric, so a ratio
+above $1$ here is lawful and is not a reverse-disparity finding, yet the metric
+reports it identically. The instrument cannot express the rule it is being used
+to check.
 
-\subsection{What the narrative form added}
+\subsection{A label convention inverted a headline metric}
+\label{sec:orientation}
 
-Track H audits passed the citation check at $27/27$ against the retrieved
-evidence pool, with weighted rubric scores of $4.8$, $4.7$ and $5.0$ out of $5$
-(cross-model: \texttt{o3} generated, \texttt{gpt-4o} graded, reported as
-secondary evidence because a model grading a model is weaker than a mechanical
-gate \citep{zheng2023}).
+In the Lending Club setting, \texttt{gender} initially returned
+$\mathrm{DI} = 0.0$ and a \textsc{critical} label --- the most severe output the
+pipeline can produce. It was an artifact. The target is \texttt{loan\_default},
+so label $1$ is the \emph{unfavorable} outcome; selection rates computed on
+predicted default give $0.0000$ and $0.0069$, hence $\mathrm{DI}=0.0$. Oriented
+on the favorable outcome the rates are $1.0000$ and $0.9931$, so
+$\mathrm{DI} = 0.9931$: near parity.
 
-Two behaviours are worth naming because the deterministic template cannot produce
-them. On \texttt{foreign\_worker\_original} the audit independently reproduced the
-$n = 6$ caveat and quantified it: one label change would swing DI to $0.78$,
-therefore statistical power is inadequate. On UC3 it identified the
-near-degenerate classifier unprompted and declined the flattering reading,
-converting a null result into a conditional prediction with a mechanism and a
-supporting citation --- that near-parity here reflects a classifier approving
-almost everything, and that latent disparities may surface once realistic credit
-thresholds are enforced.
+Nothing was misused. AIF360 computed what it was asked. The data were clean.
+Disparate impact was the right screen. The error lives entirely in the mapping
+from a column name to a normative category, and that mapping is a convention
+rather than a computation: a target named \texttt{approved} makes label $1$
+favorable, a target named \texttt{loan\_default} inverts it, and nothing in the
+metric signature records which case holds. Default, delinquency, charge-off and
+fraud are all conventionally coded with the adverse event as $1$, so fairness
+tooling applied to any risk model inherits this unless an analyst supplies the
+mapping. It is now a required argument and a regression test in our pipeline,
+which converts a silent inversion into a build failure.
 
-The deterministic pipeline establishes what is true. The narrative layer
-establishes what it means for a decision. They are not competing
-implementations, and asking which is more accurate is a category error.
+\subsection{Our own detectors penalised correct behaviour}
+\label{sec:instruments}
 
-\section{Discussion}
+The findings above concern conventions we inherited. These concern code we wrote,
+deliberately, to hold the model to account.
 
-\paragraph{Audit infrastructure needs its own audit.} Our three findings share a
-structure: a component that is correct in its own terms produces a wrong or
-misleading conclusion at the level of the audit. Metric libraries, severity
-thresholds, refusal detectors and quality gates are all measurement instruments,
-and measurement instruments require validation against cases where the right
-answer is known independently. We had that only by accident --- the $n = 6$
-subgroup and the 22-character correct answer were adversarial test cases we did
-not design. Audit tooling should ship with them deliberately.
+\paragraph{The refusal detector measured brevity.} It flagged six of nine
+responses under a terse-output prompt strategy. None was a refusal: no flagged
+record contained a refusal phrase, a missing field, or an invalid severity. The
+detector treats any narrative field under 40 characters as effectively empty, so
+\texttt{how\_to\_fix: "DisparateImpactRemover"} --- correct, on-spec, and naming
+the applicable post-processor \citep{feldman2015} in 22 characters --- registered
+as a refusal. Compliance with the instruction was the trigger. Reporting the raw
+output would have yielded a $66.7\%$ refusal rate and a tidy story about
+constrained prompting inducing evasion, entirely an artifact of our instrument.
 
-\paragraph{Conventions should become parameters.} The orientation failure
-(\S\ref{sec:orientation}) is repairable by design: make the favorable outcome a
-required argument. Generalising, any place where a fairness pipeline infers a
-normative category from a syntactic feature --- a label value, a column name, a
-character count --- is a place where the pipeline will silently encode someone's
-assumption. Making these explicit costs one parameter and converts a class of
-silent inversions into visible errors.
+\paragraph{And then it set policy.} Applied to a second provider, the same
+detector flagged 19 of 24 cycles and mechanically zeroed 14 of them. Every
+zero-score cycle is a flagged cycle; excluding them moves that provider's mean
+score from $19.79$ to $\mathbf{70.0}$. At least five flagged cycles are not
+refusals --- one scored $85/100$. On the strength of the $19.79$ figure, that
+provider was recorded as permanently blocked in our guardrail configuration,
+where the block persists. An invalid measurement did not merely mislead a table;
+it produced a durable governance decision about a vendor.
 
-\paragraph{Which attributes deserve protection is deferred, not answered.} UC3
-audits \texttt{income\_level} and \texttt{loan\_amount\_level} beside
-\texttt{gender} with identical machinery and identical thresholds. Near-parity on
-gender and near-parity on income level are not the same kind of result: one
-concerns a protected class, the other an economic characteristic that lending law
-generally permits pricing on. The pipeline cannot tell them apart, and by
-treating them uniformly it silently defers a normative question to whoever
-configured the attribute list. This is the point at which the stakeholder
-literature \citep{luo2025,luo2026,deshpande2022} becomes not merely
-complementary but necessary: the apparatus has no resources for the question.
+\paragraph{The fabrication detector penalised arithmetic.} Our second detector
+flags any numeric value absent from the provided context. Replaying identical
+packs against two model generations, \texttt{gpt-5-mini} trips $17$ flags across
+$28$ calls where \texttt{gpt-4o} trips $4$. Read naively, the newer model
+fabricates five times as often. Checking each flagged value against the context,
+\textbf{14 of 21 ($67\%$) are derivable from it}: $88.88$ is the disparate impact
+$0.8888$ restated as a percentage, $83.87$ is $0.8387$, and most of the remainder
+are gaps between two provided values expressed in percentage points. The detector
+matches raw float literals, so converting a ratio to a percentage or subtracting
+two given numbers registers as fabrication. The model that reasons more
+explicitly is ranked as the less trustworthy one, precisely because it shows its
+work.
 
-\paragraph{Thresholds are screens, not verdicts.} We report DI against the
-four-fifths screen throughout, and both \S\ref{sec:intersectional} readings turn
-on refusing to treat it as a gate. A failed screen with EOD $\approx 0$ means
-label bias; a passed screen at $n = 6$ means nothing at all.
-\citet{barocas2016} and \citet{wachter2021} establish why the legal question does
-not reduce to the ratio, and our results show the technical question does not
-either.
+\paragraph{A guardrail punished ``collect more data''.} A third check requires
+every proposed mitigation to name a canonical algorithm --- reweighing
+\citep{kamiran2011}, disparate impact removal \citep{feldman2015}, and similar. It
+failed exactly the two attributes whose problem \emph{is} data scarcity, where
+the audit proposed acquiring records to a stated floor, hierarchical shrinkage
+and manual review. No post-processor repairs a six-record subgroup. The gate
+encodes an assumption that every fairness problem has an algorithmic mitigation,
+and where that is false it penalises the only defensible answer.
 
-\paragraph{For practitioners.} Three concrete moves follow: state the favorable
-outcome explicitly and test it; compute intersectional cells by default and print
-$n$ beside every ratio; and treat each mechanical gate in the audit stack as a
-hypothesis to be falsified, starting with the inputs where the correct answer is
-unusual.
+We left all three unrepaired and report them instead. Repairing them would have
+concealed the finding, and the finding is the point: three instruments, written
+in good faith by people who understood the domain, each scoring a correct
+behaviour as a fault.
 
-\section{Limitations}
+\subsection{Prompt sensitivity is model-generation-specific}
+\label{sec:interpretive}
 
-\textbf{Subgroup sizes.} \texttt{foreign\_worker\_original} has $n = 6$ in the
-privileged group and several HMDA race categories are severely sparse.
-Intersectional cells are reported with $n$ and excluded from conclusions below $n = 15$ --- a floor whose cost we quantify in \S\ref{sec:floor}.
+A widely reported result about LLM evaluators is that prompt phrasing moves the
+verdict. It reproduces here, and it does not generalise across model generations.
+On identical packs, the spread in cycle-mean score across four prompt strategies
+is $14.7$ and $9.0$ points for \texttt{gpt-4o} and $\mathbf{0.0}$ and
+$\mathbf{1.9}$ for \texttt{gpt-5-mini}. Claims of the form ``LLM auditors are
+unstable under paraphrase'' should therefore carry a model and a date.
 
-\textbf{UC3 is barely informative as a fairness case.} A classifier predicting
-one class $\sim99.5\%$ of the time cannot exhibit measurable disparity. UC3
-exercises the pipeline; it does not audit a working model. Its value here is the
-orientation artifact and the proxy-versus-class contrast.
+Two methodological notes. \texttt{gpt-5-mini} rejects the \texttt{temperature}
+parameter outright, so a temperature sweep is impossible on it and any
+repeated-sampling study must use another model --- an API constraint that
+silently determines which experiments a benchmark can run. And our four-cycle
+design varies prompt strategy rather than resampling one strategy, so
+cycle-to-cycle differences confound phrasing with sampling noise; the
+cross-model contrast above is robust to this, since both models face the same
+confound.
 
-\textbf{LLM nondeterminism.} We pinned neither temperature nor seed. The
-four-cycle design varies prompt strategy, not repeated samples of one strategy,
-so cycle-to-cycle differences confound strategy with sampling noise. The
-severity-flip result in \S\ref{sec:interpretive} should be read as ``phrasing or
-sampling'' rather than phrasing alone.
+\section{Why this matters}
 
-\textbf{API versioning.} \texttt{gpt-4o} and \texttt{o3} are moving targets.
-Frozen prompt packs make the inputs reproducible; the outputs are not.
+\subsection{Audits are becoming gates, and nobody audits the auditor}
 
-\textbf{Metric grounding.} All metrics are associational. Root-cause mapping is
-rule-based inference over metric values and feature correlations, not causal
-identification. We make no causal claim.
+The findings above would be curiosities if audits were advisory. They are not.
+Bias-audit requirements are entering regulation, procurement, and internal model
+governance, which means an audit result increasingly decides deployment. Our
+audit, run competently on clean data with a standard toolkit, reported the wrong
+most-harmed group on a mortgage dataset and issued a clean bill of health on the
+one age class US credit law protects. Both outputs would have passed review,
+because both are what the pipeline says.
 
-\textbf{Cost accounting.} \texttt{o3} is priced at the higher of two conflicting
-internal rate tables, so reported spend is an upper bound rather than a billed
-amount.
+The asymmetry that matters is directional. A false alarm costs reviewer time. A
+false clearance closes an open question, and \S\ref{sec:floor} and
+\S\ref{sec:ecoa} are both false clearances --- exactly the direction least likely
+to prompt a second look.
 
-\textbf{No legal claim.} ECOA, Regulation B and the four-fifths rule appear as
-decision context. A disparate impact ratio below $0.8$ is a screening signal, not
-a finding of unlawful discrimination \citep{barocas2016,wachter2021}.
+\subsection{A single benchmark number can be an artifact of task difficulty}
 
-\textbf{Scope.} HMDA is Georgia only; German Credit is 1990s German data used as
-a benchmark rather than a current population. Three datasets, one primary model,
-and a single institution's judgement about what counts as a correct mitigation.
+Our headline agreement figure between model and ground truth was $75\%$. It
+decomposes to $33.3\%$, $91.7\%$ and $100\%$, and the $100\%$ comes from the
+setting where the audited classifier barely discriminates at all, so agreeing
+costs nothing. The ordering tracks how hard each case is, not how capable the
+model is. This generalises past fairness: any benchmark averaging over
+heterogeneous instances can report a number dominated by the difficulty mix of
+its constituents rather than by the capability it claims to measure.
 
-\textbf{A known artifact defect.} Our consolidated metric CSV carries two
-disjoint column schemas because per-dataset files are concatenated without
-harmonisation. The per-dataset files are authoritative. We note it because it is
-exactly the class of infrastructure defect this paper is about.
+\subsection{Every mechanical proxy for judgement is a policy}
+
+A length threshold that treats brevity as refusal is a policy about what counts
+as an answer. A keyword list that treats ``acquire more data'' as a non-mitigation
+is a policy about what counts as a remedy. A float-literal match that treats a
+percentage as a fabrication is a policy about what counts as evidence. None was
+labelled a policy; each was a heuristic written to make an evaluation
+automatable, and each punished the better answer in the cases where judgement was
+most needed. As evaluation automates further --- LLM judges, automated red-teams,
+compliance scoring --- this class of failure scales with it.
+
+\subsection{A workable division of labour}
+
+The architecture that survived our evidence is narrow and, we think,
+transferable: deterministic code owns the numbers and the thresholds; the model
+owns the interpretation; and the interpretation is scored against the numbers
+rather than against another model. Calculator, not oracle. The pattern extends to
+any setting where a model is asked to interpret computed quantities under
+consequence, and it is the reason we can state which of our own results are
+artifacts --- the ground truth did not move when the model did.
+
+\section{What to do about it}
+
+These follow directly from the results and are cheap to adopt.
+
+\begin{enumerate}
+  \item \textbf{Make the favorable outcome an explicit, required argument.} Never
+        infer it from label values. One parameter converts a class of silent
+        inversions into a build failure (\S\ref{sec:orientation}).
+  \item \textbf{Report what the floor withheld.} An audit should print
+        suppressed cells with their $n$ and their unreported ratio, not omit
+        them. The audit in \S\ref{sec:floor} was not wrong about any number it
+        computed; it was wrong about what it did not print.
+  \item \textbf{Bind protected-class definitions to the governing statute} in
+        code, with the citation next to the threshold. A comment asserting the
+        wrong statute survived review precisely because it looked authoritative
+        (\S\ref{sec:ecoa}).
+  \item \textbf{Treat every mechanical gate as a hypothesis to falsify},
+        starting with inputs where the correct answer is unusual: the terse
+        answer, the tiny subgroup, the model that shows its work.
+  \item \textbf{Audit the population, not a convenience sample.} Most of our
+        small-cell instability came from auditing a held-out split rather than
+        every applicant in the review period.
+  \item \textbf{Record which reference group a ratio uses.} Comparing against
+        the most-favoured cell rather than a designated control group moved one
+        verdict across the four-fifths line, and nothing in the metric signature
+        recorded which convention was in force.
+\end{enumerate}
+
+\section{What this does not show}
+
+\textbf{Scale.} Three datasets, two primary models. These are mechanism-level
+findings: we show that a class of failure occurs and how it operates, not how
+often it occurs in the wild. The mechanisms transfer even where the statistics do
+not --- a convention default that inverts a metric is a class of defect, not an
+incident.
+
+\textbf{No human subjects.} We make claims about what an audit reader would
+conclude without testing them on audit readers. That is the natural next study
+and the main gap between this work and the stakeholder line it builds on
+\citep{luo2025,luo2026b}.
+
+\textbf{No causal or legal claims.} All metrics are associational; root-cause
+mapping is rule-based inference over metric values. ECOA, Regulation B and the
+four-fifths rule appear as decision context. A disparate impact ratio below
+$0.80$ is a screening signal, not a finding of unlawful discrimination
+\citep{barocas2016,wachter2021}.
+
+\textbf{Model limitations.} The German Credit classifier uses protected
+attributes as features; the Lending Club protected attribute is synthetic; HMDA
+lacks credit score. Each is disclosed in \S\ref{sec:method} and each bounds what
+the corresponding audit can mean.
+
+\textbf{Sampling confound.} Temperature and seed are unpinned, so within-model
+cycle differences mix prompt strategy with sampling noise.
 
 \section{Conclusion}
 
-We set out to benchmark whether a language model can interpret fairness metrics
-and found that the harder problem was upstream. A disparate impact ratio of $0.0$
-that should have been $0.9931$; three passing marginals concealing an
-intersectional ratio of $0.6087$; a refusal detector that measured brevity; a
-guardrail that penalised the only correct answer to a six-record subgroup. None
-of these was a bug in the ordinary sense, and none was user error. Each was a
-defensible design decision whose normative content became visible only when it
-punished a correct answer.
+We set out to measure whether a language model can audit fairness. The more
+durable result concerns the measuring apparatus. A reporting floor decided which
+racial groups appeared in a mortgage audit's conclusion. A threshold borrowed
+from employment law decided that the age class credit law protects was fine. A
+column name decided whether a disparity ratio read $0.9931$ or $0.0$. A character
+count decided that a correct answer was a refusal, and then decided that a vendor
+should be blocked.
 
-If fairness is defined relative to a human decision context
-\citep{lee2020}, then the apparatus that measures fairness inherits that
-dependence. Our instruments were built by people who knew the domain and still
-encoded assumptions that inverted conclusions. We expect this to be the common
-case rather than the exception, and we release the frozen artifacts so that the
-claim can be checked against our own instruments rather than taken on our word.
+None of these was a bug, and none was the work of anyone careless. They are what
+it looks like when normative questions are answered by defaults. As fairness
+audits become gates, the defaults become policy --- and unlike policy, they are
+not written down anywhere a reviewer would think to look. The remedy we can offer
+is unglamorous: make the commitments explicit, print what was withheld, and test
+the instruments on the cases where the right answer is unusual, because that is
+where they fail.
 
 \begin{acks}
 We thank the maintainers of AIF360 and Fairlearn. Retrieved literature was
