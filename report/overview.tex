@@ -37,16 +37,17 @@
 
 \section{The question}
 
-When a fairness audit prints a number --- ``disparate impact $0.94$'' --- does
+When a fairness audit prints a number, say ``disparate impact $0.94$,'' does
 that number measure what its name says? We built a complete fairness audit of
 consumer credit and mortgage models ($1{,}000$ and $10{,}978$ real
 applications, every applicant scored out-of-fold), and then audited the audit.
 
 \section{The result}
 
-\textbf{Nine measurements in one ordinary audit computed something other than
-the construct they were named for --- and every one produced a clean,
-reassuring output.} The four sharpest:
+\textbf{The same model, judged on the same applicants, passes or fails
+depending on settings that appear nowhere in the output. Nine measurements in
+this one audit computed something other than the construct they were named
+for, and every one produced a clean, reassuring result.} The four sharpest:
 
 \textbf{(1)} A library constructor default (\texttt{favorable\_label=1.0},
 AIF360 0.6) decides which outcome of a loan is \emph{good}. On a
@@ -55,7 +56,7 @@ $\mathrm{DI}=1.2072$ where the oriented value is $0.9862$.
 
 \textbf{(2)} The age attribute decides which age question is asked. Banded at
 $40{+}$ (a threshold imported from employment practice) the model reads
-$0.9791$ --- clean. On the $62{+}$ boundary the mortgage data ship a dedicated
+$0.9791$: clean. On the $62{+}$ boundary the mortgage data ship a dedicated
 flag for, \emph{the same model over the same people} reads $\mathbf{0.8897}$,
 the largest age disparity present. The public age bands straddle 62, so no
 banded attribute can ever see it.
@@ -73,20 +74,20 @@ that hides them is silently blind.
 defining refusal as \emph{under 40 characters} flagged six correct terse
 answers and helped block a provider, and most of a cross-model ``prompt
 sensitivity'' spread ($14.7$ vs.\ $0.0$ points) came from our scorer
-penalising instructed brevity --- excluding that cycle, $6.7$.
+penalising instructed brevity; excluding that cycle, $6.7$.
 
 \section{What it means}
 
-The number cannot tell you which of these happened to it. All nine audits ran
-correctly and printed clean results; which conclusion you get is fixed
-upstream, by choices --- label orientation, attribute banding, reporting
-policy, reference group, detector thresholds --- that are made silently and
-appear nowhere in the output. Two consequences. \textbf{A disaggregated
-fairness number is uninterpretable without its measurement record}: the same
-data honestly support ``worst cell $0.67$,'' ``worst cell $0.90$,'' or ``worst
-cell unknowable,'' depending on unrecorded choices. And \textbf{the errors
-point one way}: false clearance --- the reassuring, unre-examined direction
---- in every instance we measured.
+A fairness verdict is therefore not a property of the model alone; it is a
+property of the model plus a configuration (label orientation, attribute
+banding, reporting policy, reference group, detector thresholds) that is set
+silently and appears nowhere in the output. Two consequences. \textbf{A
+fairness number you are handed is uninterpretable without its configuration}:
+the same data honestly support ``worst cell $0.67$,'' ``worst cell $0.90$,''
+or ``worst cell unknowable.'' And \textbf{the errors point one way}: every
+wrong verdict we measured erred toward false clearance, the reassuring
+direction nobody rechecks. An audit should ship its configuration the way
+results ship error bars; the section below is that record.
 
 \section{What an audit must record}
 

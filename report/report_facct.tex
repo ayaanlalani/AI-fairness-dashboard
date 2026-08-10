@@ -54,43 +54,44 @@
 \renewcommand{\shortauthors}{Jain, Lalani, and Vincent}
 
 \begin{abstract}
-A fairness audit is a chain of measurements, and at every link a construct
-someone intended --- ``favorable outcome,'' ``the protected class,''
-``disparate impact,'' ``refusal,'' ``fabrication'' --- is operationalised as
-something a program can compute. This paper measures the gap between the two
-in consumer lending, a setting where the intended definitions are unusually
-well documented, on $1{,}000$ consumer credit applications and $10{,}978$
-Georgia mortgage applications.
+The same model, evaluated on the same applicants, can pass or fail a fairness
+audit depending on settings that appear nowhere in the audit's output. This
+paper identifies those settings across a complete audit of consumer lending
+($1{,}000$ credit applications and $10{,}978$ Georgia mortgage applications)
+and measures how often each one changes the verdict. Each is an instance of
+one underlying event: a construct someone intended (``favorable outcome,''
+``the protected class,'' ``refusal'') is operationalised as something a
+program can compute, the two differ, and the output looks equally clean
+either way.
 
-The gap appears at three layers. In the metric library (verified directly in
-AIF360~0.6 and Fairlearn~0.13, and scoped to what we verified): one AIF360
+The settings live at three layers. In the metric library (verified directly
+in AIF360~0.6 and Fairlearn~0.13, and scoped to what we verified): one AIF360
 constructor defaults \texttt{favorable\_label=1.0}, so on a target named
-\texttt{loan\_default} it reports the disadvantaged group as favoured ---
-$\mathrm{DI}=1.2072$ where the oriented value is $0.9862$ --- and neither
+\texttt{loan\_default} it reports the disadvantaged group as favoured, with
+$\mathrm{DI}=1.2072$ where the oriented value is $0.9862$; and neither
 library attaches an interval, a sample size, or a record of the reference
 group to a disaggregated ratio. In the mapping from attribute to construct: a
-banded age attribute reads $0.9791$ where the $62{+}$ cut --- the boundary the
-mortgage data ship a dedicated flag for --- reads $0.8897$; and a subsampling
-study over the full mortgage population shows that at the audit size we
-originally used, a no-floor audit falsely clears a violating subgroup in
-$83.8\%$ of draws while a reporting floor never does --- because it never
-reports the subgroup at all, misidentifying the worst-treated group in
-$100\%$ of draws. In the audit's own instruments: a refusal detector that
-operationalises ``refusal'' as \emph{under 40 characters} flagged six correct
-answers and contributed to permanently blocking a provider, and the score
-spread read as prompt sensitivity concentrates in the one cycle whose correct
-answers are terse.
+banded age attribute reads $0.9791$, no disparity, where the $62{+}$ cut (the
+boundary the mortgage data ship a dedicated flag for) reads $0.8897$, the
+largest age disparity present; and a subsampling study over the full mortgage
+population shows that at the audit size we originally used, a no-floor audit
+falsely clears a genuinely disadvantaged subgroup in $83.8\%$ of draws while
+a reporting floor never does, because it never reports the subgroup at all
+and misidentifies the worst-treated group in $100\%$ of draws. In the audit's
+own instruments: a refusal detector that operationalises ``refusal'' as
+\emph{under 40 characters} flagged six correct answers and contributed to
+permanently blocking a provider, and most of a cross-model ``prompt
+sensitivity'' spread came from our own scorer penalising instructed brevity.
 
-The result, across all nine instances we measured, is the same event three
-layers deep: a correct computation of the wrong construct, invisible in the
-output, erring toward false reassurance. The practical meaning is that a
-disaggregated fairness number is uninterpretable without a record of how it
-was produced --- the same data honestly support ``worst-treated group at
-$0.67$,'' ``at $0.90$,'' or ``unknowable,'' depending on unrecorded choices.
-We close with the six-item measurement record an audit would need for its
-numbers to mean what readers take them to mean, and with appendices that
-print the full cell tables and a claim-by-claim map from every number to the
-artifact that regenerates it.
+The implication is that a fairness verdict is not a property of the model
+alone; it is a property of the model plus an unrecorded configuration. The
+same data honestly support ``worst-treated group at $0.67$,'' ``at $0.90$,''
+or ``unknowable,'' depending on choices no reader can see, and every wrong
+verdict we measured erred toward the clean, reassuring direction. An audit
+should therefore ship its configuration the way results ship error bars. We
+close with the six-item record that would accomplish this, and with
+appendices that print the full cell tables and a claim-by-claim map from
+every number to the artifact that regenerates it.
 \end{abstract}
 
 \begin{CCSXML}
@@ -135,7 +136,7 @@ than in metric space. Lending's decision context is unusually well
 documented: the mortgage data are published for public audit, the protected
 categories come with written definitions, and the datasets themselves ship the
 flags those definitions turn on. That is what makes lending the right place to
-measure a gap that is usually unmeasurable --- between the construct a
+measure a gap that is usually unmeasurable: the gap between the construct a
 fairness instrument is \emph{named for} and the construct it actually
 \emph{operationalises} \citep{jacobswallach2021}.
 
@@ -144,8 +145,8 @@ takes the same shape at each layer, and that it is invisible in the output.
 The layers are: the metric library, whose defaults resolve normative questions
 no caller answered; the mapping from attribute to construct, where the
 quantity computed and the quantity the audit's readers care about part
-company; and the audit's own evaluation instruments --- detectors, gates,
-scores --- each of which operationalises a judgement (``what counts as an
+company; and the audit's own evaluation instruments (detectors, gates,
+scores), each of which operationalises a judgement (``what counts as an
 answer,'' ``what counts as evidence,'' ``what counts as a remedy'') as a
 mechanical proxy. At each layer the instrument computes correctly, the output
 is clean, and the substitution is recorded nowhere.
@@ -238,8 +239,8 @@ reference group (\S\ref{sec:library}, appendix~\ref{app:repro}).
 operationalisation cannot represent the $62{+}$ boundary the data's own flag
 encodes, and outcome-rate tooling is structurally silent about the model's
 inputs (\S\ref{sec:statute}).
-(iii)~A subsampling study --- $2{,}000$ draws at each of five audit sizes,
-five reporting policies, three reference conventions --- that converts this
+(iii)~A subsampling study ($2{,}000$ draws at each of five audit sizes,
+five reporting policies, three reference conventions) that converts this
 audit's founding anecdote into a rate: policies that report small cells
 falsely clear violating subgroups in $84$--$95\%$ of draws at the audit size
 we originally used, and policies that suppress them never name the
@@ -258,13 +259,14 @@ test suite (appendices~\ref{app:cells}--\ref{app:map}).
 \paragraph{Measurement.} \citet{jacobswallach2021} supply the vocabulary this
 paper instantiates: fairness quantities are \emph{measurement models} of
 unobservable theoretical constructs, and the question to ask of any number is
-whether the operationalisation matches the construct it claims to measure ---
-construct validity. \citet{passi2019} locate the same gap upstream, in problem
+whether the operationalisation matches the construct it claims to measure,
+which is construct validity. \citet{passi2019} locate the same gap upstream,
+in problem
 formulation; \citet{selbst2019} describe the failure of porting formal
 criteria across social contexts; \citet{obermeyer2019} give the canonical
 in-vivo case, a proxy (cost) silently standing in for a construct (need).
-Disaggregated evaluation has its own choices --- which groups, which cells,
-which comparisons --- that \citet{barocas2021} catalogue; \citet{chen2018}
+Disaggregated evaluation has its own choices (which groups, which cells,
+which comparisons) that \citet{barocas2021} catalogue; \citet{chen2018}
 supply the bias--variance decomposition that governs what a subgroup estimate
 can support, the statistical half of our \S\ref{sec:validity}. On
 intersectionality, \citet{crenshaw1989} names the construct our
@@ -276,7 +278,7 @@ criteria conflict is settled \citep{chouldechova2017,kleinberg2017,hardt2016};
 decision context.
 
 \paragraph{The documented decision context.} We make no legal claims in this
-paper --- discrimination law does not reduce to a metric threshold
+paper: discrimination law does not reduce to a metric threshold
 \citep{barocas2016,wachter2021}, and adjudicating it is not our competence.
 What lending supplies, and what this paper uses, is narrower: the decision
 context comes with \emph{written definitions and published flags}. The public
@@ -284,8 +286,8 @@ mortgage data ship a dedicated \texttt{applicant\_age\_above\_62} field
 because $62{+}$ is a defined boundary in that domain's own documentation, so
 whether an age operationalisation can represent that boundary is a checkable
 question of measurement, not of law. Likewise, whether a model consumes a
-protected attribute directly is a documented property of its inputs ---
-\citet{gillis2022} examines input scrutiny at length --- and no outcome-rate
+protected attribute directly is a documented property of its inputs
+(\citet{gillis2022} examines input scrutiny at length), and no outcome-rate
 metric reports it (\S\ref{sec:treatment}).
 
 One convention in this paper is itself an imported construct, and we label it
@@ -300,9 +302,9 @@ paper measures.
 
 \paragraph{The audit's instruments.} The third layer is newer but not new.
 LLM-as-judge evaluation is known to be fragile \citep{zheng2023};
-\citet{wester2024} study how models deny requests --- the construct our
+\citet{wester2024} study how models deny requests, the construct our
 refusal detector was built to measure; \citet{sclar2024} show scores move
-under semantically null formatting changes --- the construct our
+under semantically null formatting changes, the construct our
 prompt-sensitivity comparison was built to measure. What this literature and
 the measurement literature have not yet been made to say jointly is that a
 detector, a gate, or a score \emph{is} a measurement model, with the same
@@ -312,7 +314,7 @@ premise that fairness work needs infrastructure; audit practice
 \citep{metaxa2021,raji2019,raji2020} and traceability \citep{kroll2021} give
 the released-artifact design its rationale. The stakeholder line
 \citep{luo2025,luo2026,luo2026b,deshpande2022,stumpf2024,kim2025} asks who
-should choose the criteria; our contribution is adjacent --- we show the
+should choose the criteria; our contribution is adjacent, showing that the
 apparatus resolves several such questions before anyone is asked, at layers
 where nobody thinks to look. \citet{zamfirescu2022} diagnose human error
 inside an analysis pipeline; we diagnose the pipeline's own rulers.
@@ -322,7 +324,7 @@ inside an analysis pipeline; we diagnose the pipeline's own rulers.
 
 \paragraph{Settings.} Two regulated lending decisions and one instrument-test
 setting. German Credit \citep{germancredit} stands in for consumer installment
-credit: $1{,}000$ applications, 1990s German data --- a structural analogue
+credit: $1{,}000$ applications of 1990s German data, a structural analogue
 from a different market and era, from which we draw no US conclusion. HMDA
 Georgia
 \citep{hmda} is residential mortgage origination: $10{,}978$ applications
@@ -338,13 +340,13 @@ documented across this span \citep{duarte2012,pope2011,bartlett2019,butler2017,s
 \paragraph{Deterministic layer.} A pipeline computes disparate impact with
 AIF360 \citep{aif360}, cross-checked against Fairlearn \citep{fairlearn}, and
 assigns severity labels by a fixed rule. The per-attribute summary the
-downstream layers receive carries three fields --- \texttt{DisparateImpact},
-\texttt{TheilIndex}, \texttt{BiasFlag} --- of which the Theil index is
+downstream layers receive carries three fields (\texttt{DisparateImpact},
+\texttt{TheilIndex}, \texttt{BiasFlag}), of which the Theil index is
 computed on the prediction vector alone and is therefore identical across
 attributes within a dataset; the per-dataset CSV carries difference metrics
 (demographic parity, equal opportunity, average odds) whose full-population
 values appear in appendix~\ref{app:map}'s artifacts.\footnote{The Lending Club
-summary uses a different five-field schema than the two regulated settings ---
+summary uses a different five-field schema than the two regulated settings,
 a dual-schema defect we report rather than repair, since repairing it would
 churn every downstream artifact.} Population, not sample: every applicant is
 scored out-of-fold by stratified five-fold cross-validation (random forest,
@@ -353,17 +355,16 @@ and $1{,}000$ rows rather than a held-out split.
 
 \paragraph{Interpretation layer.} A language model interprets the computed
 metrics and never recomputes one; scoring is against the deterministic label,
-never another model's opinion --- with one disclosed exception
+never another model's opinion, with one disclosed exception
 (\S\ref{sec:capability}). Track~Q issues four frozen prompt strategies per
 (setting, attribute) pair and scores the returned severity against the
 deterministic label; Track~H produces narrative audits judged against
 mechanical checks. Prompt builders, detectors, severity rule and rubric are
 printed verbatim in appendix~\ref{app:instruments}; a no-key replay path
-reproduces all scoring. Spend: 98 calls, \$0.8933, against a \$15 cap with a
-pre-call abort and a persisted ledger.
+reproduces all scoring.
 
 \paragraph{Population construction.} The HMDA file begins at $20{,}000$ rows
-and the audit runs on $10{,}978$ --- an attrition of $45.1\%$ that includes
+and the audit runs on $10{,}978$: an attrition of $45.1\%$ that includes
 dropping \texttt{Race Not Available} ($4{,}140$ rows, $20.7\%$ of the file),
 joint applications, and free-form race text. That is selection on the
 protected attribute, performed before any metric runs; \S\ref{sec:invisible}
@@ -384,25 +385,25 @@ section are about those libraries as verified, not about the field.
 \paragraph{Which outcome is good is a default.} AIF360's
 \texttt{BinaryLabelDataset} takes \texttt{favorable\_label} with a default of
 $1.0$. Credit risk targets are conventionally coded with the adverse event as
-$1$ --- default, delinquency, charge-off, fraud --- so on a column named
+$1$ (default, delinquency, charge-off, fraud), so on a column named
 \texttt{loan\_default} the default asserts that defaulting is the good
 outcome. The minimal reproduction (appendix~\ref{app:repro}; deterministic,
-pinned versions) returns $\mathrm{DI}=1.2072$ under the library default ---
-the disadvantaged group reported as \emph{favoured} --- and $0.9862$ under
+pinned versions) returns $\mathrm{DI}=1.2072$ under the library default, with
+the disadvantaged group reported as \emph{favoured}, and $0.9862$ under
 correct orientation. The scope of this claim matters and we state it
 precisely: this is one constructor in a two-API library. AIF360's other entry
 point, \texttt{StandardDataset}, makes \texttt{favorable\_classes} a required
 argument and cannot be constructed without answering the question. Fairlearn's
 \texttt{demographic\_parity\_ratio} exposes no favorable-label parameter at
 all; it computes a min/max ratio of the prediction column \emph{as encoded},
-so on the same table it reports $0.8284$ --- a ratio of default rates, a
-number about the wrong outcome entirely --- and delegates the orientation
+so on the same table it reports $0.8284$, a ratio of default rates and a
+number about the wrong outcome entirely, and delegates the orientation
 question to whoever encoded the column, without recording that it did so.
 
 The in-vivo version ran end to end in our own harness before we caught it:
 selection rates computed on predicted default gave the Lending Club synthetic
-\texttt{gender} attribute $\mathrm{DI}=0.0$ and a \textsc{critical} label ---
-the most severe output the pipeline can produce --- where the oriented value
+\texttt{gender} attribute $\mathrm{DI}=0.0$ and a \textsc{critical} label,
+the most severe output the pipeline can produce, where the oriented value
 is $0.9931$, near parity. Nothing was misused; AIF360 computed what it was
 asked. A target named \texttt{approved} makes label $1$ favorable, a target
 named \texttt{loan\_default} inverts it, and nothing in the metric signature
@@ -437,13 +438,13 @@ Fairness work on credit routinely audits age at $40{+}$, and our pipeline did,
 on the strength of a code comment asserting that the threshold aligned with
 the domain's definition. It does not: $40{+}$ is a threshold imported from
 employment practice. The boundary lending's own documentation defines is
-$62{+}$ --- which is why the public mortgage data ship a dedicated
+$62{+}$, which is why the public mortgage data ship a dedicated
 \texttt{applicant\_age\_above\_62} flag in the first place.
 
 The substitution is not cosmetic. Our banded age attribute pools young and
 senior applicants ($n{=}2{,}304$ and $3{,}167$) against the middle band; the
 two move in opposite directions, so pooling cancels them. The banded attribute
-returns $\mathrm{DI}=0.9791$, severity \textsc{low} --- a clean bill of
+returns $\mathrm{DI}=0.9791$, severity \textsc{low}: a clean bill of
 health. Audited on the documented cut, the same model over the same $10{,}978$
 rows returns $0.8897$, the largest age disparity in the dataset and the lowest
 of its four protected attributes. The flag required was present and unused in
@@ -462,10 +463,10 @@ this data.
 ratio against an unrecorded, convention-chosen denominator.}
 
 Every ratio in this paper's tables is measured, by our pipeline's convention,
-against the most-favoured adequately-sized cell --- and no metric signature
-records that. Measured instead against a designated control group ---
-\texttt{White $\times$ Male}, the comparison conventional in US fair lending
-analysis --- the same cells read differently: \texttt{American Indian $\times$
+against the most-favoured adequately-sized cell, and no metric signature
+records that. Measured instead against a designated control group
+(\texttt{White $\times$ Male}, the comparison conventional in US fair lending
+analysis), the same cells read differently: \texttt{American Indian $\times$
 Male} $0.7012$ rather than $0.6734$, \texttt{Black $\times$ Female} $0.8988$
 rather than $0.8632$. The convention moves every number in the table by three
 to four points (appendix~\ref{app:cells} prints all cells under three
@@ -479,16 +480,16 @@ re-estimated in every sample.
 \emph{Construct named: discrimination. Operationalised as: outcome-rate
 disparity.}
 
-The German Credit model takes applicant sex and age as input features ---
-direct use of the protected attributes, the first thing any fairness review
-of a lending model would ask about --- and our pipeline ran that
+The German Credit model takes applicant sex and age as input features
+(direct use of the protected attributes, the first thing any fairness review
+of a lending model would ask about), and our pipeline ran that
 specification end to end and emitted a clean $\mathrm{DI}=0.8888$ without
 comment. We previously filed this under limitations; it is a result, and
 arguably the paper's sharpest. An outcome-rate metric is a function of
 predictions and group labels alone: it is structurally silent about what the
 model consumes, so the cleanest possible metric output is compatible with the
 most direct possible use of a protected attribute. No disparity ratio, at any
-sample size, under any convention, could have flagged it --- input scrutiny
+sample size, under any convention, could have flagged it. Input scrutiny
 and outcome scrutiny are different measurements \citep{gillis2022}, and a
 toolchain that computes only the second says nothing about the first.
 
@@ -500,12 +501,12 @@ toolchain that computes only the second says nothing about the first.
 
 Our audit originally ran on a held-out split of $2{,}196$ mortgage
 applications and reported, among other things, that American Indian men were
-the \emph{best}-treated group in the data ($\mathrm{DI}=1.1504$) --- on the
+the \emph{best}-treated group in the data ($\mathrm{DI}=1.1504$), on the
 evidence of four applicants, who all happened to be approved. Over the full
 population the same group is the worst cell in the dataset: $0.6734$ at
 $n{=}31$. The audit did not miss the disparity; it \emph{inverted} it, and
 attached a reassuring number to the inversion. The floor was right about what
-it suppressed --- \texttt{American Indian $\times$ Female} read $0.1917$ on the
+it suppressed: \texttt{American Indian $\times$ Female} read $0.1917$ on the
 split (one approval in six), which looks like the most severe disparity in the
 study and is noise: $0.8815$ at $n{=}25$ in full. Small-group estimates are
 unreliable in both directions, and every affected cell belonged to a racial
@@ -514,20 +515,20 @@ a floor on group population, so the groups whose treatment is least certain
 are exactly the groups least likely to be counted.
 
 Table~\ref{tab:cells} prints the full-population
-\texttt{race}$\times$\texttt{sex} table --- in full, because this paper's
-argument is precisely that partial tables mislead --- with the Wilson-interval
+\texttt{race}$\times$\texttt{sex} table, in full because this paper's
+argument is precisely that partial tables mislead, with the Wilson-interval
 disparate-impact bounds beside every ratio (reference: \texttt{Asian $\times$
 Female}, $n{=}254$, the pipeline's most-favoured-adequate-cell convention;
 floor $15$). Six of twelve cells have no determinate severity band: their
 intervals straddle a band boundary, so the audit does not know which band they
 belong to. \texttt{American Indian $\times$ Male}, the lowest point estimate,
-has interval $[0.453, 0.904]$ --- consistent with a critical violation and
+has interval $[0.453, 0.904]$: consistent with a critical violation and
 with clearing the screen. It cannot be called the worst-treated group. What
 survives is narrower and firmer: \texttt{Black $\times$ Female} ($0.8632$,
 $[0.806, 0.937]$, $n{=}1{,}994$) and \texttt{Black $\times$ Male} ($0.8643$,
 $[0.805, 0.940]$, $n{=}1{,}707$) have intervals wholly below parity. The
 defensible reading of this dataset is a real, precisely estimated disparity
-against Black applicants of roughly $0.86$ --- which a point-estimate ranking
+against Black applicants of roughly $0.86$, which a point-estimate ranking
 demotes to sixth and seventh place, behind five cells whose ordering is noise.
 Reporting a ratio to four decimals without an interval is what makes that
 demotion possible \citep{chen2018}.
@@ -555,8 +556,8 @@ draw: a floor at $n \geq 15$ (the pipeline's), a floor at $n \geq 30$ (which
 our own codebase also contained, in an adjacent module), no-floor point
 estimates, no-floor Wilson intervals that assert a verdict only when the
 interval clears or fails the screen entirely, and empirical-Bayes shrinkage
-toward the pooled rate --- each under three reference conventions, with
-$\theta$ defined per convention. We record how often each policy asserts a
+toward the pooled rate. Each policy runs under three reference conventions,
+with $\theta$ defined per convention. We record how often each policy asserts a
 population-violating cell clear (false clearance), asserts a clearing cell in
 violation (false alarm), places a reported estimate on the wrong side of
 parity (sign inversion), and names the wrong worst-treated cell or declines to
@@ -571,7 +572,7 @@ Table~\ref{tab:subsample} give the primary convention.
 bands are $95\%$ Wilson intervals on the rate; primary reference convention).
 Left: how often each policy asserts a population-violating cell clear of the
 $0.80$ screen. The floor and interval policies coincide at zero for
-$m \leq 2{,}196$ --- floors by silence, intervals by abstention --- and the
+$m \leq 2{,}196$ (floors by silence, intervals by abstention), and the
 $n\geq15$ floor begins to leak exactly when the violating cells cross it
 ($26\%$ at $m{=}8{,}000$). Right: how often the policy names the wrong
 worst-treated cell, given that it names one.}
@@ -579,7 +580,7 @@ worst-treated cell, given that it names one.}
 \end{figure*}
 
 \begin{table*}[t]
-\caption{All five policies at $m{=}2{,}196$ --- the size of the audit we
+\caption{All five policies at $m{=}2{,}196$, the size of the audit we
 originally ran. Rates are \% of draws with $95\%$ Wilson intervals;
 ``abstains'' is the share of draws where the policy declines to name a worst
 cell; ``cells suppressed'' is the mean count of the twelve
@@ -592,7 +593,7 @@ cell; ``cells suppressed'' is the mean count of the twelve
 Three results order the section. First, at the audit size we actually used,
 \emph{every policy that reports small cells is usually wrong}: no-floor point
 estimates falsely clear a violating cell in $83.8\%$ of draws and put at least
-one reported estimate on the wrong side of parity in $79.0\%$ --- our
+one reported estimate on the wrong side of parity in $79.0\%$. Our
 $1.1504$ was not bad luck. Second, the floors never false-clear at this size
 for the least reassuring possible reason: they never report the violating
 cells at all. Both floors suppress six of twelve cells on average and
@@ -603,8 +604,8 @@ solve the small-cell problem; it postpones it to a larger audit and converts
 it to silence in the meantime. Third, the two policies that respect
 uncertainty fail in opposite, honest ways: the Wilson policy never
 false-clears and almost never misranks ($6.0\%$), but abstains from naming a
-worst cell in $90.3\%$ of draws --- at full population its interval on the
-worst cell still straddles the screen --- while empirical-Bayes shrinkage is
+worst cell in $90.3\%$ of draws (at full population its interval on the
+worst cell still straddles the screen), while empirical-Bayes shrinkage is
 the \emph{most} confident false-clearer of all ($95.2\%$ at $m{=}2{,}196$,
 rising with $m$), because a prior centered on the pooled rate absorbs exactly
 the small cells where the disparities live. Floors trade false clearance for
@@ -633,8 +634,8 @@ The detector flagged six of nine responses under the terse-output prompt
 strategy. None was a refusal: no flagged record contained a refusal phrase, a
 missing field, or an invalid severity. The detector treats any narrative field
 under 40 characters as effectively empty, so \texttt{how\_to\_fix:
-"DisparateImpactRemover"} --- correct, on-spec, and naming the applicable
-post-processor \citep{feldman2015} in 22 characters --- registered as a
+"DisparateImpactRemover"} (correct, on-spec, and naming the applicable
+post-processor \citep{feldman2015} in 22 characters) registered as a
 refusal. Compliance with the instruction was the trigger. Reporting the raw
 output would have yielded a $66.7\%$ refusal rate and a tidy story about
 constrained prompting inducing evasion, entirely an artifact of our
@@ -645,15 +646,15 @@ that setting is for.)
 Then it set policy. Applied to a second provider, the same detector flagged 19
 of 24 cycles. Reanalysis of the frozen records
 (appendix~\ref{app:instruments}) separates what the flag conflated: 18 of the
-24 records are \emph{empty API results} --- transport failures, not model
-behaviour --- of which 14 scored zero and four scored $10.0$ despite containing
+24 records are \emph{empty API results} (transport failures, not model
+behaviour), of which 14 scored zero and four scored $10.0$ despite containing
 nothing, because the cause-alignment subscore returns a flat $10.0$ whenever
 the deterministic baseline lists no cause labels. The provider's mean is
 $19.79$ over all records; $47.50$ excluding zero scores (the figure we
 previously reported, which still contains the four empty-but-scored records);
-and $72.50$ over the six records that contain any content at all --- one of
-which, a terse correct answer scoring $85$, is the only content-bearing record
-the refusal detector flagged. On the strength of the $19.79$ figure, that
+and $72.50$ over the six records that contain any content at all. One of
+those six, a terse correct answer scoring $85$, is the only content-bearing
+record the refusal detector flagged. On the strength of the $19.79$ figure, that
 provider was recorded as permanently blocked in our guardrail configuration,
 where the block persists. An invalid measurement did not merely mislead a
 table; it produced a durable governance decision about a vendor.
@@ -683,8 +684,8 @@ remain honest fabrication candidates, and we report them as such.
 \emph{Construct named: a specific, actionable remedy. Operationalised as: a
 keyword match against a list of algorithm names.}
 
-A guardrail requires every proposed mitigation to name a canonical algorithm
---- reweighing \citep{kamiran2011}, disparate impact removal
+A guardrail requires every proposed mitigation to name a canonical algorithm:
+reweighing \citep{kamiran2011}, disparate impact removal
 \citep{feldman2015}, and similar. It failed exactly the two attributes whose
 problem \emph{is} data scarcity, where the audit proposed acquiring records to
 a stated floor, hierarchical shrinkage, and manual review. No post-processor
@@ -700,11 +701,12 @@ $0.80$.}
 
 The pipeline's severity rule places its \textsc{critical} boundary at $0.72$.
 That number is $0.80 \times 0.9$, constructed in this project, with no
-statutory or statistical provenance --- it looks authoritative for the same
-reason the ``$40{+}$ aligns with ECOA'' comment did. The same codebase carried
-two reporting floors, $n \geq 15$ and $n \geq 30$, in adjacent modules, so the
-same cell was reportable or not depending on which module read it ---
-\S\ref{sec:subsample} shows those two floors behave identically at small $m$
+external provenance, regulatory or statistical; it looks authoritative for
+the same reason the mis-sourced $40{+}$ code comment did. The same codebase
+carried two reporting floors, $n \geq 15$ and $n \geq 30$, in adjacent
+modules, so the same cell was reportable or not depending on which module
+read it; \S\ref{sec:subsample} shows those two floors behave identically at
+small $m$
 and diverge exactly at the audit sizes where the $n \geq 15$ floor starts to
 leak. This is why the analysis in \S\ref{sec:validity} uses only the labeled
 $0.80$ screen plus intervals, and quotes the pipeline's band labels as
@@ -724,17 +726,17 @@ the ordering tracks how discriminating each audited classifier is rather than
 how capable the model is: the $100\%$ case is the setting where the classifier
 barely separates anyone, so every attribute is a trivial near-parity
 \textsc{low} and agreeing costs nothing. A single headline agreement figure
-for an LLM auditor is not a well-defined quantity --- the general form of the
-point is that any benchmark averaging over heterogeneous instances reports a
-number dominated by its difficulty mix. Errors were asymmetric in the safe
+for an LLM auditor is not a well-defined quantity; in general, any benchmark
+averaging over heterogeneous instances reports a number dominated by its
+difficulty mix. Errors were asymmetric in the safe
 direction (seven over-escalations, two under-escalations), which matters
 because under-escalation is the consequential failure for an audit tool.
 
 \paragraph{Track H, disclosed.} The narrative-audit track's rubric scores are
-one model's opinion of another's work --- \texttt{gpt-4o} grading narratives
-generated by \texttt{o3} --- which is exactly what this paper's architecture
-forbids (scoring against the deterministic label, never another model's
-opinion), so we exclude those scores ($4.8$, $4.7$, $5.0$ of $5$) rather than
+one model's opinion of another's work (\texttt{gpt-4o} grading narratives
+generated by \texttt{o3}), which is exactly what this paper's architecture
+forbids: scoring against the deterministic label, never another model's
+opinion. We exclude those scores ($4.8$, $4.7$, $5.0$ of $5$) rather than
 report them; an LLM-judged ``quality'' score is itself an unvalidated
 operationalisation \citep{zheng2023}, and this one was ours. What survives on
 mechanical evidence: all $27$ of $27$ citations in the narrative audits
@@ -752,20 +754,20 @@ for \texttt{gpt-4o} (German Credit, HMDA) against $0.0$ and $1.9$ for
 \texttt{gpt-5-mini}. We previously reported that contrast as
 model-generational. Reanalysis of the frozen records
 (appendix~\ref{app:instruments}) shows the refusal flag never feeds the score,
-so no refusal penalty inflates it --- but the \texttt{gpt-4o} spread is
+so no refusal penalty inflates it. But the \texttt{gpt-4o} spread is
 concentrated in the one strategy that demands terse output: excluding the
 constrained cycle it falls to $6.7$ and $1.25$, and the cycle-four dip
 decomposes almost entirely into the completeness and severity-agreement
-subscores ($78\%/22\%$ on German Credit, $42\%/58\%$ on HMDA) --- subscores
+subscores ($78\%/22\%$ on German Credit, $42\%/58\%$ on HMDA), subscores
 that reward enumerating content, scored on answers instructed to be short.
 Every \texttt{gpt-4o} constrained-cycle record was simultaneously flagged by
 the 40-character refusal rule; the scorer and the detector were measuring the
 same thing, brevity, under two different construct names. A generational
-difference survives --- \texttt{gpt-5-mini}'s spread is near zero under every
-treatment --- but the published magnitude was partly our instrument, and
+difference survives (\texttt{gpt-5-mini}'s spread is near zero under every
+treatment), but the published magnitude was partly our instrument, and
 paraphrase-instability claims should carry a model, a date, \emph{and} an
 instrument audit. (\texttt{gpt-5-mini} also rejects the \texttt{temperature}
-parameter outright, so a repeated-sampling study is impossible on it --- an
+parameter outright, so a repeated-sampling study is impossible on it, an
 API constraint that silently determines which experiments a benchmark can
 run.)
 
@@ -773,7 +775,7 @@ run.)
 \label{sec:invisible}
 
 The layer-one findings hold for anyone using the verified libraries; the rest
-are about choices our audit made because nothing made them for us --- and that
+are about choices our audit made because nothing made them for us, and that
 is the point. An audit's numbers mean what its readers take them to mean only
 if the construct questions are answered correctly: which outcome is favorable,
 who counts as protected, against whom, on how much evidence, checked by which
@@ -798,20 +800,20 @@ a non-mitigation is a policy about what counts as a remedy. A float-literal
 match that treats a percentage as a fabrication is a policy about what counts
 as evidence. None was labelled a policy; each was a heuristic written to make
 an evaluation automatable, and each punished the better answer in the cases
-where judgement was most needed. As evaluation automates further --- LLM
-judges, automated red-teams, compliance scoring --- this class of failure
+where judgement was most needed. As evaluation automates further (LLM
+judges, automated red-teams, compliance scoring), this class of failure
 scales with it.
 
 Two of our own decisions belong in this catalogue, and we close the section
 with them rather than with other people's tools. Our population construction
 dropped $45.1\%$ of the raw HMDA file before any metric ran, including every
-applicant whose race is not available ($20.7\%$ of the file) --- selection on
+applicant whose race is not available ($20.7\%$ of the file): selection on
 the protected attribute, deciding who counts as protected upstream of every
-number in this paper; appendix~\ref{app:attrition} prints what the dropped
+number in this paper. Appendix~\ref{app:attrition} prints what the dropped
 categories look like when retained (the excluded \texttt{Race Not Available}
 group approves at $0.7234$, below every retained majority group). And our
-division of labour --- deterministic code owns every number, the model owns
-only interpretation, scoring runs against the numbers --- protected every
+division of labour (deterministic code owns every number, the model owns
+only interpretation, scoring runs against the numbers) protected every
 \emph{number} in this paper and not one of the \emph{operationalisations}: it
 is the reason we can state which of our results were artifacts, and it is no
 defence against choosing the wrong construct in the first place.
@@ -829,7 +831,7 @@ appear to mean.
         class of silent inversions into a build failure
         (\S\ref{sec:library}).
   \item \textbf{Report the interval, the $n$, and the reference group beside
-        every ratio}, and print what any floor withheld --- suppressed cells
+        every ratio}, and print what any floor withheld: suppressed cells
         with their $n$ and their unreported value. The audit of
         \S\ref{sec:intervals} was not wrong about any number it computed; it
         was wrong about what it did not print.
@@ -846,8 +848,8 @@ appear to mean.
         auditing a split; all of our attrition happened before any metric ran
         (\S\ref{sec:subsample}, appendix~\ref{app:attrition}).
   \item \textbf{Name the reporting policy.} Floor, interval, or shrinkage is a
-        choice among failure modes --- silence, abstention, or confident
-        clearance --- and \S\ref{sec:subsample} shows they disagree massively
+        choice among failure modes (silence, abstention, or confident
+        clearance), and \S\ref{sec:subsample} shows they disagree massively
         at realistic audit sizes. A reported table should say which policy
         produced it.
 \end{enumerate}
@@ -855,7 +857,7 @@ appear to mean.
 \paragraph{These steps are necessary, not sufficient.} The list is what our
 measured failures imply, not an enumeration of the ways an audit can be wrong,
 and completing it does not make a model fair or a lender compliant. A real
-review involves far more than a disparity screen --- significance testing,
+review involves far more than a disparity screen: significance testing,
 controls for legitimate underwriting factors, comparative file review, and
 analyses of pricing and of less discriminatory alternatives, none of which a
 disparity ratio addresses. We perform the screening step only. Anyone citing
@@ -871,14 +873,14 @@ German data are a structural analogue from a different market and era, and no
 US conclusion is drawn from them.
 
 \textbf{No human subjects.} We make claims about what an audit reader would
-conclude without testing them on audit readers --- the natural next study, and
-the main gap between this work and the stakeholder line it builds on
-\citep{luo2025,luo2026b}.
+conclude without testing them on audit readers. That is the natural next
+study, and the main gap between this work and the stakeholder line it builds
+on \citep{luo2025,luo2026b}.
 
 \textbf{No causal or legal claims.} All metrics are associational; root-cause
 mapping is rule-based inference over metric values. Regulation appears in this
-paper only as the provenance of definitions and flags --- never as something
-we interpret --- and a disparate-impact ratio below $0.80$ is a screening
+paper only as the provenance of definitions and flags, never as something
+we interpret, and a disparate-impact ratio below $0.80$ is a screening
 signal, not a finding of discrimination \citep{barocas2016,wachter2021}.
 
 \textbf{Model limitations.} The German Credit classifier uses protected
@@ -908,7 +910,7 @@ At the layer of the library, a constructor default decided which outcome of a
 loan is good, and reported the disadvantaged group as favoured. At the layer
 of the definition, an attribute banding decided which age question the audit
 asked, and answered the wrong one cleanly; and at realistic audit sizes, the
-reporting policy --- floor, point, interval, shrinkage --- decided whether a
+reporting policy (floor, point, interval, shrinkage) decided whether a
 violating subgroup was falsely cleared, silently omitted, or honestly left
 undetermined, at rates between $84\%$ and $95\%$ for the policies that report
 small cells. At the layer of the audit's own instruments, a 40-character rule
@@ -920,8 +922,8 @@ previously reported.
 
 Every one of these is the same event: an intended, documented construct,
 operationalised as something adjacent, producing a clean number, recorded
-nowhere. The gap is not closable in general --- every measurement
-operationalises --- but it is \emph{recordable}, and \S\ref{sec:protocol} is
+nowhere. The gap is not closable in general, because every measurement
+operationalises, but it is \emph{recordable}, and \S\ref{sec:protocol} is
 the record this audit would have needed: the outcome, the interval, the $n$,
 the reference group, the definition's source, the reporting policy, and an
 adversarial test for every gate. None of it is technically difficult. All of
@@ -975,7 +977,7 @@ $0.8897$; Lending Club (synthetic gender; instrument-test setting only)
 \section{Minimal reproduction of the favorable-label default}
 \label{app:repro}
 
-The script (deterministic --- fixed counts, no RNG), its complete output, and
+The script (deterministic: fixed counts, no RNG), its complete output, and
 the pinned environment (\texttt{requirements-repro.txt}: \texttt{aif360==0.6.1},
 \texttt{fairlearn==0.13.0}). Two groups of $1{,}772$; the privileged group
 defaults $111$ times, the unprivileged $134$.
@@ -998,9 +1000,9 @@ full-population cell table \emph{under each reference convention}; violating
 cells are those with $\theta$-DI below $0.80$ excluding the reference (four
 cells under the max-rate conventions, three under the control convention).
 Policies as in \S\ref{sec:subsample}. The Wilson policy's DI interval is
-deliberately conservative --- disadvantaged cell's lower bound over the
-reference's upper bound, ignoring the correlation between the two estimates
---- and it over-covers: measured coverage $0.993$--$1.0$ against nominal
+deliberately conservative (disadvantaged cell's lower bound over the
+reference's upper bound, ignoring the correlation between the two estimates)
+and it over-covers: measured coverage $0.993$--$1.0$ against nominal
 $0.95$. That is the intended direction of error for an audit, and it is why
 the abstention rates in the grid are upper bounds on what a sharper interval
 (delta method, bootstrap) would produce \citep{chen2018}. The empirical-Bayes
@@ -1010,8 +1012,8 @@ weighted (Kleinman) beta-binomial moment estimator of the intraclass
 correlation $\rho$, clipped to $[10^{-4}, 0.99]$; on this population
 $\tau \approx 90$, which is why the policy clears small violating cells even
 at full population strength. A data-dependent reference (both max-rate
-conventions) is re-fit within every draw --- that is what the convention
-\emph{is} --- while the control reference is fixed.
+conventions) is re-fit within every draw, because that is what the convention
+\emph{is}, while the control reference is fixed.
 
 \paragraph{Full grid.} Rates in \% of draws.
 
@@ -1028,7 +1030,7 @@ Generated by \texttt{scripts/hmda\_attrition.py}, which replays
 
 \subsection*{Race DI on raw approval rates, dropped categories retained}
 
-Raw approvals (\texttt{action\_taken == 1}) over all $20{,}000$ rows --- a
+Raw approvals (\texttt{action\_taken == 1}) over all $20{,}000$ rows: a
 property of the data, not the model, since dropped rows never receive
 predictions. The excluded \texttt{Race Not Available} group ($4{,}140$
 applicants) approves at $0.7234$: it clears the $0.80$ screen against White

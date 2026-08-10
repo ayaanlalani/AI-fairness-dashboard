@@ -60,14 +60,13 @@ Deterministic Ground Truth for Auditing LLM Fairness Interpretation}
 \begin{abstract}
 Large language models are increasingly proposed as fairness auditors, but
 evaluating them requires ground truth that does not itself come from a model.
-We release a benchmark over three lending use cases --- consumer credit (German
-Credit), mortgage origination (HMDA Georgia), and peer-to-peer default risk
-(Lending Club) --- in which a deterministic AIF360 pipeline computes every
+We release a benchmark over three lending use cases (consumer credit with
+German Credit, mortgage origination with HMDA Georgia, and peer-to-peer
+default risk with Lending Club) in which a deterministic AIF360 pipeline computes every
 metric and assigns every severity label, and the LLM is scored only on its
 interpretation of that fixed context. The benchmark ships 36 frozen prompts, a
 no-API-key replay path, two anti-hallucination detectors, and an enforced
-cumulative cost cap; full reproduction cost \$0.89 across 98 calls. Our results
-argue against
+cumulative cost cap. Our results argue against
 the summary statistic our own benchmark produces. Aggregate severity agreement
 for \texttt{gpt-4o} is 75\%, but it decomposes to 33\%, 92\%, and 100\% across
 the three use cases, and that ordering tracks how discriminating each underlying
@@ -76,8 +75,8 @@ changed severity label across four prompt strategies on identical input.
 We also report two findings against our own instruments: a
 refusal detector that flagged six correct terse answers as refusals, and a
 guardrail that penalised the epistemically correct response to an $n{=}6$
-subgroup. Separately, a metric-orientation error --- computing selection rates
-on the unfavorable label --- produced a disparate-impact ratio of $0.0$ where
+subgroup. Separately, a metric-orientation error (computing selection rates
+on the unfavorable label) produced a disparate-impact ratio of $0.0$ where
 the correct value is $0.9931$, from a single convention applied to a target
 named \texttt{loan\_default}. Following \citet{lee2020}, we pair every
 statistical finding with its decision-context interpretation.
@@ -138,10 +137,10 @@ They differ in the two properties that most change what an audit can conclude:
 whether the protected attribute is a protected class or an economic proxy, and
 whether the classifier discriminates enough for disparity to be measurable at
 all. Lending discrimination is well documented empirically across exactly this
-span --- appearance and gender effects in peer-to-peer markets
+span: appearance and gender effects in peer-to-peer markets
 \citep{duarte2012,pope2011}, FinTech-era consumer lending
 \citep{bartlett2019}, local credit-market conditions \citep{butler2017}, and
-historical records used as training data \citep{sarwal2024} --- which is what
+historical records used as training data \citep{sarwal2024}. That span is what
 makes the lifecycle framing tractable rather than arbitrary.
 
 \begin{table}[t]
@@ -183,8 +182,8 @@ privileged-minus-unprivileged ordering while severity narratives quote the sign.
 \subsection{Frozen prompts and the two tracks}
 
 Each (use case $\times$ attribute) pair is rendered into four prompt
-strategies --- \texttt{zero\_shot}, \texttt{chain\_of\_thought},
-\texttt{self\_critique}, \texttt{constrained} --- giving
+strategies (\texttt{zero\_shot}, \texttt{chain\_of\_thought},
+\texttt{self\_critique}, \texttt{constrained}), giving
 $3 \times 3 \times 4 = 36$ prompts. Every prompt
 embeds the computed metric context, the use-case framing, and retrieved
 Semantic Scholar evidence, and is stored in full alongside its scored mock
@@ -194,7 +193,7 @@ the released packs double as a no-key regression test.
 \textbf{Track Q} asks whether the model is a reliable metric interpreter, and is
 scored against \texttt{classify\_severity}. \textbf{Track H} asks whether the
 model raises the audit-quality ceiling, and is judged \emph{only} against an
-H1--H5 checklist, a mechanical guardrail baseline, and a quality rubric ---
+H1--H5 checklist, a mechanical guardrail baseline, and a quality rubric,
 never against the deterministic numbers, since doing so would re-run Track Q
 and would
 penalise an audit for being more careful than a threshold table.
@@ -219,7 +218,7 @@ revision of this benchmark, auditing a $200$-row held-out split, reported
 \texttt{under\_40}\,$\times$\,\texttt{female} at DI $0.6087$ ($n{=}46$) as a
 critical intersectional finding; over all $1{,}000$ applicants the same cell
 reads $\mathbf{0.8201}$ with a $95\%$ interval of $[0.697, 1.003]$ ($n{=}241$)
---- clearing the screen, with a band the audit cannot determine. The
+and clears the screen, with a band the audit cannot determine. The
 split-size number was an artifact of the audited population, and its
 correction is itself benchmark evidence: intersectional cells at held-out-split
 size mislead in \emph{both} directions.
@@ -236,7 +235,7 @@ interval reports it.
 Over all $10{,}978$ applicants, six of twelve
 \texttt{race}\,$\times$\,\texttt{sex} cells have no determinate severity band:
 the lowest point estimate, \texttt{American Indian}\,$\times$\,\texttt{Male}
-at $0.6734$ ($n{=}31$), carries a $95\%$ interval of $[0.453, 0.904]$ ---
+at $0.6734$ ($n{=}31$), carries a $95\%$ interval of $[0.453, 0.904]$:
 consistent with a critical violation and with clearing the screen. The
 disparities the data defensibly support are the large cells:
 \texttt{Black}\,$\times$\,\texttt{Female} at $0.8632$ $[0.806, 0.937]$
@@ -257,7 +256,7 @@ The target is \texttt{loan\_default}, so label $1$ is the \emph{unfavorable}
 outcome. Computing selection rates on predicted default gave male $0.0000$
 versus female $0.0069$, hence $\mathrm{DI}=0/0.0069=0.0$, reported as
 \textsc{critical}. Oriented on the favorable outcome (predicted non-default),
-the rates are $1.0000$ and $0.9931$ and \textbf{$\mathrm{DI}=0.9931$} --- near
+the rates are $1.0000$ and $0.9931$ and \textbf{$\mathrm{DI}=0.9931$}, near
 parity. One convention moved the headline metric from maximally alarming to
 unremarkable.
 
@@ -298,7 +297,7 @@ Refusals are split into genuine versus brevity-heuristic artifacts
 Aggregate severity agreement is $27/36$ ($75.0\%$). \textbf{We argue against
 quoting that number.} It decomposes to german\_credit $33.3\%$, hmda $91.7\%$,
 lending\_club $100\%$, and the ordering is not a capability ranking.
-lending\_club's perfect score is the easiest possible case --- a near-degenerate
+lending\_club's perfect score is the easiest possible case: a near-degenerate
 classifier makes every attribute a trivially correct near-parity \textsc{low}.
 german\_credit is hardest: three \textsc{moderate} baselines near threshold
 boundaries where small interpretive differences flip the label. Aggregate
@@ -312,8 +311,8 @@ tool; over-escalation costs review time, not a missed finding.
 
 \textbf{Three of nine attribute pairs changed severity label across the four
 strategies on identical input context} (Figure~\ref{fig:matrix}). Same model,
-same numbers, different phrasing, different verdict. This --- not the agreement
-rate --- is the core reliability result, and it is why we do not recommend
+same numbers, different phrasing, different verdict. This, not the agreement
+rate, is the core reliability result, and it is why we do not recommend
 letting a model \emph{set} a severity label. One caution on reading the
 \emph{score} column: reanalysis of the frozen records shows cycle-level mean
 scores dip on the \texttt{constrained} strategy because the completeness and
@@ -332,14 +331,14 @@ alone moved the verdict.}
 
 \paragraph{Grounding: a legacy contrast, not an ablation.}
 An earlier ungrounded run showed many more fabricated-citation flags than the
-frozen grounded run, but the two runs straddle a pipeline revision --- leak
-removal, full-population re-run, an added attribute --- so the metric inputs
+frozen grounded run, but the two runs straddle a pipeline revision (leak
+removal, full-population re-run, an added attribute), so the metric inputs
 changed alongside the grounding, and no effect size should be quoted until a
 clean ablation holding the pipeline fixed has been run.
 
 \paragraph{Provider comparison requires separating transport from behaviour.}
 On the identical harness, the refusal detector flagged 19 of 24 Gemini 2.5
-Flash cycles --- but 18 of the 24 records are \emph{empty API results}, which
+Flash cycles. But 18 of the 24 records are \emph{empty API results}, which
 the 40-character rule counts as refusals, and four of those empty records
 still scored $10.0$ through a scoring default. The provider means are $19.79$
 over all records, $47.50$ excluding zero scores, and $72.50$ over the six
@@ -355,8 +354,8 @@ citations verified} against the retrieved evidence pool. A rubric judge
 (\texttt{gpt-4o} grading o3's narratives) scored $4.8$, $4.7$, and $5.0$ out of
 $5$; the benchmark's own architecture scores models against deterministic
 labels rather than another model's opinion, so we quote those rubric numbers
-only to disclose them --- the companion FAccT paper excludes them as an
-unvalidated operationalisation of ``quality'' --- and rest Track H's claims on
+only to disclose them (the companion FAccT paper excludes them as an
+unvalidated operationalisation of ``quality'') and rest Track H's claims on
 the mechanical gates alone.
 
 Qualitatively, the narrative form supplied things the deterministic template
@@ -378,8 +377,8 @@ accurate" is a category error.
 \paragraph{The refusal detector conflates brevity with refusal.}
 It flagged 6 of 9 \texttt{constrained} responses; \textbf{none were genuine
 refusals}. Any narrative field under 40 characters counts as effectively empty,
-so \texttt{how\_to\_fix: "DisparateImpactRemover"} --- precise and on-spec in 22
-characters --- registers as a refusal, under a prompt that asked for terse
+so \texttt{how\_to\_fix: "DisparateImpactRemover"} (precise and on-spec in 22
+characters) registers as a refusal, under a prompt that asked for terse
 output. Reporting a $66.7\%$ refusal rate would have attributed a measurement
 artifact to the model. We left the detector unchanged, since it is part of the
 frozen harness and altering it would invalidate the ungrounded comparison, and
@@ -388,7 +387,7 @@ report the distinction instead.
 \paragraph{A guardrail penalised the correct answer.}
 Our baseline requires every mitigation to name a canonical algorithm. The two
 attributes that fail are exactly the two whose problem \emph{is} data scarcity
---- foreign worker ($n{=}6$) and loan-amount tier ($3.2\times$ imbalance) ---
+(foreign worker at $n{=}6$, and loan-amount tier at $3.2\times$ imbalance)
 where the audit instead proposed acquiring records to a stated floor, Bayesian
 hierarchical shrinkage, bootstrapped confidence intervals, and manual review.
 \textbf{No post-processor repairs an $n{=}6$ subgroup}; applying one would
@@ -407,8 +406,8 @@ capability than about where a model can be trusted in a human decision pipeline.
 The defensible division of labour is the one the benchmark enforces:
 \emph{deterministic code owns the numbers and the thresholds; the model owns the
 interpretation; and the interpretation is gated on evidence the model did not
-invent.} Track Q supports the first clause --- severity labels move under
-paraphrase --- and the citation-verification gate supports the third.
+invent.} Track Q supports the first clause, since severity labels move under
+paraphrase, and the citation-verification gate supports the third.
 
 Two implications for practice. First, point-estimate auditing of small
 intersectional cells misleads in both directions: UC1's split-sized audit
@@ -417,7 +416,7 @@ and UC2's full-population table shows the defensible disparity demoted to
 sixth place by a ranked point-estimate reading. Second, threshold-as-gate
 reading destroys information. UC2's determinate cells mean a real $0.86$
 disparity; UC3's null means the model is not deciding anything yet. Both are
-invisible if DI is read as pass/fail --- which is how it tends to be used, and
+invisible if DI is read as pass/fail, which is how it tends to be used, and
 what \citet{stumpf2024} and \citet{kim2025} identify as the gap between
 fairness metrics and the assessments practitioners actually need.
 
@@ -444,8 +443,6 @@ fairness metrics and the assessments practitioners actually need.
   \item \textbf{No legal claim.} Regulation appears only as the provenance of
         definitions and flags in the underlying data. A DI below $0.8$ is a
         screening signal, not a finding of discrimination.
-  \item \textbf{Cost figures.} o3 is priced at the higher historical rate, so its
-        cost is an upper bound rather than a billed amount.
   \item \textbf{Generality.} HMDA is Georgia only; German Credit is 1990s data
         used as a benchmark, not a current population.
 \end{itemize}
@@ -453,8 +450,8 @@ fairness metrics and the assessments practitioners actually need.
 \section{Conclusion}
 
 We release a lending-lifecycle fairness benchmark whose ground truth is
-deterministic, whose 36 prompts are frozen and replayable without an API key,
-and whose full reproduction costs under a dollar. Its most useful outputs are
+deterministic and whose 36 prompts are frozen and replayable without an API
+key. Its most useful outputs are
 the uncomfortable ones: an aggregate agreement statistic that we show is not a
 well-defined quantity, severity labels that move under paraphrase, a
 disparate-impact ratio that read $0.0$ instead of $0.9931$ because of one

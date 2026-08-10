@@ -92,11 +92,6 @@ MAP: list[tuple[str, str, str]] = [
         "python3.11 scripts/evaluate_track_h.py",
     ),
     (
-        "Spend: $0.8933 over 98 calls against a $15 cap",
-        "artifacts/llm_benchmark/spend_ledger.json",
-        "cat artifacts/llm_benchmark/spend_ledger.json",
-    ),
-    (
         "German Credit AgeGroup x Sex cell table; under-40 female 0.8201",
         "artifacts/consolidated/interval_estimates.json",
         "python3.11 scripts/interval_estimates.py --emit-tex",
