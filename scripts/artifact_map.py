@@ -47,7 +47,7 @@ MAP: list[tuple[str, str, str]] = [
         "python3.11 scripts/compare_populations.py",
     ),
     (
-        "Subsampling rates (Fig. 1, Table 4, App. D): false clearance 83.8% point / 95.2% EB; floors 100% wrong worst cell; Wilson abstains 90.3% (m=2196)",
+        "Subsampling rates (Fig. 1, Table 3, subsampling appendix): false clearance 83.8% point / 95.2% EB; floors 100% wrong worst cell; Wilson abstains 90.3% (m=2196)",
         "artifacts/consolidated/subsample_study.json",
         "python3.11 scripts/subsample_study.py",
     ),

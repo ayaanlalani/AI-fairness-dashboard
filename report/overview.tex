@@ -20,8 +20,8 @@
 
 \begin{document}
 
-\title{The Metric Is Not the Statute}
-\subtitle{Construct validity at every layer of a fair lending audit}
+\title{The Metric Is Not the Construct}
+\subtitle{Construct validity at every layer of a lending audit}
 
 \author{Siddhant Jain}
 \affiliation{\institution{Simon Fraser University}\country{}}
@@ -37,16 +37,17 @@
 \section{The question}
 
 Models now decide consumer installment credit and residential mortgage
-origination. Both are regulated --- ECOA and Regulation B govern both, the Fair
-Housing Act adds to mortgage --- so the constructs an audit must measure are
-written down. \textbf{At each layer of a fairness audit --- the metric library,
-the mapping to the statute, and the audit's own evaluation instruments ---
-does the quantity actually computed match the construct it is named for, and
-would anyone be able to tell from the output?}
+origination --- a setting where the constructs an audit must measure come with
+written definitions and published flags. \textbf{At each layer of a fairness
+audit --- the metric library, the mapping from attribute to construct, and
+the audit's own evaluation instruments --- does the quantity actually
+computed match the construct it is named for, and would anyone be able to
+tell from the output?}
 
 \section{Why it matters}
 
-Five decisions determine whether a lending audit is \emph{legally} meaningful:
+Five decisions determine whether an audit's numbers mean what its readers
+take them to mean:
 which outcome counts as favorable, who counts as protected, against whom the
 comparison runs, how much evidence supports each subgroup estimate, and which
 instruments check the audit's own components. Get any one wrong and the audit
@@ -76,10 +77,11 @@ target named \texttt{loan\_default} it reports the disadvantaged group as
 ships an interval, an $n$, or a record of the reference group with a
 disaggregated ratio.
 
-\textbf{The statute layer.} Auditing age at $40{+}$ (ADEA, employment law)
-returns $0.9791$ --- clean. At $62{+}$, the line Regulation~B turns on, the
-same model over the same $10{,}978$ rows returns $\mathbf{0.8897}$, the
-largest age disparity present. And at the audit size we originally used
+\textbf{The definition layer.} Auditing age at $40{+}$ --- a threshold
+imported from employment practice --- returns $0.9791$: clean. At $62{+}$,
+the boundary the mortgage data ship a dedicated flag for, the same model over
+the same $10{,}978$ rows returns $\mathbf{0.8897}$, the largest age disparity
+present. And at the audit size we originally used
 ($m{=}2{,}196$), the subsampling study shows a no-floor audit falsely clears a
 violating race$\times$sex cell in $\mathbf{83.8\%}$ of draws, while reporting
 floors never do --- because they misidentify the worst-treated group in
@@ -97,10 +99,10 @@ so the published magnitude was partly our own scorer.
 
 \textbf{1.} State the favorable outcome explicitly; never accept the default.
 \textbf{2.} Report the interval, the $n$, and the reference group beside every
-ratio, and publish what any floor suppressed. \textbf{3.} Put the statute
-citation beside the threshold in code: Reg.~B turns on $62{+}$, not ADEA
-$40{+}$; \S1002.6(b)(2)(iv) permits \emph{favouring} elderly applicants, which
-a symmetric ratio cannot express. \textbf{4.} Treat every mechanical gate as a
+ratio, and publish what any floor suppressed. \textbf{3.} Put the
+definition's source beside the threshold in code --- a comment asserting the
+wrong provenance for $40{+}$ survived review because it looked authoritative.
+\textbf{4.} Treat every mechanical gate as a
 hypothesis to falsify, starting where the correct answer is unusual.
 \textbf{5.} Audit the book, not a test split, and disclose population
 construction. \textbf{6.} Name the reporting policy --- floor, interval, or

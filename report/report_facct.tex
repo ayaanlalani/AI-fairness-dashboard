@@ -1,10 +1,12 @@
 % report_facct.tex — FAccT/ACM draft. PRIMARY paper for this project.
 %
 % Thesis: at every layer of a fairness audit — the metric library, the mapping
-% to the governing statute, and the instruments that evaluate the audit's own
-% components — the construct actually operationalised differs from the
-% construct named, the output is clean either way, and nothing records the
-% substitution.
+% from attribute to documented construct, and the instruments that evaluate
+% the audit's own components — the construct actually operationalised differs
+% from the construct named, the output is clean either way, and nothing
+% records the substitution. The paper makes measurement claims only; law
+% appears solely as the provenance of definitions and flags, never
+% interpreted (user decision 2026-08-10: no legal stance).
 %
 % The NeurIPS Datasets & Benchmarks variant is report/report.tex (same project,
 % artifact-first framing; shares refs.bib and all numbers). Numbers changed
@@ -31,8 +33,8 @@
 
 \begin{document}
 
-\title{The Metric Is Not the Statute}
-\subtitle{Construct Validity at Every Layer of a Fair Lending Audit}
+\title{The Metric Is Not the Construct}
+\subtitle{Construct Validity at Every Layer of a Lending Audit}
 
 \author{Siddhant Jain}
 \affiliation{%
@@ -52,13 +54,13 @@
 \renewcommand{\shortauthors}{Jain, Lalani, and Vincent}
 
 \begin{abstract}
-A fairness audit is a chain of measurements, and at every link something named
-in law or in documentation --- ``favorable outcome,'' ``the protected class,''
+A fairness audit is a chain of measurements, and at every link a construct
+someone intended --- ``favorable outcome,'' ``the protected class,''
 ``disparate impact,'' ``refusal,'' ``fabrication'' --- is operationalised as
-something a program can compute. This paper measures the gap between the two,
-in a setting where the named construct is written down: US fair lending law,
-audited on $1{,}000$ consumer credit applications and $10{,}978$ Georgia
-mortgage applications.
+something a program can compute. This paper measures the gap between the two
+in consumer lending, a setting where the intended definitions are unusually
+well documented, on $1{,}000$ consumer credit applications and $10{,}978$
+Georgia mortgage applications.
 
 The gap appears at three layers. In the metric library (verified directly in
 AIF360~0.6 and Fairlearn~0.13, and scoped to what we verified): one AIF360
@@ -66,36 +68,37 @@ constructor defaults \texttt{favorable\_label=1.0}, so on a target named
 \texttt{loan\_default} it reports the disadvantaged group as favoured ---
 $\mathrm{DI}=1.2072$ where the oriented value is $0.9862$ --- and neither
 library attaches an interval, a sample size, or a record of the reference
-group to a disaggregated ratio. In the mapping to the statute: a banded age
-attribute reads $0.9791$ where the cut Regulation~B actually turns on,
-$62{+}$, reads $0.8897$; and a subsampling study over the full mortgage
-population shows that at the audit size we originally used, a no-floor audit
-falsely clears a violating subgroup in $83.8\%$ of draws while a reporting
-floor never does --- because it never reports the subgroup at all,
-misidentifying the worst-treated group in $100\%$ of draws. In the audit's own
-instruments: a refusal detector that operationalises ``refusal'' as
-\emph{under 40 characters} flagged six correct answers and contributed to
-permanently blocking a provider, and the score spread read as prompt
-sensitivity concentrates in the one cycle whose correct answers are terse.
+group to a disaggregated ratio. In the mapping from attribute to construct: a
+banded age attribute reads $0.9791$ where the $62{+}$ cut --- the boundary the
+mortgage data ship a dedicated flag for --- reads $0.8897$; and a subsampling
+study over the full mortgage population shows that at the audit size we
+originally used, a no-floor audit falsely clears a violating subgroup in
+$83.8\%$ of draws while a reporting floor never does --- because it never
+reports the subgroup at all, misidentifying the worst-treated group in
+$100\%$ of draws. In the audit's own instruments: a refusal detector that
+operationalises ``refusal'' as \emph{under 40 characters} flagged six correct
+answers and contributed to permanently blocking a provider, and the score
+spread read as prompt sensitivity concentrates in the one cycle whose correct
+answers are terse.
 
 Every one of these substitutions produced a clean output --- the direction
 least likely to prompt a second look --- and none of them is recorded anywhere
 a reader of the audit could find. We close with what an audit would have to
 record for its numbers to mean what its readers take them to mean, and with
-appendices that print the full cell tables, the statutory text, and a
-claim-by-claim map from every number to the artifact that regenerates it.
+appendices that print the full cell tables and a claim-by-claim map from
+every number to the artifact that regenerates it.
 \end{abstract}
 
 \begin{CCSXML}
 <ccs2012>
 <concept>
-<concept_id>10003456.10003462.10003480</concept_id>
-<concept_desc>Social and professional topics~Governmental regulations</concept_desc>
+<concept_id>10010147.10010257</concept_id>
+<concept_desc>Computing methodologies~Machine learning</concept_desc>
 <concept_significance>500</concept_significance>
 </concept>
 <concept>
-<concept_id>10010147.10010257</concept_id>
-<concept_desc>Computing methodologies~Machine learning</concept_desc>
+<concept_id>10003456.10003462.10003480</concept_id>
+<concept_desc>Social and professional topics~Governmental regulations</concept_desc>
 <concept_significance>300</concept_significance>
 </concept>
 <concept>
@@ -106,12 +109,12 @@ claim-by-claim map from every number to the artifact that regenerates it.
 </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Social and professional topics~Governmental regulations}
-\ccsdesc[300]{Computing methodologies~Machine learning}
+\ccsdesc[500]{Computing methodologies~Machine learning}
+\ccsdesc[300]{Social and professional topics~Governmental regulations}
 \ccsdesc[300]{Human-centered computing~Human computer interaction (HCI)}
 
 \keywords{measurement, construct validity, algorithmic auditing, disparate
-impact, intersectionality, lending, ECOA, large language models}
+impact, intersectionality, lending, large language models}
 
 \maketitle
 
@@ -122,29 +125,29 @@ Credit decisions are among the most consequential automated decisions people
 encounter, and two of them dominate household outcomes: consumer installment
 credit, which governs access to short-term liquidity, and residential mortgage
 origination, which governs access to the principal asset most households will
-ever own. Both are directly regulated. The Equal Credit Opportunity Act and
-Regulation~B govern both; the Fair Housing Act adds to mortgage; and the Home
-Mortgage Disclosure Act makes mortgage lending publicly auditable in a way
-almost no other consumer decision is. \citet{lee2020} make the organising
-commitment of human-centered fair AI that fairness is defined relative to a
-human decision context rather than in metric space. In lending, that decision
-context is written down: it is a statute. That is what makes lending the right
-place to measure a gap that is usually unmeasurable --- between the construct a
+ever own. \citet{lee2020} make the organising commitment of human-centered
+fair AI that fairness is defined relative to a human decision context rather
+than in metric space. Lending's decision context is unusually well
+documented: the mortgage data are published for public audit, the protected
+categories come with written definitions, and the datasets themselves ship the
+flags those definitions turn on. That is what makes lending the right place to
+measure a gap that is usually unmeasurable --- between the construct a
 fairness instrument is \emph{named for} and the construct it actually
 \emph{operationalises} \citep{jacobswallach2021}.
 
 This paper's claim is that the gap appears at every layer of an audit, that it
 takes the same shape at each layer, and that it is invisible in the output.
 The layers are: the metric library, whose defaults resolve normative questions
-no caller answered; the mapping from metric to statute, where the quantity
-computed and the quantity the law turns on part company; and the audit's own
-evaluation instruments --- detectors, gates, scores --- each of which
-operationalises a judgement (``what counts as an answer,'' ``what counts as
-evidence,'' ``what counts as a remedy'') as a mechanical proxy. At each layer
-the instrument computes correctly, the output is clean, and the substitution
-is recorded nowhere. Table~\ref{tab:inventory} is the paper in one place:
-every instance, its named construct, its operationalisation, and the clean
-number the gap produced.
+no caller answered; the mapping from attribute to construct, where the
+quantity computed and the quantity the audit's readers care about part
+company; and the audit's own evaluation instruments --- detectors, gates,
+scores --- each of which operationalises a judgement (``what counts as an
+answer,'' ``what counts as evidence,'' ``what counts as a remedy'') as a
+mechanical proxy. At each layer the instrument computes correctly, the output
+is clean, and the substitution is recorded nowhere.
+Table~\ref{tab:inventory} is the paper in one place: every instance, its
+named construct, its operationalisation, and the clean number the gap
+produced.
 
 That the instrument is part of the finding is by now well documented.
 \citet{deng2022} find practitioners using fairness toolkits in ways their
@@ -153,9 +156,9 @@ open-source toolkits support; \citet{holstein2019} report that practitioner
 needs diverge sharply from what the literature supplies. \citet{mei2025} show,
 in a speech setting, that audit \emph{pipelines} introduce pitfalls that change
 conclusions, and \citet{zaccour2025} show that quantitative audits are more
-often blocked by data access than by method. We add a regulated setting where
-the named constructs are statutory text, so the gap can be measured rather
-than argued.
+often blocked by data access than by method. We add a setting where the named
+constructs come with written definitions and published flags, so the gap can
+be measured rather than argued.
 
 \begin{table*}[t]
 \caption{The instance inventory. Each row is one measurement in this audit
@@ -183,15 +186,15 @@ as $0.9604$ at $n{=}4{,}019$ & \S\ref{sec:library}, \S\ref{sec:intervals}\\
 & the convention moves every ratio 3--4 points & $0.6734$ or $0.7012$; $0.8632$
 or $0.8988$ & \S\ref{sec:reference}\\
 \midrule
-\multicolumn{5}{@{}l}{\textit{Layer two: the statute (ECOA / Regulation B; appendix~\ref{app:statutes} quotes the text)}}\\
+\multicolumn{5}{@{}l}{\textit{Layer two: the documented construct (definitions the data and their publishers supply)}}\\
 \addlinespace[2pt]
-``age'' (prohibited basis) & banded \texttt{age\_group} audited at $40{+}$
-& public age bands straddle 62, the line \S1002.6(b)(2) turns on; young and
-senior pool and cancel & $0.9791$, severity \textsc{low} ($62{+}$ cut: $0.8897$)
-& \S\ref{sec:age}\\
+``age'' (protected class) & banded \texttt{age\_group} audited at $40{+}$
+& public age bands straddle 62, the boundary the data's own flag encodes;
+young and senior pool and cancel & $0.9791$, severity \textsc{low} ($62{+}$
+cut: $0.8897$) & \S\ref{sec:age}\\
 \addlinespace[2pt]
-``discrimination'' & outcome-rate disparity & silent on the disparate-\emph{treatment}
-prong entirely & clean $\mathrm{DI}=0.8888$ from a model taking sex and age as
+``discrimination'' & outcome-rate disparity & silent about the model's inputs
+entirely & clean $\mathrm{DI}=0.8888$ from a model taking sex and age as
 inputs & \S\ref{sec:treatment}\\
 \midrule
 \multicolumn{5}{@{}l}{\textit{Layer three: the audit's own instruments (our released harness; evidence about building an audit)}}\\
@@ -227,10 +230,10 @@ Fairlearn~0.13 and scoped to what we verified: a favorable-label constructor
 default that inverts a ratio's meaning, the absence of any uncertainty
 quantification on disaggregated ratios, and the absence of any record of the
 reference group (\S\ref{sec:library}, appendix~\ref{app:repro}).
-(ii)~Two statute-layer gaps measured on real mortgage data: the banded-age
-operationalisation cannot see the line Regulation~B turns on, and
-disparate-impact tooling is structurally silent on the disparate-treatment
-prong (\S\ref{sec:statute}).
+(ii)~Two definition-layer gaps measured on real lending data: the banded-age
+operationalisation cannot represent the $62{+}$ boundary the data's own flag
+encodes, and outcome-rate tooling is structurally silent about the model's
+inputs (\S\ref{sec:statute}).
 (iii)~A subsampling study --- $2{,}000$ draws at each of five audit sizes,
 five reporting policies, three reference conventions --- that converts this
 audit's founding anecdote into a rate: policies that report small cells
@@ -241,9 +244,9 @@ worst-treated group at all (\S\ref{sec:subsample}, appendix~\ref{app:subsample})
 evidence about building an audit, including a reanalysis showing that a
 cross-model prompt-sensitivity difference we previously reported is partly an
 artifact of how our scorer treats terse output (\S\ref{sec:instruments}).
-(v)~Full-transparency appendices: every cell table under every convention, the
-statutory text, the minimal reproduction, and a claim-by-claim artifact map
-enforced by a test suite (appendices~\ref{app:cells}--\ref{app:map}).
+(v)~Full-transparency appendices: every cell table under every convention,
+the minimal reproduction, and a claim-by-claim artifact map enforced by a
+test suite (appendices~\ref{app:cells}--\ref{app:map}).
 
 \section{Background: three kinds of named construct}
 \label{sec:background}
@@ -268,34 +271,28 @@ criteria conflict is settled \citep{chouldechova2017,kleinberg2017,hardt2016};
 \citet{corbettdavies2018} catalogue how measures mislead when detached from
 decision context.
 
-\paragraph{The statute.} Fair lending law names its constructs with unusual
-precision, which is what makes the layer-two comparisons in this paper
-checkable (appendix~\ref{app:statutes} quotes every provision in full). Age is
-a prohibited basis \emph{at any age} for an applicant with capacity to
-contract (15~U.S.C.\ \S1691(a)(1); 12~C.F.R.\ \S1002.2(z)). ``Elderly'' means
-$62{+}$ (\S1002.2(o)) and exists to scope \S1002.6(b)(2), whose subparagraph
-(ii) is the provision that actually speaks to a scoring model: an empirically
-derived, demonstrably and statistically sound system may use age as a
-predictive variable \emph{provided the age of an elderly applicant is not
-assigned a negative factor}. Subparagraph (iv) permits \emph{favouring} an
-elderly applicant --- an asymmetric protection a symmetric ratio cannot
-express. And the general rule, \S1002.6(b)(1), bars taking a prohibited basis
-into account in any system of evaluating creditworthiness --- the
-disparate-\emph{treatment} prong, which no outcome-rate metric touches.
-\citet{barocas2016} and \citet{wachter2021} establish that legal
-discrimination does not reduce to a metric threshold; \citet{gillis2022}
-argues that input-scrutiny itself fails against algorithmic pricing, the
-complementary direction to our \S\ref{sec:treatment}.
+\paragraph{The documented decision context.} We make no legal claims in this
+paper --- discrimination law does not reduce to a metric threshold
+\citep{barocas2016,wachter2021}, and adjudicating it is not our competence.
+What lending supplies, and what this paper uses, is narrower: the decision
+context comes with \emph{written definitions and published flags}. The public
+mortgage data ship a dedicated \texttt{applicant\_age\_above\_62} field
+because $62{+}$ is a defined boundary in that domain's own documentation, so
+whether an age operationalisation can represent that boundary is a checkable
+question of measurement, not of law. Likewise, whether a model consumes a
+protected attribute directly is a documented property of its inputs ---
+\citet{gillis2022} examines input scrutiny at length --- and no outcome-rate
+metric reports it (\S\ref{sec:treatment}).
 
 One convention in this paper is itself an imported construct, and we label it
-rather than launder it. The four-fifths screen comes from 29~C.F.R.\
-\S1607.4(D) --- EEOC \emph{employment} guidance with no ECOA standing. We
-retain $0.80$ because it is the de facto screening convention in fair lending
-practice, we use it only as a screen, and we note that \S1607.4(D) itself
-contains the caveat our \S\ref{sec:validity} quantifies: greater differences
-``may not constitute adverse impact where the differences are based on small
-numbers and are not statistically significant.'' The screen's own text
-anticipates the failure mode this paper measures.
+rather than launder it. The four-fifths screen originated in US employment
+guidance, not in credit; we retain $0.80$ because it is the de facto screening
+convention in fairness practice, we use it only as a screen, and we note that
+the guidance's own text contains the caveat our \S\ref{sec:validity}
+quantifies: greater differences ``may not constitute adverse impact where the
+differences are based on small numbers and are not statistically
+significant.'' The screen's own source anticipates the failure mode this
+paper measures.
 
 \paragraph{The audit's instruments.} The third layer is newer but not new.
 LLM-as-judge evaluation is known to be fragile \citep{zheng2023};
@@ -322,7 +319,8 @@ inside an analysis pipeline; we diagnose the pipeline's own rulers.
 \paragraph{Settings.} Two regulated lending decisions and one instrument-test
 setting. German Credit \citep{germancredit} stands in for consumer installment
 credit: $1{,}000$ applications, 1990s German data --- a structural analogue
-under no US statute, from which we draw no ECOA conclusion. HMDA Georgia
+from a different market and era, from which we draw no US conclusion. HMDA
+Georgia
 \citep{hmda} is residential mortgage origination: $10{,}978$ applications
 after population construction (below). The third setting, a Lending Club
 default task, contains \emph{no protected class}: its \texttt{gender} column
@@ -421,52 +419,37 @@ measures what its absence costs.
 denominator, and neither library's output records which group supplied it.
 \S\ref{sec:reference} shows the choice moves every number in our tables.
 
-\section{Layer two: what the statute names}
+\section{Layer two: what the documented construct defines}
 \label{sec:statute}
 
 \subsection{The protected-class boundary}
 \label{sec:age}
 
-\emph{Construct named: age, a prohibited basis under ECOA. Operationalised as:
-a banded \texttt{age\_group} attribute audited at $40{+}$.}
+\emph{Construct named: age, as the lending domain defines the protected
+boundary. Operationalised as: a banded \texttt{age\_group} attribute audited
+at $40{+}$.}
 
 Fairness work on credit routinely audits age at $40{+}$, and our pipeline did,
-on the strength of a code comment asserting that $40{+}$ ``aligns with US
-ECOA.'' It does not: $40{+}$ is the Age Discrimination in Employment Act,
-which governs employment.
-
-The correct statement of the credit rule is more specific than swapping the
-number, and the distinction matters. Under Regulation~B, age is a prohibited
-basis \emph{at any age} for an applicant with the capacity to contract
-(\S1002.2(z)); ECOA does not protect only the old. The $62{+}$ definition of
-``elderly'' in \S1002.2(o) exists to scope the carve-outs in \S1002.6(b)(2),
-which govern when a demonstrably and statistically sound scoring system may
-use age at all and forbid assigning a negative factor to the age of an elderly
-applicant. So $62{+}$ is not ``the protected class'' --- it is the threshold
-at which a specific, asymmetric protection attaches. A binary audit at either
-threshold is a simplification; the difference is that $62{+}$ corresponds to
-something in the governing statute and $40{+}$ corresponds to nothing.
+on the strength of a code comment asserting that the threshold aligned with
+the domain's definition. It does not: $40{+}$ is a threshold imported from
+employment practice. The boundary lending's own documentation defines is
+$62{+}$ --- which is why the public mortgage data ship a dedicated
+\texttt{applicant\_age\_above\_62} flag in the first place.
 
 The substitution is not cosmetic. Our banded age attribute pools young and
 senior applicants ($n{=}2{,}304$ and $3{,}167$) against the middle band; the
 two move in opposite directions, so pooling cancels them. The banded attribute
 returns $\mathrm{DI}=0.9791$, severity \textsc{low} --- a clean bill of
-health. Audited on the statutory cut, the same model over the same $10{,}978$
+health. Audited on the documented cut, the same model over the same $10{,}978$
 rows returns $0.8897$, the largest age disparity in the dataset and the lowest
-of its four protected attributes. The flag required,
-\texttt{applicant\_age\_above\_62}, was present and unused in the raw HMDA
-file; it is published precisely because \S1002.2(o) turns on it, and it is
-necessary because the public age bands straddle $62$ (the ``55--64'' band
-cannot be split), so \emph{no} banded attribute can isolate the class. We
-report honestly that $0.8897$ clears the $0.80$ screen and the pipeline's
-\texttt{BiasFlag} remains false on both cuts: the statutory boundary changes
-which question the number answers, not the verdict on this data.
-
-One asymmetry this exposes and cannot resolve: \S1002.6(b)(2)(iv) expressly
-permits \emph{favouring} an elderly applicant. Disparate impact is symmetric,
-so a ratio above $1$ here is lawful and is not a reverse-disparity finding,
-yet the metric reports it identically. The instrument cannot express the rule
-it is being used to check.
+of its four protected attributes. The flag required was present and unused in
+the raw HMDA file, and it is necessary rather than convenient: the public age
+bands straddle $62$ (the ``55--64'' band cannot be split), so \emph{no} banded
+attribute can represent the boundary. No re-binning fixes a partition whose
+cuts are in the wrong places. We report honestly that $0.8897$ clears the
+$0.80$ screen and the pipeline's \texttt{BiasFlag} remains false on both cuts:
+the boundary changes which question the number answers, not the verdict on
+this data.
 
 \subsection{The comparator}
 \label{sec:reference}
@@ -486,23 +469,24 @@ conventions), and \S\ref{sec:subsample} shows the choice also changes how
 often an audit is \emph{wrong}, because a data-dependent reference is itself
 re-estimated in every sample.
 
-\subsection{The prong the metric cannot see}
+\subsection{The inputs the metric cannot see}
 \label{sec:treatment}
 
 \emph{Construct named: discrimination. Operationalised as: outcome-rate
 disparity.}
 
-The German Credit model takes applicant sex and age as input features. In a US
-setting that is facially disparate \emph{treatment} under 15~U.S.C.\
-\S1691(a)(1) and 12~C.F.R.\ \S1002.6(b)(1) --- per se unlawful, with no
-business-necessity defence --- and our pipeline ran that specification end to
-end and emitted a clean $\mathrm{DI}=0.8888$ without comment. We previously
-filed this under limitations; it is a result, and arguably the paper's
-sharpest. Disparate-impact tooling audits one prong of a two-prong legal
-standard and is structurally silent about the other, so the cleanest possible
-metric output is compatible with the most unambiguous form of violation. No
-disparity ratio, at any sample size, under any convention, could have flagged
-it \citep{gillis2022}.
+The German Credit model takes applicant sex and age as input features ---
+direct use of the protected attributes, the first thing any fairness review
+of a lending model would ask about --- and our pipeline ran that
+specification end to end and emitted a clean $\mathrm{DI}=0.8888$ without
+comment. We previously filed this under limitations; it is a result, and
+arguably the paper's sharpest. An outcome-rate metric is a function of
+predictions and group labels alone: it is structurally silent about what the
+model consumes, so the cleanest possible metric output is compatible with the
+most direct possible use of a protected attribute. No disparity ratio, at any
+sample size, under any convention, could have flagged it --- input scrutiny
+and outcome scrutiny are different measurements \citep{gillis2022}, and a
+toolchain that computes only the second says nothing about the first.
 
 \section{Measurement validity: what the number can support}
 \label{sec:validity}
@@ -786,9 +770,10 @@ run.)
 
 The layer-one findings hold for anyone using the verified libraries; the rest
 are about choices our audit made because nothing made them for us --- and that
-is the point. A lending audit is legally meaningful only if it answers the
-construct questions correctly: which outcome is favorable, who counts as
-protected, against whom, on how much evidence, checked by which instruments.
+is the point. An audit's numbers mean what its readers take them to mean only
+if the construct questions are answered correctly: which outcome is favorable,
+who counts as protected, against whom, on how much evidence, checked by which
+instruments.
 The toolchain answers the first by default and the rest not at all, so each is
 settled privately, by whoever writes the harness, without a record.
 
@@ -844,9 +829,9 @@ appear to mean.
         with their $n$ and their unreported value. The audit of
         \S\ref{sec:intervals} was not wrong about any number it computed; it
         was wrong about what it did not print.
-  \item \textbf{Bind protected-class definitions to the governing statute} in
-        code, with the citation next to the threshold. A comment asserting the
-        wrong statute survived review precisely because it looked
+  \item \textbf{Bind protected-class definitions to their documented source}
+        in code, with the citation next to the threshold. A comment asserting
+        the wrong provenance survived review precisely because it looked
         authoritative (\S\ref{sec:age}).
   \item \textbf{Treat every mechanical gate as a hypothesis to falsify},
         starting with inputs where the correct answer is unusual: the terse
@@ -865,23 +850,21 @@ appear to mean.
 
 \paragraph{These steps are necessary, not sufficient.} The list is what our
 measured failures imply, not an enumeration of the ways an audit can be wrong,
-and completing it does not make a model fair or a lender compliant. A full
-fair lending review additionally requires significance testing, controls for
-legitimate underwriting factors, comparative file review, proxy methodology,
-pricing and redlining analysis, and a documented search for less
-discriminatory alternatives --- the later stages of the burden-shifting
-structure, none of which a disparity ratio addresses. We perform the screening
-step only. Anyone citing this protocol as evidence of compliance is misusing
-it.
+and completing it does not make a model fair or a lender compliant. A real
+review involves far more than a disparity screen --- significance testing,
+controls for legitimate underwriting factors, comparative file review, and
+analyses of pricing and of less discriminatory alternatives, none of which a
+disparity ratio addresses. We perform the screening step only. Anyone citing
+this protocol as evidence of compliance is misusing it.
 
 \section{What this does not show}
 \label{sec:limitations}
 
-\textbf{Scale.} Two regulated datasets, one geography and era each, two
+\textbf{Scale.} Two lending datasets, one geography and era each, two
 primary models. These are mechanism-level findings: we show that a class of
 failure occurs and how it operates, not how often it occurs in the wild. The
-German data are a structural analogue under no US statute, and no ECOA
-conclusion is drawn from them.
+German data are a structural analogue from a different market and era, and no
+US conclusion is drawn from them.
 
 \textbf{No human subjects.} We make claims about what an audit reader would
 conclude without testing them on audit readers --- the natural next study, and
@@ -889,10 +872,10 @@ the main gap between this work and the stakeholder line it builds on
 \citep{luo2025,luo2026b}.
 
 \textbf{No causal or legal claims.} All metrics are associational; root-cause
-mapping is rule-based inference over metric values. ECOA, Regulation~B and the
-four-fifths convention appear as decision context. A disparate-impact ratio
-below $0.80$ is a screening signal, not a finding of unlawful discrimination
-\citep{barocas2016,wachter2021}.
+mapping is rule-based inference over metric values. Regulation appears in this
+paper only as the provenance of definitions and flags --- never as something
+we interpret --- and a disparate-impact ratio below $0.80$ is a screening
+signal, not a finding of discrimination \citep{barocas2016,wachter2021}.
 
 \textbf{Model limitations.} The German Credit classifier uses protected
 attributes as features (reported as a result, \S\ref{sec:treatment}); the
@@ -919,7 +902,7 @@ appendix~\ref{app:subsample} details this and the estimator choices.
 
 At the layer of the library, a constructor default decided which outcome of a
 loan is good, and reported the disadvantaged group as favoured. At the layer
-of the statute, an attribute banding decided which age question the audit
+of the definition, an attribute banding decided which age question the audit
 asked, and answered the wrong one cleanly; and at realistic audit sizes, the
 reporting policy --- floor, point, interval, shrinkage --- decided whether a
 violating subgroup was falsely cleared, silently omitted, or honestly left
@@ -931,14 +914,14 @@ two mechanical subscores, rewarding enumeration on answers instructed to be
 terse, manufactured most of a ``prompt sensitivity'' result we ourselves
 previously reported.
 
-Every one of these is the same event: a construct named in law or in
-documentation, operationalised as something adjacent, producing a clean
-number, recorded nowhere. The gap is not closable in general --- every
-measurement operationalises --- but it is \emph{recordable}, and
-\S\ref{sec:protocol} is the record this audit would have needed: the outcome,
-the interval, the $n$, the reference group, the statute, the reporting policy,
-and an adversarial test for every gate. None of it is technically difficult.
-All of it is currently optional, which is the problem.
+Every one of these is the same event: an intended, documented construct,
+operationalised as something adjacent, producing a clean number, recorded
+nowhere. The gap is not closable in general --- every measurement
+operationalises --- but it is \emph{recordable}, and \S\ref{sec:protocol} is
+the record this audit would have needed: the outcome, the interval, the $n$,
+the reference group, the definition's source, the reporting policy, and an
+adversarial test for every gate. None of it is technically difficult. All of
+it is currently optional, which is the problem.
 
 \begin{acks}
 We thank the maintainers of AIF360 and Fairlearn. Retrieved literature was
@@ -984,59 +967,6 @@ $0.8897$; Lending Club (synthetic gender; instrument-test setting only)
 \texttt{gender} $0.9931$, \texttt{income\_level} $1.0072$,
 \texttt{loan\_amount\_level} $1.0063$. Source:
 \texttt{artifacts/*/fairness/fairness\_summary.json}.
-
-\section{The statutory text}
-\label{app:statutes}
-
-Quoted verbatim so the paper's legal claims can be checked without leaving it.
-(An earlier draft of this project asserted that ``$40{+}$ aligns with US
-ECOA'' and that ``ECOA protects $62{+}$''; both are wrong, and both survived
-review because the text was not on the page.)
-
-\paragraph{15 U.S.C. \S1691(a)(1).} ``It shall be unlawful for any creditor to
-discriminate against any applicant, with respect to any aspect of a credit
-transaction --- (1) on the basis of race, color, religion, national origin,
-sex or marital status, or age (provided the applicant has the capacity to
-contract).''
-
-\paragraph{12 C.F.R. \S1002.2(o).} ``Elderly means age 62 or older.''
-
-\paragraph{12 C.F.R. \S1002.2(z).} ``Prohibited basis means race, color,
-religion, national origin, sex, marital status, or age (provided that the
-applicant has the capacity to enter into a binding contract); the fact that
-all or part of the applicant's income derives from any public assistance
-program; or the fact that the applicant has in good faith exercised any right
-under the Consumer Credit Protection Act or any state law upon which an
-exemption has been granted by the Bureau.''
-
-\paragraph{12 C.F.R. \S1002.6(b)(1).} ``Except as provided in the Act and this
-part, a creditor shall not take a prohibited basis into account in any system
-of evaluating the creditworthiness of applicants.''
-
-\paragraph{12 C.F.R. \S1002.6(b)(2).} ``(i) Except as permitted in this
-paragraph, a creditor shall not take into account an applicant's age (provided
-that the applicant has the capacity to enter into a binding contract) or
-whether an applicant's income derives from any public assistance program.
-(ii) In an empirically derived, demonstrably and statistically sound, credit
-scoring system, a creditor may use an applicant's age as a predictive
-variable, provided that the age of an elderly applicant is not assigned a
-negative factor or value. (iii) In a judgmental system of evaluating
-creditworthiness, a creditor may consider an applicant's age or whether an
-applicant's income derives from any public assistance program only for the
-purpose of determining a pertinent element of creditworthiness. (iv) In any
-system of evaluating creditworthiness, a creditor may consider the age of an
-elderly applicant when such age is used to favor the elderly applicant in
-extending credit.''
-
-\paragraph{29 C.F.R. \S1607.4(D) (EEOC; employment, not credit).} ``A
-selection rate for any race, sex, or ethnic group which is less than
-four-fifths (4/5) (or eighty percent) of the rate for the group with the
-highest rate will generally be regarded by the Federal enforcement agencies as
-evidence of adverse impact\ldots\ Greater differences in selection rate may
-not constitute adverse impact where the differences are based on small numbers
-and are not statistically significant, or where special recruiting or other
-programs cause the pool of minority or female candidates to be atypical of the
-normal pool of applicants from that group.''
 
 \section{Minimal reproduction of the favorable-label default}
 \label{app:repro}
