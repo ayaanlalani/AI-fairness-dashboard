@@ -20,9 +20,8 @@
 
 \begin{document}
 
-\title{Keeping Bias Out of Lending AI}
-\subtitle{Deterministic audits, LLM interpretation, and what the standard
-toolchain leaves to you}
+\title{The Metric Is Not the Statute}
+\subtitle{Construct validity at every layer of a fair lending audit}
 
 \author{Siddhant Jain}
 \affiliation{\institution{Simon Fraser University}\country{}}
@@ -39,81 +38,74 @@ toolchain leaves to you}
 
 Models now decide consumer installment credit and residential mortgage
 origination. Both are regulated --- ECOA and Regulation B govern both, the Fair
-Housing Act adds to mortgage. \textbf{What must a team actually do to keep bias
-out of a model in these sectors, how much of that does the standard fairness
-toolchain do for them, and can a language model safely do the rest?}
+Housing Act adds to mortgage --- so the constructs an audit must measure are
+written down. \textbf{At each layer of a fairness audit --- the metric library,
+the mapping to the statute, and the audit's own evaluation instruments ---
+does the quantity actually computed match the construct it is named for, and
+would anyone be able to tell from the output?}
 
 \section{Why it matters}
 
-Four decisions determine whether a lending audit is \emph{legally} meaningful:
-which outcome counts as favorable, who counts as protected, how much data
-supports each subgroup estimate, and against whom the comparison runs. Get any
-one wrong and the audit still runs, still emits a number, and still reads clean
---- the direction nobody re-examines. A false alarm costs a reviewer an
-afternoon; a false clearance closes the question and the applicant never learns
-why.
+Five decisions determine whether a lending audit is \emph{legally} meaningful:
+which outcome counts as favorable, who counts as protected, against whom the
+comparison runs, how much evidence supports each subgroup estimate, and which
+instruments check the audit's own components. Get any one wrong and the audit
+still runs, still emits a number, and still reads clean --- the direction
+nobody re-examines. A false alarm costs a reviewer an afternoon; a false
+clearance closes the question and the applicant never learns why.
 
 \section{What we did}
 
 A complete audit of both sectors on real data: 1{,}000 consumer credit and
 10{,}978 Georgia mortgage applications, every applicant scored out-of-fold by a
-model that never saw them. The architecture separates two jobs.
-
-\textbf{Deterministic layer.} Python owns every number: AIF360 computes the
-metrics, a fixed rule assigns severity. This is the ground truth.
-
-\textbf{LLM layer.} The model owns only interpretation --- who is affected, what
-mechanism, what remedy. It never recomputes a metric, and any number in its
-output absent from the given context is recorded as fabrication. Calculator, not
-oracle.
-
-\textbf{Benchmark.} Two tracks, kept separate. \emph{Track Q}: four prompt
-strategies per attribute, severity scored against the deterministic label.
-\emph{Track H}: narrative audits judged only on a checklist and rubric, never
-against the numbers. 98 calls, \$0.89, cumulative cost cap, offline replay
-without an API key.
+model that never saw them. Deterministic code owns every number (AIF360
+computes the metrics, a fixed rule assigns severity); a language model owns
+only interpretation and is scored against the deterministic label (98 calls,
+\$0.89, offline replay without an API key). We then audited the audit: a
+subsampling study --- $2{,}000$ draws at each of five audit sizes, five
+reporting policies, three reference-group conventions against the
+full-population table --- and a reanalysis of every automated check our own
+harness applies to model output.
 
 \section{How it is relevant}
 
-\textbf{The toolchain leaves the legal questions open.} Verified directly against
-AIF360 0.6 and Fairlearn 0.13: AIF360 defaults \texttt{favorable\_label=1.0}, so
-on a target named \texttt{loan\_default} it treats defaulting as the good
-outcome; Fairlearn exposes no favorable-label parameter at all. Neither library
-has \emph{any} concept of minimum subgroup size --- no floor, no warning, no
-guidance. Neither binds a protected class to a statute.
+\textbf{The library layer.} Verified directly against AIF360 0.6 and Fairlearn
+0.13: one AIF360 constructor defaults \texttt{favorable\_label=1.0}, so on a
+target named \texttt{loan\_default} it reports the disadvantaged group as
+\emph{favoured} ($1.2072$ vs.\ the oriented $0.9862$); and neither library
+ships an interval, an $n$, or a record of the reference group with a
+disaggregated ratio.
 
-\textbf{Intersectional cells stay unidentified even at full population.} Six of
-twelve HMDA race$\times$sex cells have no determinate severity band:
-\texttt{American Indian $\times$ Male} is $0.6734$ with a $95\%$ interval of
-$[0.45, 0.90]$ at $n{=}31$ --- consistent with a critical violation and with
-passing. Growing the audit fivefold did not resolve them. The defensible
-disparities are the large cells: Black women and men at $0.863$/$0.864$, intervals
-wholly below parity, which a point-estimate ranking demotes to sixth and seventh.
+\textbf{The statute layer.} Auditing age at $40{+}$ (ADEA, employment law)
+returns $0.9791$ --- clean. At $62{+}$, the line Regulation~B turns on, the
+same model over the same $10{,}978$ rows returns $\mathbf{0.8897}$, the
+largest age disparity present. And at the audit size we originally used
+($m{=}2{,}196$), the subsampling study shows a no-floor audit falsely clears a
+violating race$\times$sex cell in $\mathbf{83.8\%}$ of draws, while reporting
+floors never do --- because they misidentify the worst-treated group in
+$100\%$ of draws by never reporting it.
 
-\textbf{The statute matters more than the metric.} Auditing age at $40{+}$
-(ADEA, employment law) returns $0.9791$ --- clean. At $62{+}$, the cut ECOA
-specifies, the same model returns $\mathbf{0.8897}$: the largest age disparity
-present.
-
-\textbf{An LLM is a usable interpreter, not a usable measurer.} Aggregate
-agreement of $75\%$ decomposes to $33\%/92\%/100\%$ and tracks task difficulty
-rather than capability. Grounding the prompt in retrieved literature cut
-fabricated citations $16 \rightarrow 2$, a larger effect than any prompt
-strategy. Prompt sensitivity is generation-specific: spread across four
-strategies is $14.7$ points on \texttt{gpt-4o} and $\mathbf{0.0}$ on
-\texttt{gpt-5-mini}.
+\textbf{The instrument layer.} A refusal detector operationalising ``refusal''
+as \emph{under 40 characters} flagged six correct terse answers and
+contributed to permanently blocking a provider; a fabrication detector flagged
+arithmetic ($0.8888$ restated as $88.88\%$); and a reported cross-model
+prompt-sensitivity spread ($14.7$ vs.\ $0.0$ points) concentrates in the one
+prompt cycle whose correct answers are terse --- excluding it, $6.7$ ---
+so the published magnitude was partly our own scorer.
 
 \section{How it applies}
 
 \textbf{1.} State the favorable outcome explicitly; never accept the default.
-\textbf{2.} Audit the book, not a test split --- in mortgage, HMDA already
-requires filing it. \textbf{3.} Put the statute citation beside the threshold in
-code: ECOA $62{+}$, not ADEA $40{+}$; note that \S1002.6(b)(2) permits
-\emph{favouring} elderly applicants, so a ratio above 1 is lawful and a symmetric
-metric cannot express that. \textbf{4.} Publish what was suppressed, with $n$ and
-the unreported ratio. \textbf{5.} Record the reference group beside every ratio.
-\textbf{6.} Let the model interpret, never compute, and score it against numbers
-it cannot move.
+\textbf{2.} Report the interval, the $n$, and the reference group beside every
+ratio, and publish what any floor suppressed. \textbf{3.} Put the statute
+citation beside the threshold in code: Reg.~B turns on $62{+}$, not ADEA
+$40{+}$; \S1002.6(b)(2)(iv) permits \emph{favouring} elderly applicants, which
+a symmetric ratio cannot express. \textbf{4.} Treat every mechanical gate as a
+hypothesis to falsify, starting where the correct answer is unusual.
+\textbf{5.} Audit the book, not a test split, and disclose population
+construction. \textbf{6.} Name the reporting policy --- floor, interval, or
+shrinkage is a choice among failure modes: silence, abstention, or confident
+clearance.
 
 \section{The proof}
 
@@ -124,16 +116,16 @@ it cannot move.
 \toprule
 \textbf{Claim} & \textbf{Where to check it}\\
 \midrule
-AIF360 default inverts a risk target & Minimal repro: default $1.2072$ vs.\ correct $0.9862$; \path{RESULTS.md}\\
-6/12 cells band-indeterminate & \path{scripts/interval_estimates.py}\\
-ECOA $0.8897$ vs.\ banded $0.9791$ & \path{hmda/fairness/fairness_summary.json}\\
-Agreement $33/92/100$; grounding $16{\rightarrow}2$ & \path{consolidated/track_q_analysis.json}\\
-Cross-model spread $14.7$ vs.\ $0.0$ & \path{llm_benchmark/gpt-5-mini/}\\
-\$0.8933 over 98 calls & \path{llm_benchmark/spend_ledger.json}\\
+AIF360 default inverts a risk target & pinned repro: default $1.2072$ vs.\ oriented $0.9862$; \path{scripts/aif360_default_repro.py}\\
+False clearance $83.8\%$ at $m{=}2{,}196$; floors wrong $100\%$ & \path{scripts/subsample_study.py}\\
+6/12 cells band-indeterminate; $0.6734$ $[0.45,0.90]$ at $n{=}31$ & \path{scripts/interval_estimates.py}\\
+Banded $0.9791$ vs.\ $62{+}$ $0.8897$ (same $10{,}978$ applicants) & \path{hmda/fairness/fairness_summary.json}\\
+$45.1\%$ attrition; Race Not Available $= 20.7\%$ of raw file & \path{scripts/hmda_attrition.py}\\
+Spread $14.7 \to 6.7$ excl.\ the terse cycle & \path{scripts/recheck_prompt_sensitivity.py}\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent 60 tests, CI green; the deterministic layer regenerates with no API key.
+\noindent 86 tests, CI green; the deterministic layer regenerates with no API key.
 
 \end{document}

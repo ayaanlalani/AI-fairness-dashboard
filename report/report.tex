@@ -4,11 +4,11 @@
 % NOT THE PRIMARY PAPER. report/report_facct.tex is primary (FAccT/ACM format,
 % built with `make paper-facct`). The two are not two formats of one paper and
 % should not be merged: this document argues the benchmark is a reusable
-% artifact; report_facct.tex argues that fairness audit infrastructure encodes
-% normative commitments which surface as penalties on the correct answer, and
-% treats the benchmark as method. Both draw their numbers from
-% artifacts/consolidated/FINDINGS.md, so a results change must be applied to
-% both. They share report/refs.bib.
+% artifact; report_facct.tex is the construct-validity paper ("the metric is
+% not the statute") and treats the benchmark as method. Both draw their
+% numbers from artifacts/consolidated/RESULTS.md (which supersedes FINDINGS.md
+% in part), so a results change must be applied to both. They share
+% report/refs.bib.
 %
 % The course-report version of this document is preserved verbatim at
 % report/report_course.tex for provenance.
@@ -65,14 +65,14 @@ Credit), mortgage origination (HMDA Georgia), and peer-to-peer default risk
 metric and assigns every severity label, and the LLM is scored only on its
 interpretation of that fixed context. The benchmark ships 36 frozen prompts, a
 no-API-key replay path, two anti-hallucination detectors, and an enforced
-cumulative cost cap; full reproduction costs \$0.71. Our results argue against
+cumulative cost cap; full reproduction cost \$0.89 across 98 calls. Our results
+argue against
 the summary statistic our own benchmark produces. Aggregate severity agreement
 for \texttt{gpt-4o} is 75\%, but it decomposes to 33\%, 92\%, and 100\% across
 the three use cases, and that ordering tracks how discriminating each underlying
 classifier is rather than model capability. Three of nine attribute pairs
 changed severity label across four prompt strategies on identical input.
-Embedding retrieved literature in the prompt cut fabricated citations from 16 to
-2 like-for-like. We also report two findings against our own instruments: a
+We also report two findings against our own instruments: a
 refusal detector that flagged six correct terse answers as refusals, and a
 guardrail that penalised the epistemically correct response to an $n{=}6$
 subgroup. Separately, a metric-orientation error --- computing selection rates
@@ -210,36 +210,44 @@ a persisted ledger makes the cap hold across the separate per-dataset runs.
 
 \section{Results}
 
-\subsection{UC1 German Credit: the marginal view hides the finding}
+\subsection{UC1 German Credit: the intersectional reading needs the full population}
 
-All three marginal DI values clear the four-fifths screen (sex $0.8595$, age
-$0.8212$, foreign worker $0.9402$). The intersection does not:
-\textbf{\texttt{under\_40}\,$\times$\,\texttt{female} has DI $0.6087$}
-($n{=}46$), below the $0.72$ \textsc{critical} threshold that \emph{neither
-marginal attribute approaches}. Auditing sex and age separately returns three
-passes and misses the disadvantaged group.
+All three marginal DI values clear the four-fifths screen on the full
+population (sex $0.8888$, age $0.9258$, foreign worker $0.8387$). An earlier
+revision of this benchmark, auditing a $200$-row held-out split, reported
+\texttt{under\_40}\,$\times$\,\texttt{female} at DI $0.6087$ ($n{=}46$) as a
+critical intersectional finding; over all $1{,}000$ applicants the same cell
+reads $\mathbf{0.8201}$ with a $95\%$ interval of $[0.697, 1.003]$ ($n{=}241$)
+--- clearing the screen, with a band the audit cannot determine. The
+split-size number was an artifact of the audited population, and its
+correction is itself benchmark evidence: intersectional cells at held-out-split
+size mislead in \emph{both} directions.
 
 The foreign-worker result is not a finding. Its privileged group has
-\textbf{six records}, under the reporting floor, and the marginal is dominated by
-the $n{=}194$ side. \emph{Decision-context reading:} for a loan officer, "this
-model passes on sex and age" and "this model denies young women at $0.61$ the
-rate of older women" are different operational facts, and only the second is
-actionable.
+\textbf{six records}, under the reporting floor, and the marginal is dominated
+by the majority side. \emph{Decision-context reading:} a loan officer acting
+on the split-sized audit would have investigated a disparity that the full
+book does not support; the operational fact is the uncertainty, and only an
+interval reports it.
 
-\subsection{UC2 HMDA: same lesson, different mechanism}
+\subsection{UC2 HMDA: what the full population can and cannot support}
 
-\texttt{Black}\,$\times$\,\texttt{Female} ($n{=}410$) reaches DI $0.7821$
-against \texttt{Asian}\,$\times$\,\texttt{Male} ($n{=}130$), with a joint disparity exceeding both
-marginals; both cells are adequately sized. The error profile is diagnostic:
-race DI $0.8956$ is the weakest marginal ratio while $\mathrm{EOD}=0.0025$ and
-$\mathrm{AOD}=0.0117$ are approximately zero. The model is \emph{not} making
-differentially worse errors by race --- it is reproducing a base-rate difference
-already present in the labels.
+Over all $10{,}978$ applicants, six of twelve
+\texttt{race}\,$\times$\,\texttt{sex} cells have no determinate severity band:
+the lowest point estimate, \texttt{American Indian}\,$\times$\,\texttt{Male}
+at $0.6734$ ($n{=}31$), carries a $95\%$ interval of $[0.453, 0.904]$ ---
+consistent with a critical violation and with clearing the screen. The
+disparities the data defensibly support are the large cells:
+\texttt{Black}\,$\times$\,\texttt{Female} at $0.8632$ $[0.806, 0.937]$
+($n{=}1{,}994$) and \texttt{Black}\,$\times$\,\texttt{Male} at $0.8643$
+$[0.805, 0.940]$ ($n{=}1{,}707$), intervals wholly below parity, which a
+point-estimate ranking demotes to sixth and seventh. Marginal race DI is
+$0.9371$.
 
-\emph{Decision-context reading:} this distinction determines who owns the fix.
-Differential error is a modelling problem; base-rate bias is a policy and data
-problem upstream of the model, and an equalised-odds post-processor would target
-a defect this model does not have.
+\emph{Decision-context reading:} the actionable finding is the precisely
+estimated $0.86$ disparity against Black applicants, not the noisier extreme
+cells a ranked table would surface first; the companion FAccT paper quantifies
+how often each reporting policy gets this wrong at realistic audit sizes.
 
 \subsection{UC3 Lending Club: a corrected artifact and an honest null}
 \label{sec:orientation}
@@ -305,7 +313,12 @@ tool; over-escalation costs review time, not a missed finding.
 strategies on identical input context} (Figure~\ref{fig:matrix}). Same model,
 same numbers, different phrasing, different verdict. This --- not the agreement
 rate --- is the core reliability result, and it is why we do not recommend
-letting a model \emph{set} a severity label.
+letting a model \emph{set} a severity label. One caution on reading the
+\emph{score} column: reanalysis of the frozen records shows cycle-level mean
+scores dip on the \texttt{constrained} strategy because the completeness and
+severity-agreement subscores penalise instructed terseness, so score
+differences between cycles partly measure the scorer; the label changes above
+are model outputs and do not inherit that artifact.
 
 \begin{figure}[t]
 \centering
@@ -316,37 +329,34 @@ alone moved the verdict.}
 \label{fig:matrix}
 \end{figure}
 
-\paragraph{Grounding suppresses fabrication.}
-Comparing like-for-like on the two use cases also covered by an earlier
-ungrounded run --- same model, same attributes, differing only in whether
-retrieved literature was embedded --- fabricated citations fall from
-\textbf{16 to 2} and mean score rises from $69.08$ to $76.67$
-(Figure~\ref{fig:grounding}). Retrieval grounding is doing more for factuality
-here than prompt engineering is.
+\paragraph{Grounding: a legacy contrast, not an ablation.}
+An earlier ungrounded run showed many more fabricated-citation flags than the
+frozen grounded run, but the two runs straddle a pipeline revision --- leak
+removal, full-population re-run, an added attribute --- so the metric inputs
+changed alongside the grounding, and no effect size should be quoted until a
+clean ablation holding the pipeline fixed has been run.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.86\textwidth]{track_q_grounding_effect.png}
-\caption{Embedding retrieved Semantic Scholar evidence in the prompt cut
-fabricated citations roughly eight-fold on the two use cases common to both
-runs.}
-\label{fig:grounding}
-\end{figure}
-
-\paragraph{Provider capability dominates.}
-On the identical harness, Gemini 2.5 Flash refused 19 of 24 cycles with mean
-score $19.79$. A benchmark of this shape measures provider capability at least
-as much as method, which bounds how much any single-model result should be
-generalised.
+\paragraph{Provider comparison requires separating transport from behaviour.}
+On the identical harness, the refusal detector flagged 19 of 24 Gemini 2.5
+Flash cycles --- but 18 of the 24 records are \emph{empty API results}, which
+the 40-character rule counts as refusals, and four of those empty records
+still scored $10.0$ through a scoring default. The provider means are $19.79$
+over all records, $47.50$ excluding zero scores, and $72.50$ over the six
+content-bearing records. A benchmark of this shape measures provider
+\emph{availability} at least as much as capability, which bounds how much any
+single-model result should be generalised.
 
 \subsection{Track H: audit quality}
 
 Three narrative audits (o3, three self-refinement cycles each) passed $13/15$
 mechanical guardrail gates and $13/15$ H1--H5 criteria, with \textbf{27/27
-citations verified} against the retrieved evidence pool. A cross-model rubric
-judge (\texttt{gpt-4o} grading o3) scored $4.8$, $4.7$, and $5.0$ out of $5$; we
-report this as secondary evidence, since an LLM grading an LLM is weaker than a
-mechanical gate.
+citations verified} against the retrieved evidence pool. A rubric judge
+(\texttt{gpt-4o} grading o3's narratives) scored $4.8$, $4.7$, and $5.0$ out of
+$5$; the benchmark's own architecture scores models against deterministic
+labels rather than another model's opinion, so we quote those rubric numbers
+only to disclose them --- the companion FAccT paper excludes them as an
+unvalidated operationalisation of ``quality'' --- and rest Track H's claims on
+the mechanical gates alone.
 
 Qualitatively, the narrative form supplied things the deterministic template
 cannot. On foreign worker it reproduced the $n{=}6$ caveat and quantified it:
@@ -397,16 +407,18 @@ The defensible division of labour is the one the benchmark enforces:
 \emph{deterministic code owns the numbers and the thresholds; the model owns the
 interpretation; and the interpretation is gated on evidence the model did not
 invent.} Track Q supports the first clause --- severity labels move under
-paraphrase --- and the 16-to-2 fabrication result supports the third.
+paraphrase --- and the citation-verification gate supports the third.
 
-Two implications for practice. First, marginal-only auditing, which is the
-common case, systematically misses intersectional harm: in UC1 every marginal
-passes while the joint group sits at $0.6087$. Second, threshold-as-gate reading
-destroys information. UC2's race result means label bias, not model error; UC3's
-null means the model is not deciding anything yet. Both are invisible if DI is
-read as pass/fail --- which is how it tends to be used, and what
-\citet{stumpf2024} and \citet{kim2025} identify as the gap between fairness
-metrics and the assessments practitioners actually need.
+Two implications for practice. First, point-estimate auditing of small
+intersectional cells misleads in both directions: UC1's split-sized audit
+manufactured a critical joint-group finding the full book does not support,
+and UC2's full-population table shows the defensible disparity demoted to
+sixth place by a ranked point-estimate reading. Second, threshold-as-gate
+reading destroys information. UC2's determinate cells mean a real $0.86$
+disparity; UC3's null means the model is not deciding anything yet. Both are
+invisible if DI is read as pass/fail --- which is how it tends to be used, and
+what \citet{stumpf2024} and \citet{kim2025} identify as the gap between
+fairness metrics and the assessments practitioners actually need.
 
 \section{Limitations}
 
