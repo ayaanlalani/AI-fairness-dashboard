@@ -1,12 +1,13 @@
-% overview.tex — one page, six sections: question, why it matters, what we did,
-% relevance, application, proof. Companion to report_facct.tex.
+% overview.tex — one page, five sections: question, result, meaning, method,
+% what to record, proof. Companion to report_facct.tex.
 % Build: make overview
 %
 % CONSTRAINT: exactly one page. It is full. To add anything, cut something else.
 %
-% FRAMING: our pipeline is not the status quo. Claims about standard practice are
-% restricted to what was verified directly in AIF360 0.6 / Fairlearn 0.13.
-% Findings are stated as findings, not as a project narrative.
+% FRAMING: lead with the result and its meaning (user feedback 2026-08-10:
+% "unclear what the result is and what it means"). No legal stance; regulation
+% appears only as provenance of definitions and flags. Claims about standard
+% practice are restricted to what was verified in AIF360 0.6 / Fairlearn 0.13.
 
 \documentclass[sigconf,nonacm]{acmart}
 
@@ -36,78 +37,65 @@
 
 \section{The question}
 
-Models now decide consumer installment credit and residential mortgage
-origination --- a setting where the constructs an audit must measure come with
-written definitions and published flags. \textbf{At each layer of a fairness
-audit --- the metric library, the mapping from attribute to construct, and
-the audit's own evaluation instruments --- does the quantity actually
-computed match the construct it is named for, and would anyone be able to
-tell from the output?}
+When a fairness audit prints a number --- ``disparate impact $0.94$'' --- does
+that number measure what its name says? We built a complete fairness audit of
+consumer credit and mortgage models ($1{,}000$ and $10{,}978$ real
+applications, every applicant scored out-of-fold), and then audited the audit.
 
-\section{Why it matters}
+\section{The result}
 
-Five decisions determine whether an audit's numbers mean what its readers
-take them to mean:
-which outcome counts as favorable, who counts as protected, against whom the
-comparison runs, how much evidence supports each subgroup estimate, and which
-instruments check the audit's own components. Get any one wrong and the audit
-still runs, still emits a number, and still reads clean --- the direction
-nobody re-examines. A false alarm costs a reviewer an afternoon; a false
-clearance closes the question and the applicant never learns why.
+\textbf{Nine measurements in one ordinary audit computed something other than
+the construct they were named for --- and every one produced a clean,
+reassuring output.} The four sharpest:
 
-\section{What we did}
+\textbf{(1)} A library constructor default (\texttt{favorable\_label=1.0},
+AIF360 0.6) decides which outcome of a loan is \emph{good}. On a
+default-coded target it reports the disadvantaged group as favoured:
+$\mathrm{DI}=1.2072$ where the oriented value is $0.9862$.
 
-A complete audit of both sectors on real data: 1{,}000 consumer credit and
-10{,}978 Georgia mortgage applications, every applicant scored out-of-fold by a
-model that never saw them. Deterministic code owns every number (AIF360
-computes the metrics, a fixed rule assigns severity); a language model owns
-only interpretation and is scored against the deterministic label (98 calls,
-\$0.89, offline replay without an API key). We then audited the audit: a
-subsampling study --- $2{,}000$ draws at each of five audit sizes, five
-reporting policies, three reference-group conventions against the
-full-population table --- and a reanalysis of every automated check our own
-harness applies to model output.
+\textbf{(2)} The age attribute decides which age question is asked. Banded at
+$40{+}$ (a threshold imported from employment practice) the model reads
+$0.9791$ --- clean. On the $62{+}$ boundary the mortgage data ship a dedicated
+flag for, \emph{the same model over the same people} reads $\mathbf{0.8897}$,
+the largest age disparity present. The public age bands straddle 62, so no
+banded attribute can ever see it.
 
-\section{How it is relevant}
+\textbf{(3)} The reporting policy decides what small groups can do to the
+verdict. At the audit size we first used ($m{=}2{,}196$ of $10{,}978$),
+$2{,}000$ resampled audits show: point estimates falsely clear a
+truly-violating subgroup in $\mathbf{83.8\%}$ of draws; reporting floors never
+false-clear but name the wrong worst-treated group in $\mathbf{100\%}$
+(they never report it); honest intervals must abstain in $90.3\%$.
+\emph{Every} policy that shows small cells is usually wrong; every policy
+that hides them is silently blind.
 
-\textbf{The library layer.} Verified directly against AIF360 0.6 and Fairlearn
-0.13: one AIF360 constructor defaults \texttt{favorable\_label=1.0}, so on a
-target named \texttt{loan\_default} it reports the disadvantaged group as
-\emph{favoured} ($1.2072$ vs.\ the oriented $0.9862$); and neither library
-ships an interval, an $n$, or a record of the reference group with a
-disaggregated ratio.
+\textbf{(4)} Our own checking instruments did it too: a refusal detector
+defining refusal as \emph{under 40 characters} flagged six correct terse
+answers and helped block a provider, and most of a cross-model ``prompt
+sensitivity'' spread ($14.7$ vs.\ $0.0$ points) came from our scorer
+penalising instructed brevity --- excluding that cycle, $6.7$.
 
-\textbf{The definition layer.} Auditing age at $40{+}$ --- a threshold
-imported from employment practice --- returns $0.9791$: clean. At $62{+}$,
-the boundary the mortgage data ship a dedicated flag for, the same model over
-the same $10{,}978$ rows returns $\mathbf{0.8897}$, the largest age disparity
-present. And at the audit size we originally used
-($m{=}2{,}196$), the subsampling study shows a no-floor audit falsely clears a
-violating race$\times$sex cell in $\mathbf{83.8\%}$ of draws, while reporting
-floors never do --- because they misidentify the worst-treated group in
-$100\%$ of draws by never reporting it.
+\section{What it means}
 
-\textbf{The instrument layer.} A refusal detector operationalising ``refusal''
-as \emph{under 40 characters} flagged six correct terse answers and
-contributed to permanently blocking a provider; a fabrication detector flagged
-arithmetic ($0.8888$ restated as $88.88\%$); and a reported cross-model
-prompt-sensitivity spread ($14.7$ vs.\ $0.0$ points) concentrates in the one
-prompt cycle whose correct answers are terse --- excluding it, $6.7$ ---
-so the published magnitude was partly our own scorer.
+The number cannot tell you which of these happened to it. All nine audits ran
+correctly and printed clean results; which conclusion you get is fixed
+upstream, by choices --- label orientation, attribute banding, reporting
+policy, reference group, detector thresholds --- that are made silently and
+appear nowhere in the output. Two consequences. \textbf{A disaggregated
+fairness number is uninterpretable without its measurement record}: the same
+data honestly support ``worst cell $0.67$,'' ``worst cell $0.90$,'' or ``worst
+cell unknowable,'' depending on unrecorded choices. And \textbf{the errors
+point one way}: false clearance --- the reassuring, unre-examined direction
+--- in every instance we measured.
 
-\section{How it applies}
+\section{What an audit must record}
 
-\textbf{1.} State the favorable outcome explicitly; never accept the default.
-\textbf{2.} Report the interval, the $n$, and the reference group beside every
-ratio, and publish what any floor suppressed. \textbf{3.} Put the
-definition's source beside the threshold in code --- a comment asserting the
-wrong provenance for $40{+}$ survived review because it looked authoritative.
-\textbf{4.} Treat every mechanical gate as a
-hypothesis to falsify, starting where the correct answer is unusual.
-\textbf{5.} Audit the book, not a test split, and disclose population
-construction. \textbf{6.} Name the reporting policy --- floor, interval, or
-shrinkage is a choice among failure modes: silence, abstention, or confident
-clearance.
+The favorable outcome, stated explicitly. The interval, $n$, and reference
+group beside every ratio, plus every suppressed cell. The definition's source
+beside every threshold. The reporting policy by name. Population construction
+(we dropped $45.1\%$ of the raw file before any metric ran). And an
+adversarial test for every mechanical gate, starting where the correct answer
+is unusual. None of this is hard; all of it is currently optional.
 
 \section{The proof}
 
@@ -118,12 +106,12 @@ clearance.
 \toprule
 \textbf{Claim} & \textbf{Where to check it}\\
 \midrule
-AIF360 default inverts a risk target & pinned repro: default $1.2072$ vs.\ oriented $0.9862$; \path{scripts/aif360_default_repro.py}\\
-False clearance $83.8\%$ at $m{=}2{,}196$; floors wrong $100\%$ & \path{scripts/subsample_study.py}\\
+(1) default $1.2072$ vs.\ oriented $0.9862$ & pinned repro: \path{scripts/aif360_default_repro.py}\\
+(2) banded $0.9791$ vs.\ $62{+}$ $0.8897$ (same $10{,}978$ applicants) & \path{hmda/fairness/fairness_summary.json}\\
+(3) false clearance $83.8\%$; floors wrong $100\%$; abstention $90.3\%$ & \path{scripts/subsample_study.py}\\
+(4) spread $14.7 \to 6.7$ excl.\ the terse cycle; 6 flags, 0 refusals & \path{scripts/recheck_prompt_sensitivity.py}\\
 6/12 cells band-indeterminate; $0.6734$ $[0.45,0.90]$ at $n{=}31$ & \path{scripts/interval_estimates.py}\\
-Banded $0.9791$ vs.\ $62{+}$ $0.8897$ (same $10{,}978$ applicants) & \path{hmda/fairness/fairness_summary.json}\\
-$45.1\%$ attrition; Race Not Available $= 20.7\%$ of raw file & \path{scripts/hmda_attrition.py}\\
-Spread $14.7 \to 6.7$ excl.\ the terse cycle & \path{scripts/recheck_prompt_sensitivity.py}\\
+$45.1\%$ attrition before any metric & \path{scripts/hmda_attrition.py}\\
 \bottomrule
 \end{tabular}
 \end{table}
